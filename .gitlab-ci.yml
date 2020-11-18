@@ -1,0 +1,52 @@
+stages:
+  - build
+  - release
+
+build:
+  stage: build
+  tags:
+    - k8s-root
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA} .
+    - docker push ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
+    - mkdir .images
+    - echo "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}" > .images/my-nginx
+  artifacts:
+    paths:
+      - .images/my-nginx
+  only:
+    refs:
+      - master
+
+.release:
+  stage: release
+  image: registry.met.no/k8s/tools/kustomize-cd:0.4.0
+  tags:
+    - k8s-unpriv
+  only:
+    refs:
+      - master
+  variables:
+    EXCLUDE_MAINTAINERS: '["miguelsn", "audunmg", "sebastianj"]'
+    ENVIRONMENT: "staging"
+    AUTO_RELEASE: "true"
+  script:
+    - release --repo https://gitlab.met.no/k8s/mal/test-tjeneste.git 
+        --access-token "${TJENESTE_ACCESS_TOKEN}" 
+        --automatic "$AUTO_RELEASE"
+        --environment "$ENVIRONMENT" 
+        --updates-dir .images 
+        --exclude-maintainers "$EXCLUDE_MAINTAINERS"
+
+staging:
+  extends: .release
+  variables:
+    ENVIRONMENT: "staging"
+    AUTO_RELEASE: "true"
+
+production:
+  extends: .release
+  variables:
+    ENVIRONMENT: "production"
+    AUTO_RELEASE: "false"
