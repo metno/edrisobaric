@@ -7,46 +7,18 @@ build:
   tags:
     - k8s-root
   script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build -t ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA} .
-    - docker push ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
-    - mkdir .images
-    - echo "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}" > .images/my-nginx
-  artifacts:
-    paths:
-      - .images/my-nginx
-  only:
-    refs:
-      - master
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    - docker build -t "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}" .
+    - docker push "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}"
+  rules: &buildrules
+    - if: '$CI_COMMIT_TAG =~ /^v[0-9]/'
 
-.release:
+tjenester/PROJECTNAME:
   stage: release
-  image: registry.met.no/k8s/tools/kustomize-cd:0.4.0
-  tags:
-    - k8s-unpriv
-  only:
-    refs:
-      - master
+  rules: *buildrules
   variables:
-    EXCLUDE_MAINTAINERS: '["miguelsn", "audunmg", "sebastianj"]'
-    ENVIRONMENT: "staging"
-    AUTO_RELEASE: "true"
-  script:
-    - release --repo https://gitlab.met.no/k8s/mal/test-tjeneste.git 
-        --access-token "${TJENESTE_ACCESS_TOKEN}" 
-        --automatic "$AUTO_RELEASE"
-        --environment "$ENVIRONMENT" 
-        --updates-dir .images 
-        --exclude-maintainers "$EXCLUDE_MAINTAINERS"
-
-staging:
-  extends: .release
-  variables:
-    ENVIRONMENT: "staging"
-    AUTO_RELEASE: "true"
-
-production:
-  extends: .release
-  variables:
-    ENVIRONMENT: "production"
-    AUTO_RELEASE: "false"
+    UPSTREAM_CI_COMMIT_SHA: "${CI_COMMIT_SHA}"
+    UPSTREAM_CI_PROJECT_PATH: "${CI_PROJECT_PATH}"
+    UPSTREAM_CI_PROJECT_URL: "${CI_PROJECT_URL}"
+    UPSTREAM_IMAGES: "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}"
+  trigger: ${CI_JOB_NAME}
