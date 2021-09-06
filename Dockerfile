@@ -1,4 +1,4 @@
-FROM alpine:3.12
+FROM registry.met.no/baseimg/alpine:latest
 
 COPY files/ /
 
