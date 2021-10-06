@@ -18,5 +18,5 @@ Now you are ready to clone the new repository to your computer and start creatin
 
 **Note**: The CI/CD pipeline is only run on commits that have a tag, the default rule follows the [Semantic Versioning 2](https://semver.org/) standard of `major, minor, patch`: `v0.0.1`
 
-The Deploy step in the pipeline requires you to update `tjenester/PROJECTNAME` with the kubernetes projectname you want to deploy to. All active kubernetes projectnames are listed here https://gitlab.met.no/tjenester/.
+The release step in the pipeline requires you to update `tjenester/PROJECTNAME` with the kubernetes projectname you want to deploy to. All active kubernetes projectnames are listed here https://gitlab.met.no/tjenester/.
 > Please replace/update the contents of this README with documentation for your project when appropriate.
