@@ -24,7 +24,7 @@ def build_gribfile_name(data_path: str, time: datetime = None) -> str:
 def validate_gribfile(data_path: str, fname: str) -> bool:
     """ Fetch latest grib-file """
     if not os.path.isfile(data_path + os.pathsep + fname):
-        logger.info("Datafile with name %s not found", fname)
+        print("Datafile with name %s not found", fname)
         return False
     return True
 

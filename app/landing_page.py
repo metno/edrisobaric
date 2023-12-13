@@ -17,7 +17,9 @@ def create_landing_page() -> dict:
         description = "An EDR API for isobaric data from Grib files",
         links = [
             Link(href=f"{BASE_URL}", rel="self", type="application/json",
-                title = "Landing Page")
+                title = "Landing Page"),
+        Link(href=f"{BASE_URL}conformance", rel="conformance", type="application/json",
+            title = "Conformance document")
         ],
         keywords = [
             "position",

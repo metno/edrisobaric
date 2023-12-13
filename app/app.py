@@ -6,6 +6,7 @@ import xarray as xr
 from fastapi import FastAPI
 
 import landing_page
+import conformance
 import grib
 from initialize import get_filename, get_data_path, get_base_url
 
@@ -50,6 +51,18 @@ async def startup_event():
 async def root():
     """ Reply to / """
     return landing_page.create_landing_page()
+
+
+@app.get("/conformance")
+async def get_conformance():
+    """ Conformance """
+    return conformance.create_conformance_page()
+
+
+@app.get("/collections")
+async def get_collections():
+    """ Collections """
+    return "Collections"
 
 
 if __name__ == "__main__":
