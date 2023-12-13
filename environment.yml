@@ -1,0 +1,12 @@
+name: edriso
+channels:
+  - conda-forge
+dependencies:
+  - fastapi[all]
+  - uvicorn[standard]
+  - xarray
+  - pynio
+  - pandas
+  - pip
+  - pip:
+    - edr-pydantic
