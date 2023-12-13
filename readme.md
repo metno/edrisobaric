@@ -41,3 +41,9 @@ will give these URLs:
 
 - <https://api.met.no/weatherapi/isobaricgrib/1.0/documentation>
 - <https://spire.com/tutorial/spire-weather-tutorial-intro-to-processing-grib2-data-with-python/>
+
+### Other APIs for comparison
+
+- <https://opendata.fmi.fi/edr/>
+- <https://labs.metoffice.gov.uk/edr/>
+- <https://developer.dataplatform.knmi.nl/edr-api>

@@ -19,7 +19,9 @@ def create_landing_page() -> dict:
             Link(href=f"{BASE_URL}", rel="self", type="application/json",
                 title = "Landing Page"),
         Link(href=f"{BASE_URL}conformance", rel="conformance", type="application/json",
-            title = "Conformance document")
+            title = "Conformance document"),
+        Link(href=f"{BASE_URL}collections", rel="data", type="application/json",
+            title = "Collections metadata in JSON"),
         ],
         keywords = [
             "position",
