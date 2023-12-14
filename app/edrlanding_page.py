@@ -23,19 +23,17 @@ def create_landing_page() -> dict:
         Link(href=f"{BASE_URL}collections", rel="data", type="application/json",
             title = "Collections metadata in JSON"),
         ],
-        keywords = [
-            "position",
-            "area",
-            "weather",
-            "data",
-            "api"
-        ],
         provider = Provider(
-            name = "met.no",
-            url = "https://met.no/"
+            name = "Meteorologisk institutt / The Norwegian Meteorological Institute",
+            url = "https://api.met.no/"
         ),
         contact = Contact(
-            email = "example@example.com",
+            email = "api-users-request@lists.met.no",
+            phone = "+47.22963000",
+            postalCode = "0313",
+            city = "Oslo",
+            address = "Henrik Mohns plass 1",
+            country = "Norway",
         )
     )
 

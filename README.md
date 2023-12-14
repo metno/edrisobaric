@@ -1,4 +1,4 @@
-# EDR-isobaricgrib
+# EDR-isobaric-grib
 
 [OGC Environmental Data Retrieval (EDR) API](https://ogcapi.ogc.org/edr/) interface for isobaric grib2 files from <https://api.met.no/weatherapi/isobaricgrib/1.0/documentation>.
 
@@ -8,7 +8,7 @@ Alpha
 
 ## Requirements
 
-Based on <https://github.com/KNMI/edr-pydantic> and <https://gitlab.met.no/met/mapp/trapp/trapp-api>
+Based on [edr-pydantic](https://github.com/KNMI/edr-pydantic) and [trapp-api](https://gitlab.met.no/met/mapp/trapp/trapp-api).
 
 ## Install
 
@@ -16,6 +16,8 @@ Based on <https://github.com/KNMI/edr-pydantic> and <https://gitlab.met.no/met/m
 mamba env create -f environment.yml
 conda activate edriso
 ```
+
+(Pynio is only available from conda, edr-pydantic only from pip. Conda can use pip.)
 
 ## Usage
 
@@ -31,11 +33,18 @@ will give these URLs:
 
 ## TODO
 
-- Config? Or just use parameters
+### EDR
+
+- Instance should be file/date?
+- Show only available date, or fetch others if asked?
+
+### Code
+
+- Move to github
+- Config? Or just use parameters? Filename is currently hardcoded.
 - Clean old datafiles
-- Split code in files
-- Replace cgi, it's deprecated
-- Silence unrelated warnings
+- Replace cgi module, it's deprecated
+- Temporal extent is fetched (poorly) from filename
 
 ## References
 
