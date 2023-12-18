@@ -14,11 +14,11 @@ from shapely import wkt
 from covjson_pydantic.coverage import Coverage
 from covjson_pydantic.domain import Domain, Axes, ValuesAxis, DomainType
 from covjson_pydantic.ndarray import NdArray
-# import numpy as np
-# import xarray as xr
+from covjson_pydantic.reference_system import ReferenceSystem, ReferenceSystemConnectionObject
 
 from initialize import get_base_url, get_temporal_extent, get_dataset, \
     TEMPERATURE_LABEL, LAT_LABEL, LON_LABEL, UWIND_LABEL, VWIND_LABEL
+
 
 @lru_cache
 def create_collections_page(url: str, instance_id: str = "") -> dict:
@@ -162,8 +162,8 @@ def create_data(coords: str = "") -> dict:
     ds = get_dataset()
 
     # Sanity checks on coordinates
-    print("ds[TIMELABEL][LAT_LABEL].values.max", ds[TEMPERATURE_LABEL][LAT_LABEL].values.max())
-    print("ds[TIMELABEL][LAT_LABEL].values.min", ds[TEMPERATURE_LABEL][LAT_LABEL].values.min())
+    # print("ds[TIMELABEL][LAT_LABEL].values.max", ds[TEMPERATURE_LABEL][LAT_LABEL].values.max())
+    # print("ds[TIMELABEL][LAT_LABEL].values.min", ds[TEMPERATURE_LABEL][LAT_LABEL].values.min())
     if point.y > ds[TEMPERATURE_LABEL][LAT_LABEL].values.max() \
         or point.y < ds[TEMPERATURE_LABEL][LAT_LABEL].values.min():
         print(f"Error, point.y ({point.y}) is outside data min/max \
@@ -175,30 +175,125 @@ def create_data(coords: str = "") -> dict:
             {ds[TEMPERATURE_LABEL][LON_LABEL].values.min()}/{ds[TEMPERATURE_LABEL][LON_LABEL].values.max()}")
         return {}
 
+    # data = {}
+
     # Fetch temperature
-    data = ds[TEMPERATURE_LABEL].sel(longitude=point.x, latitude=point.y, method='nearest')
-    for d in data:
-        print("isobaricInhPa", d["isobaricInhPa"].data)
-        print("temp", d.data)
+    temperatures = ds[TEMPERATURE_LABEL].sel(longitude=point.x, latitude=point.y, method='nearest')
 
-        uwind = ds[UWIND_LABEL].sel(longitude=point.x, latitude=point.y, isobaricInhPa=d["isobaricInhPa"].data, method='nearest')
-        print("uwind", uwind.data)
+    isobaric_values=temperatures.isobaricInhPa.data
+    temperature_values=[]
+    uwind_values=[]
+    vwind_values=[]
 
-        vwind = ds[UWIND_LABEL].sel(longitude=point.x, latitude=point.y, isobaricInhPa=d["isobaricInhPa"].data, method='nearest')
-        print("vwind", vwind.data)
+    for t in temperatures:
+        temperature_values.append(float(t.data))
+        # print("isobaricInhPa", t["isobaricInhPa"].data)
+        # print("temp", t.data)
+
+        # For same coord and isobaric, fetch wind vectors
+        uwind = ds[UWIND_LABEL].sel(longitude=point.x, latitude=point.y, isobaricInhPa=t["isobaricInhPa"].data, method='nearest')
+        # print("uwind", uwind.data)
+        uwind_values.append(float(uwind.data))
+
+        vwind = ds[VWIND_LABEL].sel(longitude=point.x, latitude=point.y, isobaricInhPa=t["isobaricInhPa"].data, method='nearest')
+        # print("vwind", vwind.data)
+        vwind_values.append(float(vwind.data))
 
     c = Coverage(
         domain=Domain(
-            domainType=DomainType.point_series,
+            domainType=DomainType.vertical_profile,
             axes=Axes(
-                x=ValuesAxis[float](values=[1.23]),
-                y=ValuesAxis[float](values=[4.56]),
+                x=ValuesAxis[float](values=[point.y]),
+                y=ValuesAxis[float](values=[point.x]),
+                z=ValuesAxis[float](values=isobaric_values),
                 t=ValuesAxis[AwareDatetime](values=[datetime.now(tz=timezone.utc)])
-            )
+            ),
+            referencing=[
+                ReferenceSystemConnectionObject(
+                    coordinates=["x", "y", "z"],
+                    system=ReferenceSystem(
+                        type="VerticalCRS",
+                    )
+                ),
+                ReferenceSystemConnectionObject(
+                    coordinates=["t"],
+                    system=ReferenceSystem(
+                        type="TemporalRS",
+                        calendar="Gregorian"
+                    )
+                )
+            ]
         ),
         ranges={
-            "temperature": NdArray(axisNames=["x", "y", "t"], shape=[1, 1, 1], values=[42.0])
-        }
+            "temperature": NdArray(axisNames=["x", "y", "z"], shape=[1, 1, len(isobaric_values)], values=temperature_values),
+            "uwind": NdArray(axisNames=["x", "y", "z"], shape=[1, 1, len(isobaric_values)], values=uwind_values),
+            "vwind": NdArray(axisNames=["x", "y", "z"], shape=[1, 1, len(isobaric_values)], values=vwind_values),
+        },
+        # parameters={
+        #     "temperature": Parameter(
+        #         type="Parameter",
+        #         # id="Temperature",
+        #         # label="temperature",
+        #         # description="The air temperature measured in Kelvin.",
+        #         observedProperty=ObservedProperty(
+        #             # id="https://codes.wmo.int/common/quantity-kind/_airTemperature",
+        #             # label={"en": "Air temperature"},
+        #             label="Air temperature",
+        #         ),
+        #         # unit=Unit(
+        #         #     id="https://codes.wmo.int/common/unit/_K",
+        #         #     symbol="K"
+        #         # )
+        #     ),
+        # },
+            # Parameter(
+            #     type="Parameter",
+            #     id="WindUMS",
+            #     label=[
+            #         {
+            #             "en": "U component of wind"
+            #         },
+            #     ],
+            #     description= [
+            #         {
+            #             "en": "U component of wind"
+            #         },
+            #     ],
+            #     observedProperty=ObservedProperty(
+            #         id="http://codes.wmo.int/grib2/codeflag/4.2/_0-2-2",
+            #         label=[
+            #             {"en": "u-component of wind"},
+            #         ],
+            #     ),
+            #     unit=Unit(
+            #         id="https://codes.wmo.int/common/unit/_m_s-1",
+            #         symbol="m/s"
+            #     )
+            # ),
+            # Parameter(
+            #     type="Parameter",
+            #     id="WindVMS",
+            #     label=[
+            #         {
+            #             "en": "V component of wind"
+            #         },
+            #     ],
+            #     description= [
+            #         {
+            #             "en": "V component of wind"
+            #         },
+            #     ],
+            #     observedProperty=ObservedProperty(
+            #         id="https://codes.wmo.int/grib2/codeflag/4.2/_0-2-3",
+            #         label=[
+            #             {"en": "v-component of wind "},
+            #         ],
+            #     ),
+            #     unit=Unit(
+            #         id="https://codes.wmo.int/common/unit/_m_s-1",
+            #         symbol="m/s"
+            #     )
+            # )
     )
 
     return c

@@ -1,4 +1,4 @@
-# EDR-isobaric-grib
+# EDR-isobaric-grib - edrisobaric
 
 [OGC Environmental Data Retrieval (EDR) API](https://ogcapi.ogc.org/edr/) interface for isobaric grib2 files from <https://api.met.no/weatherapi/isobaricgrib/1.0/documentation>.
 
@@ -8,16 +8,26 @@ Alpha
 
 ## Requirements
 
-Based on [edr-pydantic](https://github.com/KNMI/edr-pydantic) and [trapp-api](https://gitlab.met.no/met/mapp/trapp/trapp-api).
+Based on EDR pydantic libraries by [KNMI](https://github.com/KNMI/).
 
 ## Install
+
+Choose one of the following:
+
+### Conda
 
 ```bash
 mamba env create -f environment.yml
 conda activate edriso
 ```
 
-(Pynio is only available from conda, edr-pydantic only from pip. Conda can use pip.)
+### Pip
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
 
 ## Usage
 
@@ -35,8 +45,7 @@ will give these URLs:
 
 ### EDR
 
-- Instance should be file/date?
-- Show only available date, or fetch others if asked?
+- Instance should be file/date? Show only available date, or fetch others if asked?
 
 ### Code
 
@@ -44,15 +53,17 @@ will give these URLs:
 - Config? Or just use parameters? Filename is currently hardcoded.
 - Clean old datafiles
 - Replace cgi module, it's deprecated
-- Temporal extent is fetched (poorly) from filename
 
 ## References
 
 - <https://api.met.no/weatherapi/isobaricgrib/1.0/documentation>
 - <https://spire.com/tutorial/spire-weather-tutorial-intro-to-processing-grib2-data-with-python/>
+- <https://covjson.org/cookbook/>
+- <https://fastapi.tiangolo.com/tutorial/bigger-applications/>
 
 ### Other APIs for comparison
 
 - <https://opendata.fmi.fi/edr/>
 - <https://labs.metoffice.gov.uk/edr/>
 - <https://developer.dataplatform.knmi.nl/edr-api>
+- <https://swim.iblsoft.com/data/icon-de/edr/collections/isobaric/>
