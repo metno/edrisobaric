@@ -3,14 +3,14 @@
 import logging
 from contextlib import asynccontextmanager
 import uvicorn
-import xarray as xr
+# import xarray as xr
 from fastapi import FastAPI, Request
 
 import edrlanding_page
 import edrconformance
 import edrcollections
-import grib
-from initialize import get_filename, get_data_path, get_base_url
+# import grib
+# from initialize import get_filename, get_data_path, get_base_url
 
 
 app = FastAPI(openapi_url="/openapi.json",
@@ -28,20 +28,6 @@ async def lifespan():
         style="{", use_colors=True,
         )
     logger.handlers[0].setFormatter(console_formatter)
-
-    print("Checking grib file")
-    filename = grib.build_gribfile_name(get_data_path())
-    if get_filename() is not None:
-        filename = get_filename()
-    else:
-        if not grib.validate_gribfile(data_path=get_data_path(), fname=get_filename()):
-            grib.download_gribfile(data_path=get_data_path(), api_url=get_base_url())
-
-    ds = xr.open_dataset(filename, engine='pynio')
-    print("Variables in file:")
-    for v in ds:
-        print("Name <%s>   Long name <%s>   Unit <%s>" %
-            (v, ds[v].attrs["long_name"], ds[v].attrs["units"]))
 
     yield
 

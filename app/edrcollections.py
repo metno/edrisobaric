@@ -14,8 +14,11 @@ from shapely import wkt
 from covjson_pydantic.coverage import Coverage
 from covjson_pydantic.domain import Domain, Axes, ValuesAxis, DomainType
 from covjson_pydantic.ndarray import NdArray
+# import numpy as np
+# import xarray as xr
 
-from initialize import get_base_url, get_temporal_extent
+from initialize import get_base_url, get_temporal_extent, get_dataset, \
+    TEMPERATURE_LABEL, LAT_LABEL, LON_LABEL, UWIND_LABEL, VWIND_LABEL
 
 @lru_cache
 def create_collections_page(url: str, instance_id: str = "") -> dict:
@@ -73,7 +76,7 @@ def create_collections_page(url: str, instance_id: str = "") -> dict:
             ),
             temporal=Temporal(
                 interval = [
-                    [get_temporal_extent(), get_temporal_extent()+timedelta(hours=6)]
+                    [get_temporal_extent(), get_temporal_extent()+timedelta(hours=12)]
                 ],
                 values = [get_temporal_extent().isoformat()],
                 trs = 'TIMECRS["DateTime",TDATUM["Gregorian Calendar"],CS[TemporalDateTime,1],AXIS["Time (T)",future]'
@@ -109,7 +112,7 @@ def create_collections_page(url: str, instance_id: str = "") -> dict:
                         output_formats=[
                             "CoverageJSON"
                         ],
-                        coords="Well Known Text POINT value i.e. POINT(24.9384 60.1699)",
+                        coords="Well Known Text POINT value i.e. POINT(10.9 60.1)",
                     )
                 )
             ),
@@ -150,10 +153,39 @@ def create_collections_page(url: str, instance_id: str = "") -> dict:
 
     return collections_page
 
+
 def create_data(coords: str = "") -> dict:
     """ Fetch data based on coords """
-
     point = wkt.loads(coords)
+    print("create_data for coord ", point.y, point.x)
+
+    ds = get_dataset()
+
+    # Sanity checks on coordinates
+    print("ds[TIMELABEL][LAT_LABEL].values.max", ds[TEMPERATURE_LABEL][LAT_LABEL].values.max())
+    print("ds[TIMELABEL][LAT_LABEL].values.min", ds[TEMPERATURE_LABEL][LAT_LABEL].values.min())
+    if point.y > ds[TEMPERATURE_LABEL][LAT_LABEL].values.max() \
+        or point.y < ds[TEMPERATURE_LABEL][LAT_LABEL].values.min():
+        print(f"Error, point.y ({point.y}) is outside data min/max \
+            {ds[TEMPERATURE_LABEL][LAT_LABEL].values.min()}/{ds[TEMPERATURE_LABEL][LAT_LABEL].values.max()}")
+        return {}
+    if point.x > ds[TEMPERATURE_LABEL][LON_LABEL].values.max() \
+        or point.x < ds[TEMPERATURE_LABEL][LON_LABEL].values.min():
+        print(f"Error, point.y ({point.x}) is outside data min/max \
+            {ds[TEMPERATURE_LABEL][LON_LABEL].values.min()}/{ds[TEMPERATURE_LABEL][LON_LABEL].values.max()}")
+        return {}
+
+    # Fetch temperature
+    data = ds[TEMPERATURE_LABEL].sel(longitude=point.x, latitude=point.y, method='nearest')
+    for d in data:
+        print("isobaricInhPa", d["isobaricInhPa"].data)
+        print("temp", d.data)
+
+        uwind = ds[UWIND_LABEL].sel(longitude=point.x, latitude=point.y, isobaricInhPa=d["isobaricInhPa"].data, method='nearest')
+        print("uwind", uwind.data)
+
+        vwind = ds[UWIND_LABEL].sel(longitude=point.x, latitude=point.y, isobaricInhPa=d["isobaricInhPa"].data, method='nearest')
+        print("vwind", vwind.data)
 
     c = Coverage(
         domain=Domain(
