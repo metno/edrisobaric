@@ -24,7 +24,9 @@ from initialize import (
 @lru_cache
 def create_collections_page(url: str, instance_id: str = "") -> dict:
     """Creates the collections page"""
-    link_self = edr_pydantic.link.Link(href=url, hreflang="en", rel="self", type="aplication/json")
+    link_self = edr_pydantic.link.Link(
+        href=url, hreflang="en", rel="self", type="aplication/json"
+    )
 
     collections = [
         Collection(
@@ -49,7 +51,9 @@ def create_collections_page(url: str, instance_id: str = "") -> dict:
                 "isobaric",
             ],
             extent=edr_pydantic.extent.Extent(
-                spatial=edr_pydantic.extent.Spatial(bbox=[[64.25, -1.45, 55.35, 14.51]], crs="WGS84"),
+                spatial=edr_pydantic.extent.Spatial(
+                    bbox=[[64.25, -1.45, 55.35, 14.51]], crs="WGS84"
+                ),
                 vertical=edr_pydantic.extent.Vertical(
                     interval=[["850"], ["70"]],
                     values=[
@@ -110,10 +114,14 @@ def create_collections_page(url: str, instance_id: str = "") -> dict:
             parameter_names=edr_pydantic.parameter.Parameters(
                 {
                     "WindUMS": edr_pydantic.parameter.Parameter(
-                        observedProperty=edr_pydantic.observed_property.ObservedProperty(label="WindUMS")
+                        observedProperty=edr_pydantic.observed_property.ObservedProperty(
+                            label="WindUMS"
+                        )
                     ),
                     "WindVMS": edr_pydantic.parameter.Parameter(
-                        observedProperty=edr_pydantic.observed_property.ObservedProperty(label="WindVMS")
+                        observedProperty=edr_pydantic.observed_property.ObservedProperty(
+                            label="WindVMS"
+                        )
                     ),
                     "Air temperature": edr_pydantic.parameter.Parameter(
                         id="Temperature",
@@ -132,7 +140,9 @@ def create_collections_page(url: str, instance_id: str = "") -> dict:
         )
     ]
 
-    collections_page = edr_pydantic.collections.Collections(links=[link_self], collections=collections)
+    collections_page = edr_pydantic.collections.Collections(
+        links=[link_self], collections=collections
+    )
 
     return collections_page
 
@@ -172,9 +182,9 @@ def create_data(coords: str = "") -> dict:
     )
 
     isobaric_values = temperatures.isobaricInhPa.data
-    temperature_values:List[float|None] = []
-    uwind_values:List[float|None] = []
-    vwind_values:List[float|None] = []
+    temperature_values: List[float | None] = []
+    uwind_values: List[float | None] = []
+    vwind_values: List[float | None] = []
 
     for t in temperatures:
         temperature_values.append(float(t.data))
@@ -209,13 +219,15 @@ def create_data(coords: str = "") -> dict:
                 x=covjson_pydantic.domain.ValuesAxis[float](values=[point.y]),
                 y=covjson_pydantic.domain.ValuesAxis[float](values=[point.x]),
                 z=covjson_pydantic.domain.ValuesAxis[float](values=isobaric_values),
-                t=covjson_pydantic.domain.ValuesAxis[AwareDatetime](values=[datetime.now(tz=timezone.utc)]),
+                t=covjson_pydantic.domain.ValuesAxis[AwareDatetime](
+                    values=[datetime.now(tz=timezone.utc)]
+                ),
             ),
             referencing=[
                 covjson_pydantic.reference_system.ReferenceSystemConnectionObject(
                     coordinates=["x", "y"],
                     system=covjson_pydantic.reference_system.ReferenceSystem(
-                        id= "http://www.opengis.net/def/crs/OGC/1.3/CRS84",
+                        id="http://www.opengis.net/def/crs/OGC/1.3/CRS84",
                         type="GeographicCRS",
                     ),
                 ),
@@ -236,7 +248,9 @@ def create_data(coords: str = "") -> dict:
                 ),
                 covjson_pydantic.reference_system.ReferenceSystemConnectionObject(
                     coordinates=["t"],
-                    system=covjson_pydantic.reference_system.ReferenceSystem(type="TemporalRS", calendar="Gregorian"),
+                    system=covjson_pydantic.reference_system.ReferenceSystem(
+                        type="TemporalRS", calendar="Gregorian"
+                    ),
                 ),
             ],
         ),
@@ -260,62 +274,44 @@ def create_data(coords: str = "") -> dict:
         parameters={
             "t": covjson_pydantic.parameter.Parameter(
                 id="t",
-                label={
-                    "en": "Air temperature"
-                },
+                label={"en": "Air temperature"},
                 observedProperty=covjson_pydantic.observed_property.ObservedProperty(
                     id="https://codes.wmo.int/common/quantity-kind/_airTemperature",
-                    label={
-                        "en": "Air temperature"
-                    },
+                    label={"en": "Air temperature"},
                 ),
                 unit=covjson_pydantic.unit.Unit(
                     id="https://codes.wmo.int/common/unit/_K",
-                    label={
-                        "en": "Kelvin"
-                    },
-                    symbol="K"
+                    label={"en": "Kelvin"},
+                    symbol="K",
                 ),
             ),
             "u": covjson_pydantic.parameter.Parameter(
                 id="u",
-                label={
-                    "en": "U component of wind"
-                },
+                label={"en": "U component of wind"},
                 observedProperty=covjson_pydantic.observed_property.ObservedProperty(
                     id="https://codes.wmo.int/bufr4/b/11/_095",
-                    label={
-                        "en": "u-component of wind"
-                    },
+                    label={"en": "u-component of wind"},
                 ),
                 unit=covjson_pydantic.unit.Unit(
                     id="https://codes.wmo.int/common/unit/_m_s-1",
-                    label={
-                        "en": "m/s"
-                    },
-                    symbol="m/s"
-                )
+                    label={"en": "m/s"},
+                    symbol="m/s",
+                ),
             ),
             "v": covjson_pydantic.parameter.Parameter(
                 id="v",
-                label={
-                    "en": "V component of wind"
-                },
+                label={"en": "V component of wind"},
                 observedProperty=covjson_pydantic.observed_property.ObservedProperty(
                     id="https://codes.wmo.int/bufr4/b/11/_096",
-                label={
-                        "en": "v-component of wind"
-                    },
+                    label={"en": "v-component of wind"},
                 ),
                 unit=covjson_pydantic.unit.Unit(
                     id="https://codes.wmo.int/common/unit/_m_s-1",
-                    label={
-                        "en": "m/s"
-                    },
-                    symbol="m/s"
-                )
-            )
-        }
+                    label={"en": "m/s"},
+                    symbol="m/s",
+                ),
+            ),
+        },
     )
 
     return c
