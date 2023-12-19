@@ -145,8 +145,6 @@ def create_data(coords: str = "") -> dict:
     ds = get_dataset()
 
     # Sanity checks on coordinates
-    # print("ds[TIMELABEL][LAT_LABEL].values.max", ds[TEMPERATURE_LABEL][LAT_LABEL].values.max())
-    # print("ds[TIMELABEL][LAT_LABEL].values.min", ds[TEMPERATURE_LABEL][LAT_LABEL].values.min())
     if (
         point.y > ds[TEMPERATURE_LABEL][LAT_LABEL].values.max()
         or point.y < ds[TEMPERATURE_LABEL][LAT_LABEL].values.min()
@@ -244,13 +242,10 @@ def create_data(coords: str = "") -> dict:
             ),
         },
         parameters={
-            "temperature": covjson_pydantic.parameter.Parameter(
+            "t": covjson_pydantic.parameter.Parameter(
                 id="t",
                 label={
-                    "en": "temperature"
-                },
-                description={
-                    "en": "The air temperature measured in Kelvin."
+                    "en": "Air temperature"
                 },
                 observedProperty=covjson_pydantic.observed_property.ObservedProperty(
                     id="https://codes.wmo.int/common/quantity-kind/_airTemperature",
@@ -261,60 +256,50 @@ def create_data(coords: str = "") -> dict:
                 unit=covjson_pydantic.unit.Unit(
                     id="https://codes.wmo.int/common/unit/_K",
                     label={
-                        "en": "K"
+                        "en": "Kelvin"
                     },
                     symbol="K"
                 ),
+            ),
+            "u": covjson_pydantic.parameter.Parameter(
+                id="u",
+                label={
+                    "en": "U component of wind"
+                },
+                observedProperty=covjson_pydantic.observed_property.ObservedProperty(
+                    id="https://codes.wmo.int/bufr4/b/11/_095",
+                    label={
+                        "en": "u-component of wind"
+                    },
+                ),
+                unit=covjson_pydantic.unit.Unit(
+                    id="https://codes.wmo.int/common/unit/_m_s-1",
+                    label={
+                        "en": "m/s"
+                    },
+                    symbol="m/s"
+                )
+            ),
+            "v": covjson_pydantic.parameter.Parameter(
+                id="v",
+                label={
+                    "en": "V component of wind"
+                },
+                observedProperty=covjson_pydantic.observed_property.ObservedProperty(
+                    id="https://codes.wmo.int/bufr4/b/11/_096",
+                label={
+                        "en": "v-component of wind"
+                    },
+                ),
+                unit=covjson_pydantic.unit.Unit(
+                    id="https://codes.wmo.int/common/unit/_m_s-1",
+                    label={
+                        "en": "m/s"
+                    },
+                    symbol="m/s"
+                )
             )
         }
-        # Parameter(
-        #     type="Parameter",
-        #     id="WindUMS",
-        #     label=[
-        #         {
-        #             "en": "U component of wind"
-        #         },
-        #     ],
-        #     description= [
-        #         {
-        #             "en": "U component of wind"
-        #         },
-        #     ],
-        #     observedProperty=ObservedProperty(
-        #         id="http://codes.wmo.int/grib2/codeflag/4.2/_0-2-2",
-        #         label=[
-        #             {"en": "u-component of wind"},
-        #         ],
-        #     ),
-        #     unit=Unit(
-        #         id="https://codes.wmo.int/common/unit/_m_s-1",
-        #         symbol="m/s"
-        #     )
-        # ),
-        # Parameter(
-        #     type="Parameter",
-        #     id="WindVMS",
-        #     label=[
-        #         {
-        #             "en": "V component of wind"
-        #         },
-        #     ],
-        #     description= [
-        #         {
-        #             "en": "V component of wind"
-        #         },
-        #     ],
-        #     observedProperty=ObservedProperty(
-        #         id="https://codes.wmo.int/grib2/codeflag/4.2/_0-2-3",
-        #         label=[
-        #             {"en": "v-component of wind "},
-        #         ],
-        #     ),
-        #     unit=Unit(
-        #         id="https://codes.wmo.int/common/unit/_m_s-1",
-        #         symbol="m/s"
-        #     )
-        # )
     )
 
     return c
