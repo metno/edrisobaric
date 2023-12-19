@@ -6,7 +6,7 @@ from urllib.request import urlopen, urlretrieve
 import cgi
 
 
-def build_gribfile_name(data_path: str, time: datetime = None) -> str:
+def build_gribfile_name(data_path: str, time: datetime) -> str:
     """Generate correct name for grib files"""
     filename_prefix = "T_YTNC85_C_ENMI_"
     filename_postfix = ".bin"

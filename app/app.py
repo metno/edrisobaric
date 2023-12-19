@@ -3,8 +3,6 @@
 import logging
 from contextlib import asynccontextmanager
 import uvicorn
-
-# import xarray as xr
 from fastapi import FastAPI, Request
 
 import edrlanding_page

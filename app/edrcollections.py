@@ -1,23 +1,12 @@
 """ Collections page """
 from functools import lru_cache
+from typing import List
 from datetime import datetime, timedelta, timezone
-from edr_pydantic.collections import Collection, Collections
-from edr_pydantic.data_queries import EDRQuery, EDRQueryLink, DataQueries
-from edr_pydantic.extent import Extent, Spatial, Vertical, Temporal
-from edr_pydantic.link import Link
-from edr_pydantic.observed_property import ObservedProperty
-from edr_pydantic.parameter import Parameters, Parameter
-from edr_pydantic.unit import Unit, Symbol
-from edr_pydantic.variables import Variables
+import edr_pydantic
 from pydantic import AwareDatetime
 from shapely import wkt
+import covjson_pydantic
 from covjson_pydantic.coverage import Coverage
-from covjson_pydantic.domain import Domain, Axes, ValuesAxis, DomainType
-from covjson_pydantic.ndarray import NdArray
-from covjson_pydantic.reference_system import (
-    ReferenceSystem,
-    ReferenceSystemConnectionObject,
-)
 
 from initialize import (
     get_base_url,
@@ -34,10 +23,10 @@ from initialize import (
 @lru_cache
 def create_collections_page(url: str, instance_id: str = "") -> dict:
     """Creates the collections page"""
-    link_self = Link(href=url, hreflang="en", rel="self", type="aplication/json")
+    link_self = edr_pydantic.link.Link(href=url, hreflang="en", rel="self", type="aplication/json")
 
     collections = [
-        Collection(
+        edr_pydantic.collections.Collection(
             id="isobaric",
             title="IsobaricGRIB - GRIB files",
             description="""
@@ -58,9 +47,9 @@ def create_collections_page(url: str, instance_id: str = "") -> dict:
                 "forecast",
                 "isobaric",
             ],
-            extent=Extent(
-                spatial=Spatial(bbox=[[64.25, -1.45, 55.35, 14.51]], crs="WGS84"),
-                vertical=Vertical(
+            extent=edr_pydantic.extent.Extent(
+                spatial=edr_pydantic.extent.Spatial(bbox=[[64.25, -1.45, 55.35, 14.51]], crs="WGS84"),
+                vertical=edr_pydantic.extent.Vertical(
                     interval=[["850"], ["70"]],
                     values=[
                         "850",
@@ -76,7 +65,7 @@ def create_collections_page(url: str, instance_id: str = "") -> dict:
                     ],
                     vrs="Vertical Reference System: PressureLevel",
                 ),
-                temporal=Temporal(
+                temporal=edr_pydantic.extent.Temporal(
                     interval=[
                         [
                             get_temporal_extent(),
@@ -88,51 +77,51 @@ def create_collections_page(url: str, instance_id: str = "") -> dict:
                 ),
             ),
             links=[
-                Link(
+                edr_pydantic.link.Link(
                     href="https://api.met.no/weatherapi/isobaricgrib/1.0/documentation",
                     rel="service-doc",
                 )
             ],
-            data_queries=DataQueries(
+            data_queries=edr_pydantic.data_queries.DataQueries(
                 # List instances
-                instances=EDRQuery(
-                    link=EDRQueryLink(
+                instances=edr_pydantic.data_queries.EDRQuery(
+                    link=edr_pydantic.data_queries.EDRQueryLink(
                         href=f"{get_base_url()}collections/instances",
                         rel="data",
-                        variables=Variables(
+                        variables=edr_pydantic.variables.Variables(
                             query_type="instance", output_formats=["CoverageJSON"]
                         ),
                     )
                 ),
                 # Get posision in default instance
-                position=EDRQuery(
-                    link=EDRQueryLink(
+                position=edr_pydantic.data_queries.EDRQuery(
+                    link=edr_pydantic.data_queries.EDRQueryLink(
                         href=f"{get_base_url()}collections/position",
                         rel="data",
-                        variables=Variables(
+                        variables=edr_pydantic.variables.Variables(
                             query_type="position",
                             output_formats=["CoverageJSON"],
-                            coords="Well Known Text POINT value i.e. POINT(10.9 60.1)",
+                            # coords="Well Known Text POINT value i.e. POINT(10.9 60.1)",
                         ),
                     )
                 ),
             ),
-            parameter_names=Parameters(
+            parameter_names=edr_pydantic.parameter.Parameters(
                 {
-                    "WindUMS": Parameter(
-                        observedProperty=ObservedProperty(label="WindUMS")
+                    "WindUMS": edr_pydantic.parameter.Parameter(
+                        observedProperty=edr_pydantic.observed_property.ObservedProperty(label="WindUMS")
                     ),
-                    "WindVMS": Parameter(
-                        observedProperty=ObservedProperty(label="WindVMS")
+                    "WindVMS": edr_pydantic.parameter.Parameter(
+                        observedProperty=edr_pydantic.observed_property.ObservedProperty(label="WindVMS")
                     ),
-                    "Air temperature": Parameter(
+                    "Air temperature": edr_pydantic.parameter.Parameter(
                         id="Temperature",
-                        unit=Unit(
-                            symbol=Symbol(
+                        unit=edr_pydantic.unit.Unit(
+                            symbol=edr_pydantic.unit.Symbol(
                                 value="K", type="https://codes.wmo.int/common/unit/_K"
                             )
                         ),
-                        observedProperty=ObservedProperty(
+                        observedProperty=edr_pydantic.observed_property.ObservedProperty(
                             id="https://codes.wmo.int/common/quantity-kind/_airTemperature",
                             label="Kelvin",
                         ),
@@ -142,7 +131,7 @@ def create_collections_page(url: str, instance_id: str = "") -> dict:
         )
     ]
 
-    collections_page = Collections(links=[link_self], collections=collections)
+    collections_page = edr_pydantic.collections.Collections(links=[link_self], collections=collections)
 
     return collections_page
 
@@ -184,9 +173,9 @@ def create_data(coords: str = "") -> dict:
     )
 
     isobaric_values = temperatures.isobaricInhPa.data
-    temperature_values = []
-    uwind_values = []
-    vwind_values = []
+    temperature_values:List[float|None] = []
+    uwind_values:List[float|None] = []
+    vwind_values:List[float|None] = []
 
     for t in temperatures:
         temperature_values.append(float(t.data))
@@ -213,61 +202,70 @@ def create_data(coords: str = "") -> dict:
         vwind_values.append(float(vwind.data))
 
     c = Coverage(
-        domain=Domain(
-            domainType=DomainType.vertical_profile,
-            axes=Axes(
-                x=ValuesAxis[float](values=[point.y]),
-                y=ValuesAxis[float](values=[point.x]),
-                z=ValuesAxis[float](values=isobaric_values),
-                t=ValuesAxis[AwareDatetime](values=[datetime.now(tz=timezone.utc)]),
+        id="isobaric",
+        type="Coverage",
+        domain=covjson_pydantic.domain.Domain(
+            domainType=covjson_pydantic.domain.DomainType.vertical_profile,
+            axes=covjson_pydantic.domain.Axes(
+                x=covjson_pydantic.domain.ValuesAxis[float](values=[point.y]),
+                y=covjson_pydantic.domain.ValuesAxis[float](values=[point.x]),
+                z=covjson_pydantic.domain.ValuesAxis[float](values=isobaric_values),
+                t=covjson_pydantic.domain.ValuesAxis[AwareDatetime](values=[datetime.now(tz=timezone.utc)]),
             ),
             referencing=[
-                ReferenceSystemConnectionObject(
+                covjson_pydantic.reference_system.ReferenceSystemConnectionObject(
                     coordinates=["x", "y", "z"],
-                    system=ReferenceSystem(
+                    system=covjson_pydantic.reference_system.ReferenceSystem(
                         type="VerticalCRS",
                     ),
                 ),
-                ReferenceSystemConnectionObject(
+                covjson_pydantic.reference_system.ReferenceSystemConnectionObject(
                     coordinates=["t"],
-                    system=ReferenceSystem(type="TemporalRS", calendar="Gregorian"),
+                    system=covjson_pydantic.reference_system.ReferenceSystem(type="TemporalRS", calendar="Gregorian"),
                 ),
             ],
         ),
         ranges={
-            "temperature": NdArray(
+            "temperature": covjson_pydantic.ndarray.NdArray(
                 axisNames=["x", "y", "z"],
                 shape=[1, 1, len(isobaric_values)],
                 values=temperature_values,
             ),
-            "uwind": NdArray(
+            "uwind": covjson_pydantic.ndarray.NdArray(
                 axisNames=["x", "y", "z"],
                 shape=[1, 1, len(isobaric_values)],
                 values=uwind_values,
             ),
-            "vwind": NdArray(
+            "vwind": covjson_pydantic.ndarray.NdArray(
                 axisNames=["x", "y", "z"],
                 shape=[1, 1, len(isobaric_values)],
                 values=vwind_values,
             ),
         },
-        # parameters={
-        #     "temperature": Parameter(
-        #         type="Parameter",
-        #         # id="Temperature",
-        #         # label="temperature",
-        #         # description="The air temperature measured in Kelvin.",
-        #         observedProperty=ObservedProperty(
-        #             # id="https://codes.wmo.int/common/quantity-kind/_airTemperature",
-        #             # label={"en": "Air temperature"},
-        #             label="Air temperature",
-        #         ),
-        #         # unit=Unit(
-        #         #     id="https://codes.wmo.int/common/unit/_K",
-        #         #     symbol="K"
-        #         # )
-        #     ),
-        # },
+        parameters={
+            "temperature": covjson_pydantic.parameter.Parameter(
+                id="t",
+                label={
+                    "en": "temperature"
+                },
+                description={
+                    "en": "The air temperature measured in Kelvin."
+                },
+                observedProperty=covjson_pydantic.observed_property.ObservedProperty(
+                    id="https://codes.wmo.int/common/quantity-kind/_airTemperature",
+                    label={
+                        "en": "Air temperature"
+                    },
+                ),
+                unit=covjson_pydantic.unit.Unit(
+                    id="https://codes.wmo.int/common/unit/_K",
+                    label={
+                        "en": "K"
+                    },
+                    symbol="K"
+                ),
+            )
+        }
         # Parameter(
         #     type="Parameter",
         #     id="WindUMS",
