@@ -213,9 +213,25 @@ def create_data(coords: str = "") -> dict:
             ),
             referencing=[
                 covjson_pydantic.reference_system.ReferenceSystemConnectionObject(
-                    coordinates=["x", "y", "z"],
+                    coordinates=["x", "y"],
+                    system=covjson_pydantic.reference_system.ReferenceSystem(
+                        id= "http://www.opengis.net/def/crs/OGC/1.3/CRS84",
+                        type="GeographicCRS",
+                    ),
+                ),
+                covjson_pydantic.reference_system.ReferenceSystemConnectionObject(
+                    coordinates=["z"],
                     system=covjson_pydantic.reference_system.ReferenceSystem(
                         type="VerticalCRS",
+                        # cs='"csAxes": [{ \
+                        #     "name": { \
+                        #     "en": "Pressure" \
+                        #     }, \
+                        #     "direction": "down", \
+                        #     "unit": { \
+                        #     "symbol": "Pa" \
+                        #     } \
+                        # }]'
                     ),
                 ),
                 covjson_pydantic.reference_system.ReferenceSystemConnectionObject(
@@ -226,18 +242,18 @@ def create_data(coords: str = "") -> dict:
         ),
         ranges={
             "temperature": covjson_pydantic.ndarray.NdArray(
-                axisNames=["x", "y", "z"],
-                shape=[1, 1, len(isobaric_values)],
+                axisNames=["z"],
+                shape=[len(isobaric_values)],
                 values=temperature_values,
             ),
             "uwind": covjson_pydantic.ndarray.NdArray(
-                axisNames=["x", "y", "z"],
-                shape=[1, 1, len(isobaric_values)],
+                axisNames=["z"],
+                shape=[len(isobaric_values)],
                 values=uwind_values,
             ),
             "vwind": covjson_pydantic.ndarray.NdArray(
-                axisNames=["x", "y", "z"],
-                shape=[1, 1, len(isobaric_values)],
+                axisNames=["z"],
+                shape=[len(isobaric_values)],
                 values=vwind_values,
             ),
         },
