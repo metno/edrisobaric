@@ -1,5 +1,7 @@
 # EDR-isobaric-grib - edrisobaric
 
+![Logo](/img/pressure_9189764.png "Logo")
+
 [OGC Environmental Data Retrieval (EDR) API](https://ogcapi.ogc.org/edr/) interface for isobaric grib2 files from <https://api.met.no/weatherapi/isobaricgrib/1.0/documentation>.
 
 ## State
@@ -56,7 +58,8 @@ will give these URLs:
 
 ## References
 
-- <https://api.met.no/weatherapi/isobaricgrib/1.0/documentation>
+- Icon from <https://www.freepik.com/icon/pressure_9189764#fromView=search&term=air+preassure&track=ais&page=1&position=49&uuid=c5d25f23-4efd-4063-b6ec-2ab35db07d62>
+- Backend <https://api.met.no/weatherapi/isobaricgrib/1.0/documentation>
 - <https://spire.com/tutorial/spire-weather-tutorial-intro-to-processing-grib2-data-with-python/>
 - <https://covjson.org/cookbook/>
 - <https://fastapi.tiangolo.com/tutorial/bigger-applications/>
