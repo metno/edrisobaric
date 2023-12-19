@@ -47,7 +47,7 @@ def get_temporal_extent() -> datetime:
     if len(dataset) == 0:
         open_grib()
 
-    initial_time = dataset[TEMPERATURE_LABEL].time.data  # 2023-12-13T00:00:00.000000000
+    initial_time = str(dataset[TEMPERATURE_LABEL].time.data)  # 2023-12-13T00:00:00.000000000
     timestamp = datetime.strptime(initial_time, "%Y-%m-%dT%H:00:00.000000000")
 
     print("get_temporal_extent", timestamp.isoformat())

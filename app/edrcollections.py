@@ -3,6 +3,7 @@ from functools import lru_cache
 from typing import List
 from datetime import datetime, timedelta, timezone
 import edr_pydantic
+from edr_pydantic.collections import Collection
 from pydantic import AwareDatetime
 from shapely import wkt
 import covjson_pydantic
@@ -26,7 +27,7 @@ def create_collections_page(url: str, instance_id: str = "") -> dict:
     link_self = edr_pydantic.link.Link(href=url, hreflang="en", rel="self", type="aplication/json")
 
     collections = [
-        edr_pydantic.collections.Collection(
+        Collection(
             id="isobaric",
             title="IsobaricGRIB - GRIB files",
             description="""
