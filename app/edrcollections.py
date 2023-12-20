@@ -8,6 +8,7 @@ from pydantic import AwareDatetime
 from shapely import wkt
 import covjson_pydantic
 from covjson_pydantic.coverage import Coverage
+from covjson_pydantic.ndarray import NdArray
 
 from initialize import (
     get_base_url,
@@ -22,7 +23,7 @@ from initialize import (
 
 
 @lru_cache
-def create_collections_page(url: str, instance_id: str = "") -> dict:
+def create_collections_page(url: str) -> dict:
     """Creates the collections page"""
     link_self = edr_pydantic.link.Link(
         href=url, hreflang="en", rel="self", type="aplication/json"
@@ -144,7 +145,7 @@ def create_collections_page(url: str, instance_id: str = "") -> dict:
         links=[link_self], collections=collections
     )
 
-    return collections_page
+    return collections_page.model_dump(exclude_none=True)
 
 
 def create_data(coords: str = "") -> dict:
@@ -235,15 +236,7 @@ def create_data(coords: str = "") -> dict:
                     coordinates=["z"],
                     system=covjson_pydantic.reference_system.ReferenceSystem(
                         type="VerticalCRS",
-                        # cs='"csAxes": [{ \
-                        #     "name": { \
-                        #     "en": "Pressure" \
-                        #     }, \
-                        #     "direction": "down", \
-                        #     "unit": { \
-                        #     "symbol": "Pa" \
-                        #     } \
-                        # }]'
+                        cs={'csAxes': [{'name': {'en': 'Pressure'}, 'direction': 'down', 'unit': {'symbol': 'Pa'}}]}
                     ),
                 ),
                 covjson_pydantic.reference_system.ReferenceSystemConnectionObject(
@@ -255,17 +248,17 @@ def create_data(coords: str = "") -> dict:
             ],
         ),
         ranges={
-            "temperature": covjson_pydantic.ndarray.NdArray(
+            "temperature": NdArray(
                 axisNames=["z"],
                 shape=[len(isobaric_values)],
                 values=temperature_values,
             ),
-            "uwind": covjson_pydantic.ndarray.NdArray(
+            "uwind": NdArray(
                 axisNames=["z"],
                 shape=[len(isobaric_values)],
                 values=uwind_values,
             ),
-            "vwind": covjson_pydantic.ndarray.NdArray(
+            "vwind": NdArray(
                 axisNames=["z"],
                 shape=[len(isobaric_values)],
                 values=vwind_values,
@@ -314,4 +307,4 @@ def create_data(coords: str = "") -> dict:
         },
     )
 
-    return c
+    return c.model_dump(exclude_none=True)
