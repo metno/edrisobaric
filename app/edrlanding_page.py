@@ -49,4 +49,4 @@ def create_landing_page() -> dict:
         ),
     )
 
-    return landing
+    return landing.model_dump(exclude_none=True)
