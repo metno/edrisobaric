@@ -5,12 +5,8 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI, Request
 
-import edrlanding_page
-import edrconformance
-import edrcollections
-
-# import grib
-# from initialize import get_filename, get_data_path, get_base_url
+from app.internal import initialize
+from app.routes import collections, conformance, landing_page
 
 
 app = FastAPI(openapi_url="/openapi.json", docs_url="/api")
@@ -36,25 +32,25 @@ async def lifespan():
 @app.get("/")
 async def root():
     """Reply to /"""
-    return edrlanding_page.create_landing_page()
+    return landing_page.create_landing_page(initialize.get_base_url())
 
 
 @app.get("/conformance")
 async def get_conformance():
     """Conformance"""
-    return edrconformance.create_conformance_page()
+    return conformance.create_conformance_page()
 
 
 @app.get("/collections")
 async def get_collections(request: Request):
     """Collections"""
-    return edrcollections.create_collections_page(str(request.url))
+    return collections.create_collections_page(str(request.url))
 
 
 @app.get("/collections/position")
 async def get_instances(coords: str):
     """Position"""
-    return edrcollections.create_data(coords=coords)
+    return collections.create_point(coords=coords)
 
 
 # @app.get("/collections/{instance_id}")
@@ -64,4 +60,5 @@ async def get_instances(coords: str):
 
 
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=5000, reload=True, limit_concurrency=20)
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000,
+    reload=False, limit_concurrency=20) # app.main:app

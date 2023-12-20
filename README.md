@@ -1,29 +1,39 @@
-# EDR-isobaric-grib - edrisobaric
+# EDR-isobaric
 
 ![Logo](/img/pressure_9189764.png "Logo")
 
-[OGC Environmental Data Retrieval (EDR) API](https://ogcapi.ogc.org/edr/) interface for isobaric grib2 files from <https://api.met.no/weatherapi/isobaricgrib/1.0/documentation>.
+## What is EDR-isobaric?
 
-## State
+EDR-isobaric is an API for isobaric data (temperature and wind in isobaric layers). The API is based on [OGC Environmental Data Retrieval (EDR)](https://ogcapi.ogc.org/edr/). Data comes from [GRIB](https://en.wikipedia.org/wiki/GRIB) files from <https://api.met.no/weatherapi/isobaricgrib/1.0/documentation>.
 
-Alpha
+The code is written as an example aimed at API developers at Met.no.
 
-## Requirements
+The resulting API is for people who need vertical environmental data for a single location.
 
-Based on EDR pydantic libraries by [KNMI](https://github.com/KNMI/).
+## Who is responsible?
 
-## Install
+- <larsfp@met.no>
 
-Choose one of the following:
+## Status
 
-### Conda
+In development
+
+## Getting started
+
+### Test it out
+
+#### Install
+
+Choose one of the following, conda seems to work best:
+
+##### Conda
 
 ```bash
 mamba env create -f environment.yml
 conda activate edriso
 ```
 
-### Pip
+##### Pip
 
 ```bash
 python3 -m venv venv
@@ -31,7 +41,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Usage
+#### Usage
 
 ```bash
 uvicorn app:app --reload
@@ -43,25 +53,24 @@ will give these URLs:
 - <http://127.0.0.1:5000/docs>
 - <http://127.0.0.1:5000/redoc>
 
-## TODO
+### Use it for production
 
-### EDR
+*How to responsible use it as a dependency for your own production system.*
 
-- Instance should be file/date? Show only available date, or fetch others if asked?
+## Overview of architecture
 
-### Code
+*Link to wiki or markdown where you get C4 diagrams with legends and textual descriptions.*
 
-- Move to github
-- Config? Or just use parameters? Filename is currently hardcoded.
-- Clean old datafiles
-- Replace cgi module, it's deprecated
+## Documentation
 
-## References
+- [Documentation](docs/Documentation.md)
+- [TODO](docs/TODO.md)
+
+### References
 
 - Icon from <https://www.freepik.com/icon/pressure_9189764#fromView=search&term=air+preassure&track=ais&page=1&position=49&uuid=c5d25f23-4efd-4063-b6ec-2ab35db07d62>
-- Backend <https://api.met.no/weatherapi/isobaricgrib/1.0/documentation>
 - <https://spire.com/tutorial/spire-weather-tutorial-intro-to-processing-grib2-data-with-python/>
-- <https://covjson.org/cookbook/>
+- <https://covjson.org/>
 - <https://fastapi.tiangolo.com/tutorial/bigger-applications/>
 
 ### Other APIs for comparison
@@ -70,3 +79,11 @@ will give these URLs:
 - <https://labs.metoffice.gov.uk/edr/>
 - <https://developer.dataplatform.knmi.nl/edr-api>
 - <https://swim.iblsoft.com/data/icon-de/edr/collections/isobaric/>
+
+## How to contribute
+
+- Send an email
+
+## Documentation Template
+
+This document is based on the [Met-norway-readme](https://gitlab.met.no/maler/met-norway-readme)-template.

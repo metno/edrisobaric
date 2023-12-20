@@ -1,0 +1,21 @@
+name: edriso
+channels:
+  - conda-forge
+dependencies:
+  - fastapi[all]==0.105.0
+  - uvicorn[standard]==0.24.0.post1
+  - eccodes==1.6.1
+  - cfgrib==0.9.10.4
+  - shapely==2.0.1
+  - xarray==2023.12.0
+  - types-pytz
+  - black
+  - mypy
+  - prospector
+  - pylint
+  - tox
+  - bandit
+  - pip
+  - pip:
+    - edr-pydantic==0.2.1
+    - covjson-pydantic==0.2.0

@@ -2,10 +2,6 @@
 from functools import lru_cache
 from edr_pydantic.capabilities import ConformanceModel
 
-from initialize import get_base_url
-
-BASE_URL = get_base_url()
-
 
 @lru_cache
 def create_conformance_page() -> dict:

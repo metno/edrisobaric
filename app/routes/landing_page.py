@@ -3,13 +3,9 @@ from functools import lru_cache
 from edr_pydantic.capabilities import LandingPageModel, Provider, Contact
 from edr_pydantic.link import Link
 
-from initialize import get_base_url
-
-BASE_URL = get_base_url()
-
 
 @lru_cache
-def create_landing_page() -> dict:
+def create_landing_page(base_url) -> dict:
     """Creates the landing page"""
 
     landing = LandingPageModel(
@@ -17,19 +13,19 @@ def create_landing_page() -> dict:
         description="An EDR API for isobaric data from Grib files",
         links=[
             Link(
-                href=f"{BASE_URL}",
+                href=f"{base_url}",
                 rel="self",
                 type="application/json",
                 title="Landing Page",
             ),
             Link(
-                href=f"{BASE_URL}conformance",
+                href=f"{base_url}conformance",
                 rel="conformance",
                 type="application/json",
                 title="Conformance document",
             ),
             Link(
-                href=f"{BASE_URL}collections",
+                href=f"{base_url}collections",
                 rel="data",
                 type="application/json",
                 title="Collections metadata in JSON",

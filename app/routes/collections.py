@@ -10,7 +10,7 @@ import covjson_pydantic
 from covjson_pydantic.coverage import Coverage
 from covjson_pydantic.ndarray import NdArray
 
-from initialize import (
+from app.internal.initialize import (
     get_base_url,
     get_temporal_extent,
     get_dataset,
@@ -148,7 +148,7 @@ def create_collections_page(url: str) -> dict:
     return collections_page.model_dump(exclude_none=True)
 
 
-def create_data(coords: str = "") -> dict:
+def create_point(coords: str = "") -> dict:
     """Fetch data based on coords"""
     point = wkt.loads(coords)
     print("create_data for coord ", point.y, point.x)
