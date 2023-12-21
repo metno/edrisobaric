@@ -6,9 +6,9 @@ import uvicorn
 from fastapi import FastAPI
 from routes.routes import routes
 
-app = FastAPI(openapi_url="/openapi.json",
-              docs_url="/api")
+app = FastAPI(openapi_url="/openapi.json", docs_url="/api")
 logger = logging.getLogger("uvicorn.access")
+
 
 @asynccontextmanager
 async def lifespan():
@@ -28,9 +28,11 @@ app.include_router(routes)
 
 
 if __name__ == "__main__":
-    uvicorn.run("app:app",
-                host='0.0.0.0',
-                port=5000,
-                workers=4,
-                reload=True,
-                limit_concurrency=20)
+    uvicorn.run(
+        "app:app",
+        host="0.0.0.0",
+        port=5000,
+        workers=4,
+        reload=True,
+        limit_concurrency=20,
+    )

@@ -8,6 +8,7 @@ from edr_pydantic.capabilities import ConformanceModel
 
 router = APIRouter()
 
+
 @lru_cache
 def create_conformance_page() -> dict:
     """Creates the conformance page."""
@@ -19,6 +20,7 @@ def create_conformance_page() -> dict:
         ],
     ).model_dump(exclude_none=True)
 
-@router.get('/conformance')
+
+@router.get("/conformance")
 async def get_conformance_page(request: Request):
-    return (create_conformance_page())
+    return create_conformance_page()

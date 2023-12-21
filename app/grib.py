@@ -60,44 +60,31 @@ def download_gribfile(data_path: str, api_url: str):
     print("Downloading %s to path %s", api_url, fname)
     urlretrieve(api_url, fname)
 
+
 def get_vertical_extent() -> dict:
     """Find and return a list of vertical levels, decending."""
 
+    # ds[TEMPERATURE_LABEL][ISOBARIC_LABEL].data
 
-    #ds[TEMPERATURE_LABEL][ISOBARIC_LABEL].data
+    return ["850", "700", "500", "400", "300", "250", "200", "150", "100", "70"]
 
-    return ["850",
-            "700",
-            "500",
-            "400",
-            "300",
-            "250",
-            "200",
-            "150",
-            "100",
-            "70"]
 
 def get_spatial_extent() -> dict:
     """Find and return a list of the spatial extent. Order is [max lat, min lat, min long, max long](?)."""
     return [64.25, -1.45, 55.35, 14.51]
+
 
 def open_grib():
     """Open grib file."""
     global dataset
 
     print("Opening (or downloading) grib file")
-    filename = build_gribfile_name(
-        get_data_path(), time=datetime.now()
-    )
+    filename = build_gribfile_name(get_data_path(), time=datetime.now())
     if get_filename() is not None:
         filename = get_filename()
     else:
-        if not check_gribfile_exists(
-            data_path=get_data_path(), fname=get_filename()
-        ):
-            download_gribfile(
-                data_path=get_data_path(), api_url=get_base_url()
-            )
+        if not check_gribfile_exists(data_path=get_data_path(), fname=get_filename()):
+            download_gribfile(data_path=get_data_path(), api_url=get_base_url())
 
     try:
         print(xr.show_versions())
@@ -112,6 +99,6 @@ def open_grib():
     except ValueError as err:
         print(
             f"Unable to open file {filename}. Check installation of modules cfgrib, eccodes.\n",
-                err,
+            err,
         )
         sys.exit(1)

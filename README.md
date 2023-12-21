@@ -24,16 +24,19 @@ In development
 
 #### Install
 
-Choose one of the following, conda seems to work best:
+Choose one of the following:
 
 ##### Conda
 
 ```bash
-mamba env create -f environment.yml
+conda create --channel conda-forge --file requirements-conda.txt -n edriso
 conda activate edriso
+pip install edr-pydantic covjson-pydantic
 ```
 
 ##### Pip
+
+I've had trouble getting eccodes library to work.
 
 ```bash
 python3 -m venv venv
@@ -63,8 +66,7 @@ will give these URLs:
 
 ## Documentation
 
-- [Documentation](docs/Documentation.md)
-- [TODO](docs/TODO.md)
+- Based on Pydantic EDR- and covjson-libraries by [KNMI](https://github.com/KNMI/)
 
 ### References
 

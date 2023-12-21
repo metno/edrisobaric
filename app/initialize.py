@@ -7,8 +7,12 @@ import argparse
 import pytz
 import xarray as xr
 
-from grib import TEMPERATURE_LABEL, \
-    build_gribfile_name, check_gribfile_exists, download_gribfile
+from grib import (
+    TEMPERATURE_LABEL,
+    build_gribfile_name,
+    check_gribfile_exists,
+    download_gribfile,
+)
 
 dataset = xr.Dataset()
 DATAFILE = ""
@@ -63,23 +67,18 @@ def get_temporal_extent() -> datetime:
     print("get_temporal_extent", timestamp.isoformat())
     return timestamp.replace(tzinfo=pytz.UTC)
 
+
 def open_grib():
     """Open grib file."""
     global dataset
 
     print("Opening (or downloading) grib file")
-    filename = build_gribfile_name(
-        get_data_path(), time=datetime.now()
-    )
+    filename = build_gribfile_name(get_data_path(), time=datetime.now())
     if get_filename() is not None:
         filename = get_filename()
     else:
-        if not check_gribfile_exists(
-            data_path=get_data_path(), fname=get_filename()
-        ):
-            download_gribfile(
-                data_path=get_data_path(), api_url=get_base_url()
-            )
+        if not check_gribfile_exists(data_path=get_data_path(), fname=get_filename()):
+            download_gribfile(data_path=get_data_path(), api_url=get_base_url())
 
     try:
         dataset = xr.open_dataset(filename, engine="cfgrib")
@@ -93,7 +92,7 @@ def open_grib():
     except ValueError as err:
         print(
             f"Unable to open file {filename}. Check installation of modules cfgrib, eccodes.\n",
-                err,
+            err,
         )
         sys.exit(1)
 
@@ -103,6 +102,7 @@ def get_dataset():
     if len(dataset) == 0:
         open_grib()
     return dataset
+
 
 @lru_cache
 def get_data_path() -> str:
@@ -116,21 +116,31 @@ def get_filename() -> str:
     # return "data/T_YTNE85_C_ENMI_20231213000000.bin"
     return get_datafile()
 
+
 def parse_args() -> argparse.Namespace:
     """Parse incoming json argument."""
     parser = argparse.ArgumentParser()
+    parser.add_argument("--file", help="Grib file to read data from", required=True)
     parser.add_argument(
-        "--file", help="Grib file to read data from", required=True
-    )
-    parser.add_argument(
-        "--base_url", help="Base URL for API", default="http://localhost:5000/", required=False
+        "--base_url",
+        help="Base URL for API",
+        default="http://localhost:5000/",
+        required=False,
     )
 
     return parser.parse_args()
 
+
 def get_datafile() -> str:
     """Expose path to datafile."""
     return DATAFILE
+
+def get_dataset():
+    """Get grib dataset."""
+    if len(dataset) == 0:
+        open_grib()
+    return dataset
+
 
 args = parse_args()
 DATAFILE = args.file

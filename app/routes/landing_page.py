@@ -12,6 +12,7 @@ router = APIRouter()
 
 # LANDING_PAGE = get_config_landing_page()
 
+
 @lru_cache
 def create_landing_page() -> dict:
     """
@@ -67,4 +68,4 @@ def create_landing_page() -> dict:
 
 @router.get("/")
 async def get_landing_page():
-    return (create_landing_page())
+    return create_landing_page()
