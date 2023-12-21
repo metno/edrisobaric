@@ -16,4 +16,4 @@ lint:
     - pip install tox
     - tox
   tags:
-    - team-punkt
+    - teampunkt
