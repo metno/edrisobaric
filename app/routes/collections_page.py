@@ -1,4 +1,5 @@
 """Collections page."""
+from fastapi import APIRouter, Request
 from functools import lru_cache
 from typing import List
 from datetime import datetime, timedelta, timezone
@@ -10,28 +11,37 @@ import covjson_pydantic
 from covjson_pydantic.coverage import Coverage
 from covjson_pydantic.ndarray import NdArray
 from fastapi import status, Response
+from urllib.parse import urljoin
 
-from app.internal.initialize import (
-    get_base_url,
-    get_temporal_extent,
-    get_dataset,
+from initialize import get_base_url, get_temporal_extent
+
+from grib import (
+    get_vertical_extent,
+    get_spatial_extent,
     TEMPERATURE_LABEL,
     LAT_LABEL,
     LON_LABEL,
     UWIND_LABEL,
     VWIND_LABEL,
+    ISOBARIC_LABEL
 )
+
+base_url = get_base_url()
+router = APIRouter()
 
 
 @lru_cache
-def create_collections_page(url: str) -> dict:
+def create_collection(collection_id: str = "") -> dict:
     """Creates the collections page."""
     link_self = edr_pydantic.link.Link(
-        href=url, hreflang="en", rel="self", type="aplication/json"
+        href=base_url, hreflang="en", rel="self", type="aplication/json"
     )
 
-    collections = [
-        Collection(
+    vertical_levels = get_vertical_extent()
+    collection_url=f"{base_url}collections" + \
+        (f"/{collection_id}" if len(collection_id) > 0 else "")
+
+    isobaric_col = Collection(
             id="isobaric",
             title="IsobaricGRIB - GRIB files",
             description="""
@@ -54,23 +64,12 @@ def create_collections_page(url: str) -> dict:
             ],
             extent=edr_pydantic.extent.Extent(
                 spatial=edr_pydantic.extent.Spatial(
-                    bbox=[[64.25, -1.45, 55.35, 14.51]], crs="WGS84"
+                    bbox=[get_spatial_extent()], crs="WGS84"
                 ),
                 vertical=edr_pydantic.extent.Vertical(
-                    interval=[["850"], ["70"]],
-                    values=[
-                        "850",
-                        "700",
-                        "500",
-                        "400",
-                        "300",
-                        "250",
-                        "200",
-                        "150",
-                        "100",
-                        "70",
-                    ],
-                    vrs="Vertical Reference System: PressureLevel",
+                    interval=[[vertical_levels[0]], [vertical_levels[len(vertical_levels)-1]]],
+                    values=vertical_levels,
+                    vrs="Vertical Reference System: PressureLevel", # opendata.fmi.fi
                 ),
                 temporal=edr_pydantic.extent.Temporal(
                     interval=[
@@ -80,12 +79,12 @@ def create_collections_page(url: str) -> dict:
                         ]
                     ],
                     values=[get_temporal_extent().isoformat()],
-                    trs='TIMECRS["DateTime",TDATUM["Gregorian Calendar"],CS[TemporalDateTime,1],AXIS["Time (T)",future]',
+                    trs='TIMECRS["DateTime",TDATUM["Gregorian Calendar"],CS[TemporalDateTime,1],AXIS["Time (T)",future]', # opendata.fmi.fi
                 ),
             ),
             links=[
                 edr_pydantic.link.Link(
-                    href="https://api.met.no/weatherapi/isobaricgrib/1.0/documentation",
+                    href=collection_url,
                     rel="service-doc",
                 )
             ],
@@ -93,7 +92,7 @@ def create_collections_page(url: str) -> dict:
                 # List instances
                 instances=edr_pydantic.data_queries.EDRQuery(
                     link=edr_pydantic.data_queries.EDRQueryLink(
-                        href=f"{get_base_url()}collections/instances",
+                        href=f"{collection_url}/instances",
                         rel="data",
                         variables=edr_pydantic.variables.Variables(
                             query_type="instance", output_formats=["CoverageJSON"]
@@ -103,7 +102,7 @@ def create_collections_page(url: str) -> dict:
                 # Get posision in default instance
                 position=edr_pydantic.data_queries.EDRQuery(
                     link=edr_pydantic.data_queries.EDRQueryLink(
-                        href=f"{get_base_url()}collections/position",
+                        href=f"{collection_url}/position",
                         rel="data",
                         variables=edr_pydantic.variables.Variables(
                             query_type="position",
@@ -140,16 +139,15 @@ def create_collections_page(url: str) -> dict:
                 }
             ),
         )
-    ]
 
-    collections_page = edr_pydantic.collections.Collections(
-        links=[link_self], collections=collections
-    )
+    if len(collection_id) == 0:
+        collections_page = edr_pydantic.collections.Collections(
+            links=[link_self], collections=[isobaric_col]
+        )
+        return collections_page.model_dump(exclude_none=True)
+    return isobaric_col.model_dump(exclude_none=True)
 
-    return collections_page.model_dump(exclude_none=True)
-
-
-def create_point(coords: str = "") -> dict:
+# def create_point(datafile, coords: str = "") -> dict:
     """Fetch data based on coords."""
     point = None
     try:
@@ -189,16 +187,16 @@ def create_point(coords: str = "") -> dict:
     uwind_values: List[float | None] = []
     vwind_values: List[float | None] = []
 
-    for t in temperatures:
-        temperature_values.append(float(t.data))
-        # print("isobaricInhPa", t["isobaricInhPa"].data)
+    for temperature in temperatures:
+        temperature_values.append(float(temperature.data))
+        # print(ISOBARIC_LABEL, t[ISOBARIC_LABEL].data)
         # print("temp", t.data)
 
         # For same coord and isobaric, fetch wind vectors
         uwind = dataset[UWIND_LABEL].sel(
             longitude=point.x,
             latitude=point.y,
-            isobaricInhPa=t["isobaricInhPa"].data,
+            isobaricInhPa=temperature[ISOBARIC_LABEL].data,
             method="nearest",
         )
         # print("uwind", uwind.data)
@@ -207,13 +205,13 @@ def create_point(coords: str = "") -> dict:
         vwind = dataset[VWIND_LABEL].sel(
             longitude=point.x,
             latitude=point.y,
-            isobaricInhPa=t["isobaricInhPa"].data,
+            isobaricInhPa=temperature[ISOBARIC_LABEL].data,
             method="nearest",
         )
         # print("vwind", vwind.data)
         vwind_values.append(float(vwind.data))
 
-    c = Coverage(
+    cov = Coverage(
         id="isobaric",
         type="Coverage",
         domain=covjson_pydantic.domain.Domain(
@@ -317,4 +315,14 @@ def create_point(coords: str = "") -> dict:
         },
     )
 
-    return c.model_dump(exclude_none=True)
+    return cov.model_dump(exclude_none=True)
+
+
+@router.get("/collections")
+async def create_collections_page() -> dict:
+    return create_collection()
+
+
+@router.get("/collections/{collection_id}")
+async def create_collection_page(collection_id: str) -> dict:
+    return create_collection(collection_id)
