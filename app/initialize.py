@@ -135,12 +135,6 @@ def get_datafile() -> str:
     """Expose path to datafile."""
     return DATAFILE
 
-def get_dataset():
-    """Get grib dataset."""
-    if len(dataset) == 0:
-        open_grib()
-    return dataset
-
 
 args = parse_args()
 DATAFILE = args.file

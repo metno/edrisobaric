@@ -32,7 +32,6 @@ if __name__ == "__main__":
         "app:app",
         host="0.0.0.0",
         port=5000,
-        workers=4,
-        reload=True,
-        limit_concurrency=20,
+        workers=1,
+        # limit_concurrency=20,
     )
