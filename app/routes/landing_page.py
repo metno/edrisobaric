@@ -1,11 +1,29 @@
-"""Landing page."""
 from functools import lru_cache
+from fastapi import APIRouter, Request
 from edr_pydantic.capabilities import LandingPageModel, Provider, Contact
 from edr_pydantic.link import Link
 
+from initialize import get_base_url
+
+
+base_url = get_base_url()
+
+router = APIRouter()
+
+# LANDING_PAGE = get_config_landing_page()
 
 @lru_cache
-def create_landing_page(base_url) -> dict:
+def create_landing_page() -> dict:
+    """
+    Creates the landing page based on predefined
+    configuration file.
+
+    Returns:
+    ----------
+    landinge_page: dict
+        EDR landing page response.
+    """
+
     """Creates the landing page."""
     landing = LandingPageModel(
         title="EDR isobaric from Grib",
@@ -45,3 +63,8 @@ def create_landing_page(base_url) -> dict:
     )
 
     return landing.model_dump(exclude_none=True)
+
+
+@router.get("/")
+async def get_landing_page():
+    return (create_landing_page())
