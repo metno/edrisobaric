@@ -44,7 +44,7 @@ pip install -r requirements.txt
 #### Usage
 
 ```bash
-uvicorn app:app --reload
+uvicorn app.main:app --reload
 ```
 
 will give these URLs:

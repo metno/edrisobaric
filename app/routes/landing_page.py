@@ -1,4 +1,4 @@
-""" Landing page """
+"""Landing page."""
 from functools import lru_cache
 from edr_pydantic.capabilities import LandingPageModel, Provider, Contact
 from edr_pydantic.link import Link
@@ -6,8 +6,7 @@ from edr_pydantic.link import Link
 
 @lru_cache
 def create_landing_page(base_url) -> dict:
-    """Creates the landing page"""
-
+    """Creates the landing page."""
     landing = LandingPageModel(
         title="EDR isobaric from Grib",
         description="An EDR API for isobaric data from Grib files",

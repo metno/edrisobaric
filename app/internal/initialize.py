@@ -1,4 +1,4 @@
-""" Initialize configuration data """
+"""Initialize configuration data."""
 
 import sys
 from functools import lru_cache
@@ -8,7 +8,7 @@ import xarray as xr
 
 import app.internal.grib
 
-APP_CONFIG = 'edriso.cnf'
+APP_CONFIG = "edriso.cnf"
 TEMPERATURE_LABEL = "t"
 LAT_LABEL = "latitude"
 LON_LABEL = "longitude"
@@ -51,35 +51,28 @@ dataset = xr.Dataset()
 
 @lru_cache()
 def get_base_url() -> str:
-    """
-    Parse configuration file and return base_url
-    """
-    host="http://localhost:8000/"
+    """Parse configuration file and return base_url."""
+    host = "http://localhost:8000/"
 
-    # get_application_config("host") or 
+    # get_application_config("host") or
     return host
 
 
 @lru_cache
 def get_data_path() -> str:
-    """
-    Returns config parameter object
-    """
+    """Returns config parameter object."""
     return "data"
 
 
 @lru_cache
 def get_filename() -> str:
-    """
-    Returns config parameter object
-    """
+    """Returns config parameter object."""
     return "data/T_YTNE85_C_ENMI_20231213000000.bin"
 
 
 @lru_cache
 def get_temporal_extent() -> datetime:
-    """Fetch time from grib data"""
-
+    """Fetch time from grib data."""
     if len(dataset) == 0:
         open_grib()
 
@@ -93,16 +86,22 @@ def get_temporal_extent() -> datetime:
 
 
 def open_grib():
-    """Open grib file"""
+    """Open grib file."""
     global dataset
 
     print("Opening (or downloading) grib file")
-    filename = app.internal.grib.build_gribfile_name(get_data_path(), time=datetime.now())
+    filename = app.internal.grib.build_gribfile_name(
+        get_data_path(), time=datetime.now()
+    )
     if get_filename() is not None:
         filename = get_filename()
     else:
-        if not app.internal.grib.validate_gribfile(data_path=get_data_path(), fname=get_filename()):
-            app.internal.grib.download_gribfile(data_path=get_data_path(), api_url=get_base_url())
+        if not app.internal.grib.validate_gribfile(
+            data_path=get_data_path(), fname=get_filename()
+        ):
+            app.internal.grib.download_gribfile(
+                data_path=get_data_path(), api_url=get_base_url()
+            )
 
     try:
         dataset = xr.open_dataset(filename, engine="cfgrib")
@@ -122,7 +121,7 @@ def open_grib():
 
 
 def get_dataset():
-    """Get grib dataset"""
+    """Get grib dataset."""
     if len(dataset) == 0:
         open_grib()
     return dataset

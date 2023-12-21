@@ -1,14 +1,15 @@
-""" Collections page """
+"""Collections page."""
 from functools import lru_cache
 from typing import List
 from datetime import datetime, timedelta, timezone
 import edr_pydantic
 from edr_pydantic.collections import Collection
 from pydantic import AwareDatetime
-from shapely import wkt
+from shapely import wkt, GEOSException
 import covjson_pydantic
 from covjson_pydantic.coverage import Coverage
 from covjson_pydantic.ndarray import NdArray
+from fastapi import status, Response
 
 from app.internal.initialize import (
     get_base_url,
@@ -24,7 +25,7 @@ from app.internal.initialize import (
 
 @lru_cache
 def create_collections_page(url: str) -> dict:
-    """Creates the collections page"""
+    """Creates the collections page."""
     link_self = edr_pydantic.link.Link(
         href=url, hreflang="en", rel="self", type="aplication/json"
     )
@@ -149,36 +150,37 @@ def create_collections_page(url: str) -> dict:
 
 
 def create_point(coords: str = "") -> dict:
-    """Fetch data based on coords"""
-    point = wkt.loads(coords)
+    """Fetch data based on coords."""
+    point = None
+    try:
+        point = wkt.loads(coords)
+    except GEOSException:
+        errmsg = f'Error, coords should be a Well Known Text, for example "POINT(11.0 59.0)". You gave "{coords}"'
+        print(errmsg)
+        return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
+
     print("create_data for coord ", point.y, point.x)
 
-    ds = get_dataset()
+    dataset = get_dataset()
 
     # Sanity checks on coordinates
     if (
-        point.y > ds[TEMPERATURE_LABEL][LAT_LABEL].values.max()
-        or point.y < ds[TEMPERATURE_LABEL][LAT_LABEL].values.min()
+        point.y > dataset[TEMPERATURE_LABEL][LAT_LABEL].values.max()
+        or point.y < dataset[TEMPERATURE_LABEL][LAT_LABEL].values.min()
     ):
-        print(
-            f"Error, point.y ({point.y}) is outside data min/max \
-            {ds[TEMPERATURE_LABEL][LAT_LABEL].values.min()}/{ds[TEMPERATURE_LABEL][LAT_LABEL].values.max()}"
-        )
-        return {}
+        errmsg = f"Error, coord {point.y} out of bounds. Min/max is {dataset[TEMPERATURE_LABEL][LAT_LABEL].values.min()}/{dataset[TEMPERATURE_LABEL][LAT_LABEL].values.max()}"
+        print(errmsg)
+        return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
     if (
-        point.x > ds[TEMPERATURE_LABEL][LON_LABEL].values.max()
-        or point.x < ds[TEMPERATURE_LABEL][LON_LABEL].values.min()
+        point.x > dataset[TEMPERATURE_LABEL][LON_LABEL].values.max()
+        or point.x < dataset[TEMPERATURE_LABEL][LON_LABEL].values.min()
     ):
-        print(
-            f"Error, point.y ({point.x}) is outside data min/max \
-            {ds[TEMPERATURE_LABEL][LON_LABEL].values.min()}/{ds[TEMPERATURE_LABEL][LON_LABEL].values.max()}"
-        )
-        return {}
-
-    # data = {}
+        errmsg = f"Error, coord {point.x} out of bounds. Min/max is {dataset[TEMPERATURE_LABEL][LON_LABEL].values.min()}/{dataset[TEMPERATURE_LABEL][LON_LABEL].values.max()}"
+        print(errmsg)
+        return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
 
     # Fetch temperature
-    temperatures = ds[TEMPERATURE_LABEL].sel(
+    temperatures = dataset[TEMPERATURE_LABEL].sel(
         longitude=point.x, latitude=point.y, method="nearest"
     )
 
@@ -193,7 +195,7 @@ def create_point(coords: str = "") -> dict:
         # print("temp", t.data)
 
         # For same coord and isobaric, fetch wind vectors
-        uwind = ds[UWIND_LABEL].sel(
+        uwind = dataset[UWIND_LABEL].sel(
             longitude=point.x,
             latitude=point.y,
             isobaricInhPa=t["isobaricInhPa"].data,
@@ -202,7 +204,7 @@ def create_point(coords: str = "") -> dict:
         # print("uwind", uwind.data)
         uwind_values.append(float(uwind.data))
 
-        vwind = ds[VWIND_LABEL].sel(
+        vwind = dataset[VWIND_LABEL].sel(
             longitude=point.x,
             latitude=point.y,
             isobaricInhPa=t["isobaricInhPa"].data,
@@ -236,7 +238,15 @@ def create_point(coords: str = "") -> dict:
                     coordinates=["z"],
                     system=covjson_pydantic.reference_system.ReferenceSystem(
                         type="VerticalCRS",
-                        cs={'csAxes': [{'name': {'en': 'Pressure'}, 'direction': 'down', 'unit': {'symbol': 'Pa'}}]}
+                        cs={
+                            "csAxes": [
+                                {
+                                    "name": {"en": "Pressure"},
+                                    "direction": "down",
+                                    "unit": {"symbol": "Pa"},
+                                }
+                            ]
+                        },
                     ),
                 ),
                 covjson_pydantic.reference_system.ReferenceSystemConnectionObject(

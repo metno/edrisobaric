@@ -1,4 +1,4 @@
-""" Grib specific operations """
+"""Grib specific operations."""
 
 import os
 from datetime import datetime, timedelta
@@ -7,7 +7,7 @@ import cgi
 
 
 def build_gribfile_name(data_path: str, time: datetime) -> str:
-    """Generate correct name for grib files"""
+    """Generate correct name for grib files."""
     filename_prefix = "T_YTNC85_C_ENMI_"
     filename_postfix = ".bin"
 
@@ -22,7 +22,7 @@ def build_gribfile_name(data_path: str, time: datetime) -> str:
 
 
 def validate_gribfile(data_path: str, fname: str) -> bool:
-    """Fetch latest grib-file"""
+    """Fetch latest grib-file."""
     if not os.path.isfile(data_path + os.pathsep + fname):
         print("Datafile with name %s not found", fname)
         return False
@@ -30,7 +30,7 @@ def validate_gribfile(data_path: str, fname: str) -> bool:
 
 
 def download_gribfile(data_path: str, api_url: str):
-    """Ensure data dir exists, download latest file"""
+    """Ensure data dir exists, download latest file."""
     try:
         os.mkdir(data_path)
     except FileExistsError:

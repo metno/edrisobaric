@@ -1,4 +1,4 @@
-""" Uvicorn entry point """
+"""Uvicorn entry point."""
 
 import logging
 from contextlib import asynccontextmanager
@@ -6,7 +6,7 @@ import uvicorn
 from fastapi import FastAPI, Request
 
 from app.internal import initialize
-from app.routes import collections, conformance, landing_page
+from app.routes import edrcollections, conformance, landing_page
 
 
 app = FastAPI(openapi_url="/openapi.json", docs_url="/api")
@@ -15,9 +15,7 @@ logger = logging.getLogger("uvicorn.access")
 
 @asynccontextmanager
 async def lifespan():
-    """
-    Runs before startup. Set logging format. Open grib file.
-    """
+    """Runs before startup. Set logging format. Open grib file."""
     console_formatter = uvicorn.logging.ColourizedFormatter(
         "{levelprefix} ({asctime}) : {message}",
         "%Y-%m-%d %H:%M:%S",
@@ -31,26 +29,26 @@ async def lifespan():
 
 @app.get("/")
 async def root():
-    """Reply to /"""
+    """Reply to /."""
     return landing_page.create_landing_page(initialize.get_base_url())
 
 
 @app.get("/conformance")
 async def get_conformance():
-    """Conformance"""
+    """Conformance."""
     return conformance.create_conformance_page()
 
 
 @app.get("/collections")
 async def get_collections(request: Request):
-    """Collections"""
-    return collections.create_collections_page(str(request.url))
+    """Collections."""
+    return edrcollections.create_collections_page(str(request.url))
 
 
 @app.get("/collections/position")
-async def get_instances(coords: str):
-    """Position"""
-    return collections.create_point(coords=coords)
+async def get_position(coords: str):
+    """Position."""
+    return edrcollections.create_point(coords=coords)
 
 
 # @app.get("/collections/{instance_id}")
@@ -60,5 +58,6 @@ async def get_instances(coords: str):
 
 
 if __name__ == "__main__":
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000,
-    reload=False, limit_concurrency=20) # app.main:app
+    uvicorn.run(
+        "app.main:app", host="0.0.0.0", port=5000, reload=False, limit_concurrency=20
+    )  # app.main:app

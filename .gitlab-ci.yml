@@ -1,0 +1,19 @@
+stages:
+  - lint
+  - build_ham
+  - testimage_ham
+  - release-image_ham
+
+variables:
+  FULL_IMAGE_NAME: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
+  IMAGE_HAM: registry.met.no/team-punkt/drifty/ham/ham
+
+lint:
+  stage: lint
+  image: python:3.10-slim
+  script:
+    - cd edr-isobaricgrib
+    - pip install tox
+    - tox
+  tags:
+    - team-punkt

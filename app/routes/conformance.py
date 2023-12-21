@@ -1,12 +1,11 @@
-""" Conformance page """
+"""Conformance page."""
 from functools import lru_cache
 from edr_pydantic.capabilities import ConformanceModel
 
 
 @lru_cache
 def create_conformance_page() -> dict:
-    """Creates the conformance page"""
-
+    """Creates the conformance page."""
     return ConformanceModel(
         conformsTo=[
             "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/core",
