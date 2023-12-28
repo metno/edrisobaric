@@ -15,6 +15,6 @@ async def get_landing_page():
     return create_landing_page()
 
 if __name__ == "__main__":
-    uvicorn.run("app:app",
+    uvicorn.run("app1:app",
                 host='0.0.0.0',
                 port=5000)

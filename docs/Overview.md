@@ -4,7 +4,7 @@ Documentation for creating [EDR API](https://ogcapi.ogc.org/edr/)s using Python.
 
 ## Sections
 
-[Tutorials](Tutorials.md), [how-to](Howtos.md) guides, technical reference and explanation.
+[Tutorials](Tutorials.md), [how-to](Howtos.md) guides, technical [reference](Reference.md) and [explanation](Explanation.md).
 
 ## Components
 
@@ -15,15 +15,6 @@ Documentation for creating [EDR API](https://ogcapi.ogc.org/edr/)s using Python.
 ## Not covered
 
 - General EDR knowledge
-- Web proxy
+- Web proxy, https
 - Containerization
-
-## Links to library examples
-
-### FastAPI
-
-<https://fastapi.tiangolo.com/#example>
-
-### Pydantic / EDR-Pydantic
-
-See <https://github.com/KNMI/edr-pydantic> or the [conformance page](../app/routes/conformance_page.py) for an example.
+- Metadata
