@@ -156,7 +156,7 @@ In a different terminal:
 {"title":"EDR test","description":"An EDR API How-to","links":[{"href":"http://0.0.0.0:5000/","rel":"self","type":"application/json","title":"Landing Page"},{"href":"http://0.0.0.0:5000/conformance","rel":"conformance","type":"application/json","title":"Conformance document"},{"href":"http://0.0.0.0:5000/collections","rel":"data","type":"application/json","title":"Collections metadata in JSON"}],"provider":{"name":"Meteorologisk institutt / The Norwegian Meteorological Institute","url":"https://api.met.no/"},"contact":{"email":"api-users-request@lists.met.no","phone":"+47.22963000","address":"Henrik Mohns plass 1","postalCode":"0313","city":"Oslo","country":"Norway"}}%
 ```
 
-Note that since we use FastAPI it will automatically produce a swagger UI with openapi spec for us at <http://0.0.0.0:5000/docs> and another type of doc at <http://0.0.0.0:5000/redoc>.
+Note that since we use FastAPI it will automatically produce a Swagger UI with OpenAPI specification for us at <http://0.0.0.0:5000/docs> and another type of doc at <http://0.0.0.0:5000/redoc>.
 
 The links for collections, conformance, etc won't work as we have not implemented them.
 

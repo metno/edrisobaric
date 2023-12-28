@@ -18,3 +18,7 @@ Documentation for creating [EDR API](https://ogcapi.ogc.org/edr/)s using Python.
 - Web proxy, https
 - Containerization
 - Metadata
+
+## Documentation
+
+This documentation is based on [The Grand Unified Theory of Documentation](https://documentation.divio.com/).

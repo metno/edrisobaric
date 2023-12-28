@@ -6,9 +6,9 @@
 
 EDR-isobaric is an API for isobaric data (temperature and wind in isobaric layers). The API is based on [OGC Environmental Data Retrieval (EDR)](https://ogcapi.ogc.org/edr/). Data comes from [GRIB](https://en.wikipedia.org/wiki/GRIB) files from <https://api.met.no/weatherapi/isobaricgrib/1.0/documentation>.
 
-The code is written as an example aimed at API developers at Met.no.
-
 The resulting API is for people who need vertical environmental data for a single location.
+
+The code is written as an example aimed at API developers at Met.no. See extensive docs around creating an API at [Overview](docs/Overview.md).
 
 ## Who is responsible?
 
@@ -58,7 +58,7 @@ will give these URLs:
 
 ### Use it for production
 
-*How to responsible use it as a dependency for your own production system.*
+This is only ment for local usage. Use as noted in `Testing it out`.
 
 ## Overview of architecture
 
@@ -67,6 +67,7 @@ will give these URLs:
 ## Documentation
 
 - Based on Pydantic EDR- and covjson-libraries by [KNMI](https://github.com/KNMI/)
+- Docs around creating an API at [Overview](docs/Overview.md).
 
 ### References
 
@@ -84,7 +85,7 @@ will give these URLs:
 
 ## How to contribute
 
-- Send an email
+- Issues, merge-requests.
 
 ## Documentation Template
 
