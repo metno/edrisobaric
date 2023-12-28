@@ -1,16 +1,22 @@
 # Tutorials
 
-## EDR-Pydantic - return a conformance page
+## EDR-Pydantic - Create a conformance page
 
 In EDR a conformance page is a list of standards our API adheres to.
 
-In this tutorial we will create a json output for a conformance page. It is assumed you have basic python- and terminal knowledge and python with pip installed.
+In this tutorial we will create a json output representing a conformance page.
+
+It is assumed you have basic terminal knowledge and are on an Ubuntu workstation.
 
 ### Create a venv and install necessary tools
 
+Install system tools:
+
+- sudo apt install python3-pip python3-venv curl
+
 Create a directory for your project and set up environment.
 
-- mkdir tutorial; cd tutorial
+- mkdir ~/tutorial; cd ~/tutorial
 - python3 -m venv venv
 - source venv/bin/activate
 - pip install edr-pydantic
@@ -21,9 +27,9 @@ You should now have all the tools, and your terminal should show something like
 (venv) larsfp@laptop5701:~/tutorial$ 
 ```
 
-### Paste in this code
+### Code
 
-in a file called `conformance.py`
+Paste this code in a file called `conformance.py`
 
 ```python
 from edr_pydantic.capabilities import ConformanceModel

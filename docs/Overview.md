@@ -4,7 +4,7 @@ Documentation for creating [EDR API](https://ogcapi.ogc.org/edr/)s using Python.
 
 ## Sections
 
-[Tutorials](Tutorials.md), how-to guides, technical reference and explanation.
+[Tutorials](Tutorials.md), [how-to](Howtos.md) guides, technical reference and explanation.
 
 ## Components
 
@@ -12,7 +12,13 @@ Documentation for creating [EDR API](https://ogcapi.ogc.org/edr/)s using Python.
 - Pydantic is a library for data validation.
 - Edr-pydantic has pre-made pydantic models for EDR, like Collection, Instance, Link, etc.
 
-## Link to examples
+## Not covered
+
+- General EDR knowledge
+- Web proxy
+- Containerization
+
+## Links to library examples
 
 ### FastAPI
 
