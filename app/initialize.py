@@ -50,6 +50,7 @@ BASE_URL = ""
 
 @lru_cache()
 def get_base_url() -> str:
+    """Return base url."""
     return BASE_URL
 
 

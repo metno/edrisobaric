@@ -1,8 +1,8 @@
 """Collections page."""
-from fastapi import APIRouter, Request
 from functools import lru_cache
 from typing import List
 from datetime import datetime, timedelta, timezone
+from fastapi import APIRouter, status, Response #, Request
 import edr_pydantic
 from edr_pydantic.collections import Collection
 from pydantic import AwareDatetime
@@ -10,8 +10,6 @@ from shapely import wkt, GEOSException
 import covjson_pydantic
 from covjson_pydantic.coverage import Coverage
 from covjson_pydantic.ndarray import NdArray
-from fastapi import status, Response
-from urllib.parse import urljoin
 
 from initialize import get_base_url, get_temporal_extent, get_dataset
 
@@ -81,7 +79,8 @@ def create_collection(collection_id: str = "") -> dict:
                     ]
                 ],
                 values=[get_temporal_extent().isoformat()],
-                trs='TIMECRS["DateTime",TDATUM["Gregorian Calendar"],CS[TemporalDateTime,1],AXIS["Time (T)",future]',  # opendata.fmi.fi
+                trs='TIMECRS["DateTime",TDATUM["Gregorian Calendar"],' \
+                    + 'CS[TemporalDateTime,1],AXIS["Time (T)",future]'  # opendata.fmi.fi
             ),
         ),
         links=[
@@ -155,7 +154,8 @@ def create_point(coords: str = "") -> dict:
     try:
         point = wkt.loads(coords)
     except GEOSException:
-        errmsg = f'Error, coords should be a Well Known Text, for example "POINT(11.0 59.0)". You gave "{coords}"'
+        errmsg = 'Error, coords should be a Well Known Text, for example ' \
+            + f'"POINT(11.0 59.0)". You gave "{coords}"'
         print(errmsg)
         return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
 
@@ -168,14 +168,18 @@ def create_point(coords: str = "") -> dict:
         point.y > dataset[TEMPERATURE_LABEL][LAT_LABEL].values.max()
         or point.y < dataset[TEMPERATURE_LABEL][LAT_LABEL].values.min()
     ):
-        errmsg = f"Error, coord {point.y} out of bounds. Min/max is {dataset[TEMPERATURE_LABEL][LAT_LABEL].values.min()}/{dataset[TEMPERATURE_LABEL][LAT_LABEL].values.max()}"
+        errmsg = f"Error, coord {point.y} out of bounds. Min/max is " \
+            + "{dataset[TEMPERATURE_LABEL][LAT_LABEL].values.min()}/" \
+            + "{dataset[TEMPERATURE_LABEL][LAT_LABEL].values.max()}"
         print(errmsg)
         return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
     if (
         point.x > dataset[TEMPERATURE_LABEL][LON_LABEL].values.max()
         or point.x < dataset[TEMPERATURE_LABEL][LON_LABEL].values.min()
     ):
-        errmsg = f"Error, coord {point.x} out of bounds. Min/max is {dataset[TEMPERATURE_LABEL][LON_LABEL].values.min()}/{dataset[TEMPERATURE_LABEL][LON_LABEL].values.max()}"
+        errmsg = f"Error, coord {point.x} out of bounds. Min/max is \
+            {dataset[TEMPERATURE_LABEL][LON_LABEL].values.min()}/\
+            {dataset[TEMPERATURE_LABEL][LON_LABEL].values.max()}"
         print(errmsg)
         return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
 
