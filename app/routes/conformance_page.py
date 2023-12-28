@@ -1,15 +1,13 @@
 """Conformance page."""
-# from initialize import get_config_conformance_page
-from fastapi import APIRouter, Request
 from functools import lru_cache
-from pydantic import BaseModel
+from fastapi import APIRouter
 from edr_pydantic.capabilities import ConformanceModel
 
 
 router = APIRouter()
 
 
-@lru_cache
+@lru_cache  # Cache reply, as it will never change.
 def create_conformance_page() -> dict:
     """Creates the conformance page."""
     return ConformanceModel(
@@ -22,5 +20,6 @@ def create_conformance_page() -> dict:
 
 
 @router.get("/conformance")
-async def get_conformance_page(request: Request):
+async def get_conformance_page():
+    """Returns the conformance page contents."""
     return create_conformance_page()
