@@ -2,7 +2,7 @@
 from functools import lru_cache
 from typing import List
 from datetime import datetime, timedelta, timezone
-from fastapi import APIRouter, status, Response #, Request
+from fastapi import APIRouter, status, Response  # , Request
 import edr_pydantic
 from edr_pydantic.collections import Collection
 from pydantic import AwareDatetime
@@ -79,8 +79,8 @@ def create_collection(collection_id: str = "") -> dict:
                     ]
                 ],
                 values=[get_temporal_extent().isoformat()],
-                trs='TIMECRS["DateTime",TDATUM["Gregorian Calendar"],' \
-                    + 'CS[TemporalDateTime,1],AXIS["Time (T)",future]'  # opendata.fmi.fi
+                trs='TIMECRS["DateTime",TDATUM["Gregorian Calendar"],'
+                + 'CS[TemporalDateTime,1],AXIS["Time (T)",future]',  # opendata.fmi.fi
             ),
         ),
         links=[
@@ -148,14 +148,17 @@ def create_collection(collection_id: str = "") -> dict:
         return collections_page.model_dump(exclude_none=True)
     return isobaric_col.model_dump(exclude_none=True)
 
+
 def create_point(coords: str = "") -> dict:
     """Fetch data based on coords."""
     point = None
     try:
         point = wkt.loads(coords)
     except GEOSException:
-        errmsg = 'Error, coords should be a Well Known Text, for example ' \
+        errmsg = (
+            "Error, coords should be a Well Known Text, for example "
             + f'"POINT(11.0 59.0)". You gave "{coords}"'
+        )
         print(errmsg)
         return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
 
@@ -168,9 +171,11 @@ def create_point(coords: str = "") -> dict:
         point.y > dataset[TEMPERATURE_LABEL][LAT_LABEL].values.max()
         or point.y < dataset[TEMPERATURE_LABEL][LAT_LABEL].values.min()
     ):
-        errmsg = f"Error, coord {point.y} out of bounds. Min/max is " \
-            + "{dataset[TEMPERATURE_LABEL][LAT_LABEL].values.min()}/" \
+        errmsg = (
+            f"Error, coord {point.y} out of bounds. Min/max is "
+            + "{dataset[TEMPERATURE_LABEL][LAT_LABEL].values.min()}/"
             + "{dataset[TEMPERATURE_LABEL][LAT_LABEL].values.max()}"
+        )
         print(errmsg)
         return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
     if (
@@ -329,10 +334,12 @@ async def create_collections_page() -> dict:
     """List of collections."""
     return create_collection()
 
+
 @router.get("/collections/isobaric/position")
 async def create_isobaric_page(coords: str) -> dict:
     """Position."""
     return create_point(coords=coords)
+
 
 @router.get("/collections/{collection_id}")
 async def create_collection_page(collection_id: str) -> dict:
