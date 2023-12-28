@@ -1,21 +1,34 @@
 # Reference
 
-## ConformanceModel
-
-[ConformanceModel](https://github.com/KNMI/edr-pydantic/blob/791c6f7dd3b55b1f8ba93989bbe97d0f38f76ba9/src/edr_pydantic/capabilities.py#L37) defines a parameter `conformsTo`, with a list of strings.
-
 ## LandingPageModel
 
 [LandingPageModel](https://github.com/KNMI/edr-pydantic/blob/791c6f7dd3b55b1f8ba93989bbe97d0f38f76ba9/src/edr_pydantic/capabilities.py#L28) defines:
 
-    title: Optional[str] = None
-    description: Optional[str] = None
-    links: List[Link]
-    keywords: Optional[List[str]] = None
-    provider: Optional[Provider] = None
-    contact: Optional[Contact] = None
+    class LandingPageModel(EdrBaseModel):
+        title: Optional[str] = None
+        description: Optional[str] = None
+        links: List[Link]
+        keywords: Optional[List[str]] = None
+        provider: Optional[Provider] = None
+        contact: Optional[Contact] = None
 
-Most of these are marked optional, but should probably be included.
+Most of these are marked optional, but should be included.
+
+See example of landing pages:
+
+- [opendata.fmi.fi/edr](https://opendata.fmi.fi/edr/)
+- [labs.metoffice.gov.uk/edr](https://labs.metoffice.gov.uk/edr/)
+
+## ConformanceModel
+
+[ConformanceModel](https://github.com/KNMI/edr-pydantic/blob/791c6f7dd3b55b1f8ba93989bbe97d0f38f76ba9/src/edr_pydantic/capabilities.py#L37) defines a parameter `conformsTo`, with a list of strings.
+
+    class ConformanceModel(EdrBaseModel):
+        conformsTo: List[str]
+
+See example of conformance pages:
+
+- [labs.metoffice.gov.uk/edr/conformance](https://labs.metoffice.gov.uk/edr/conformance)
 
 ## Starting uvicon
 

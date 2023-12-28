@@ -4,7 +4,7 @@ Documentation for creating [EDR API](https://ogcapi.ogc.org/edr/)s using Python.
 
 ## Sections
 
-[Tutorials](Tutorials.md), [how-to](Howtos.md) guides, technical [reference](Reference.md) and [explanation](Explanation.md).
+[Tutorials](Tutorials.md), [how-to guides](Howtos.md), [technical reference](Reference.md) and [explanation](Explanation.md).
 
 ## Components
 
