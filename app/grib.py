@@ -1,9 +1,13 @@
 """Grib specific operations."""
 
 import os
+import sys
 from datetime import datetime, timedelta
 from urllib.request import urlopen, urlretrieve
 import cgi
+import xarray as xr
+
+# from initialize import get_data_path, get_filename, get_base_url
 
 
 # Define labels in file
@@ -61,7 +65,7 @@ def download_gribfile(data_path: str, api_url: str):
     urlretrieve(api_url, fname)
 
 
-def get_vertical_extent() -> dict:
+def get_vertical_extent() -> list[str]:
     """Find and return a list of vertical levels, decending."""
 
     # ds[TEMPERATURE_LABEL][ISOBARIC_LABEL].data
@@ -69,8 +73,11 @@ def get_vertical_extent() -> dict:
     return ["850", "700", "500", "400", "300", "250", "200", "150", "100", "70"]
 
 
-def get_spatial_extent() -> dict:
-    """Find and return a list of the spatial extent. Order is [max lat, min lat, min long, max long](?)."""
+def get_spatial_extent() -> list[float]:
+    """
+    Find and return a list of the spatial extent.
+    Order is [max lat, min lat, min long, max long](?).
+    """
     return [64.25, -1.45, 55.35, 14.51]
 
 

@@ -14,39 +14,6 @@ from grib import (
     download_gribfile,
 )
 
-dataset = xr.Dataset()
-DATAFILE = ""
-BASE_URL = ""
-
-##########################################
-# Initialize configuration for EDR pages #
-##########################################
-
-# class InitEdrConfig():
-#     """
-#     Initialize configuration for Environmental Data Retrieval
-#     """
-#     def __init__(self):
-#         with open(os.getenv("EDR_CONFIG"), 'r') as c:
-#             self.config = yaml.safe_load(c)
-
-
-# def get_edr_config(key):
-#     """
-#     Returns an element from the EDR configuration as object
-#     """
-#     try:
-#         config = InitEdrConfig().config[key]
-#     except KeyError as err:
-#         logging.exception(f"key {err} not found in the configuration file "
-#                           f"{EDR_CONFIG}.")
-#         raise HTTPException(
-#             detail='Application encountered an Internal Server Error',
-#             status_code=HTTPStatus.INTERNAL_SERVER_ERROR
-#         )
-
-#     return (config)
-
 
 @lru_cache()
 def get_base_url() -> str:
@@ -137,6 +104,7 @@ def get_datafile() -> str:
     return DATAFILE
 
 
+dataset = xr.Dataset()
 args = parse_args()
 DATAFILE = args.file
 BASE_URL = args.base_url

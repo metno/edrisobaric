@@ -9,7 +9,7 @@ from initialize import get_base_url
 
 
 @lru_cache
-def create_landing_page() -> dict:
+def create_landing_page(base_url) -> dict:
     """
     Creates the landing page based on predefined
     configuration file.
@@ -60,11 +60,10 @@ def create_landing_page() -> dict:
     return landing.model_dump(exclude_none=True)
 
 
-base_url = get_base_url()
 router = APIRouter()
 
 
 @router.get("/")
 async def get_landing_page():
     """Link path to function."""
-    return create_landing_page()
+    return create_landing_page(base_url=get_base_url())
