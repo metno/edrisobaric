@@ -234,7 +234,7 @@ def create_point(coords: str = "") -> dict:
                 y=covjson_pydantic.domain.ValuesAxis[float](values=[point.y]),
                 z=covjson_pydantic.domain.ValuesAxis[float](values=isobaric_values),
                 t=covjson_pydantic.domain.ValuesAxis[AwareDatetime](
-                    values=[datetime.now(tz=timezone.utc)]
+                    values=[get_temporal_extent(dataset)]
                 ),
             ),
             referencing=[
