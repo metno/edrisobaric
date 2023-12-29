@@ -78,10 +78,12 @@ Save this as [app2.py](app2.py)
 ```python
 import uvicorn
 from fastapi import FastAPI
+from edr_pydantic.capabilities import LandingPageModel, Provider, Contact
+from edr_pydantic.link import Link
 
 
 app = FastAPI()
-base_url = "http://0.0.0.0:5000/"
+BASE_URL = "http://0.0.0.0:5000/"
 
 def create_landing_page() -> dict:
     """Create content."""
@@ -91,19 +93,19 @@ def create_landing_page() -> dict:
         description="An EDR API How-to",
         links=[
             Link(
-                href=f"{base_url}",
+                href=f"{BASE_URL}",
                 rel="self",
                 type="application/json",
                 title="Landing Page",
             ),
             Link(
-                href=f"{base_url}conformance",
+                href=f"{BASE_URL}conformance",
                 rel="conformance",
                 type="application/json",
                 title="Conformance document",
             ),
             Link(
-                href=f"{base_url}collections",
+                href=f"{BASE_URL}collections",
                 rel="data",
                 type="application/json",
                 title="Collections metadata in JSON",
