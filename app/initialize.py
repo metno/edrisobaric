@@ -7,9 +7,10 @@ import argparse
 from datetime import datetime, timedelta
 from urllib.request import urlopen, urlretrieve
 import xarray as xr
-import cgi
+import requests
+from grib import ISOBARIC_LABEL, TEMPERATURE_LABEL
 
-API_URL="https://api.met.no/weatherapi/isobaricgrib/1.0/grib2?area=southern_norway"
+API_URL = "https://api.met.no/weatherapi/isobaricgrib/1.0/grib2?area=southern_norway"
 dataset = xr.Dataset()
 
 
@@ -49,7 +50,7 @@ def open_grib():
     """Open grib file."""
     global dataset
 
-    print("Opening (or downloading) grib file")
+    # print("Opening (or downloading) grib file")
     filename = build_gribfile_name(get_data_path(), time=datetime.now())
     if len(get_filename()) > 0:
         filename = get_filename()
@@ -59,13 +60,6 @@ def open_grib():
 
     try:
         dataset = xr.open_dataset(filename, engine="cfgrib")
-        # print("Variables in file:")
-        # for v in dataset:
-        #     print(
-        #         "Name <%s>   Long name <%s>   Unit <%s>"
-        #         % (v, dataset[v].attrs["long_name"], dataset[v].attrs["units"])
-        #     )
-        # print(dataset.coords)
     except ValueError as err:
         print(
             f"Unable to open file {filename}. Check installation of modules cfgrib, eccodes.\n",
@@ -73,6 +67,28 @@ def open_grib():
         )
         print("xarray versions:", xr.show_versions())
         sys.exit(1)
+    if not validate_grib(dataset):
+        sys.exit(1)
+
+
+def validate_grib(ds: xr.Dataset) -> bool:
+    """Check that variables are as expected."""
+    # print(dataset.coords)
+    # print("Variables in file:")
+    # for v in ds:
+    #     print(
+    #         "Name <%s>   Long name <%s>   Unit <%s>"
+    #         % (v, ds[v].attrs["long_name"], dataset[v].attrs["units"])
+    #     )
+
+    if len(ds[ISOBARIC_LABEL]) < 10:
+        print("Error: Count of ISOBARIC_LABEL in file is unexpected")
+        return False
+    if ds[TEMPERATURE_LABEL] is None:
+        print("Error: Count of TEMPERATURE_LABEL in file is unexpected")
+        return False
+
+    return True
 
 
 def get_dataset():
@@ -100,7 +116,7 @@ def build_gribfile_name(data_path: str, time: datetime) -> str:
 def check_gribfile_exists(data_path: str, fname: str) -> bool:
     """Check if grib file exists."""
     if len(fname) == 0:
-        print("check_gribfile_exists: No filename given.")
+        # print("check_gribfile_exists: No filename given.")
         return False
     if not os.path.isfile(data_path + os.pathsep + fname):
         print("check_gribfile_exists: Datafile with name %s not found", fname)
@@ -116,19 +132,25 @@ def download_gribfile(data_path: str, api_url: str = API_URL) -> str:
         pass
 
     fname = ""
-    with urlopen(api_url) as remotefile:
-        contentdisposition = remotefile.info()["Content-Disposition"]
-        _, params = cgi.parse_header(contentdisposition)
-        fname = data_path + os.path.sep + params["filename"]
+    response = requests.get(api_url, timeout=30)
+    fname = (
+        data_path
+        + os.path.sep
+        + str(response.headers.get("Content-Disposition"))
+        .split("filename=")[1]
+        .replace('"', "")
+    )
 
     if os.path.exists(fname):
-        print(
-            f"Latest file is {params["filename"]}, already have that. Skipping download."
-        )
+        print(f"Latest file is {fname}, already have that. Skipping download.")
         return fname
 
-    print("Downloading %s to path %s", api_url, fname)
-    urlretrieve(api_url, fname)
+    print(f"Downloading {api_url} to path {fname}", end="")
+    with open(fname, "wb") as fd:
+        for chunk in response.iter_content(chunk_size=524288):
+            fd.write(chunk)
+            print(".", end="")
+    print(" done.")
     return fname
 
 

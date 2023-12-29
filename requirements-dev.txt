@@ -1,8 +1,9 @@
 # In addition to requirements.txt
 
+types-pytz
+types-requests
 black
 mypy
-types-pytz
 prospector
 pylint
 tox

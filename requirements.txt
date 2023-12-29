@@ -6,3 +6,4 @@ shapely==2.0.1
 xarray[io]==2023.12.0
 edr-pydantic==0.2.1
 covjson-pydantic==0.2.0
+requests==2.31.0
