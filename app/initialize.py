@@ -9,6 +9,7 @@ from urllib.request import urlopen, urlretrieve
 import xarray as xr
 import cgi
 
+API_URL="https://api.met.no/weatherapi/isobaricgrib/1.0/grib2?area=southern_norway"
 dataset = xr.Dataset()
 
 
@@ -19,9 +20,9 @@ def get_base_url() -> str:
 
 
 def parse_args() -> argparse.Namespace:
-    """Parse incoming json argument."""
+    """Parse arguments for grib filename and URL."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("--file", help="Grib file to read data from", required=True)
+    parser.add_argument("--file", help="Grib file to read data from", default="")
     parser.add_argument(
         "--base_url",
         help="Base URL for API",
@@ -32,22 +33,16 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def get_datafile() -> str:
-    """Expose path to datafile."""
-    return DATAFILE
-
-
 @lru_cache
 def get_data_path() -> str:
-    """Returns config parameter object."""
+    """Returns directory to grib file."""
     return "data"
 
 
 @lru_cache
 def get_filename() -> str:
     """Returns config parameter object."""
-    # return "data/T_YTNE85_C_ENMI_20231213000000.bin"
-    return get_datafile()
+    return DATAFILE
 
 
 def open_grib():
@@ -56,11 +51,11 @@ def open_grib():
 
     print("Opening (or downloading) grib file")
     filename = build_gribfile_name(get_data_path(), time=datetime.now())
-    if get_filename() is not None:
+    if len(get_filename()) > 0:
         filename = get_filename()
     else:
         if not check_gribfile_exists(data_path=get_data_path(), fname=get_filename()):
-            download_gribfile(data_path=get_data_path(), api_url=get_base_url())
+            filename = download_gribfile(data_path=get_data_path())
 
     try:
         dataset = xr.open_dataset(filename, engine="cfgrib")
@@ -103,15 +98,18 @@ def build_gribfile_name(data_path: str, time: datetime) -> str:
 
 
 def check_gribfile_exists(data_path: str, fname: str) -> bool:
-    """Fetch latest grib-file."""
+    """Check if grib file exists."""
+    if len(fname) == 0:
+        print("check_gribfile_exists: No filename given.")
+        return False
     if not os.path.isfile(data_path + os.pathsep + fname):
-        print("Datafile with name %s not found", fname)
+        print("check_gribfile_exists: Datafile with name %s not found", fname)
         return False
     return True
 
 
-def download_gribfile(data_path: str, api_url: str):
-    """Ensure data dir exists, download latest file."""
+def download_gribfile(data_path: str, api_url: str = API_URL) -> str:
+    """Ensure data dir exists, download latest file. Returns filename."""
     try:
         os.mkdir(data_path)
     except FileExistsError:
@@ -125,13 +123,13 @@ def download_gribfile(data_path: str, api_url: str):
 
     if os.path.exists(fname):
         print(
-            "Latest file is %s, already have that. Skipping download.",
-            params["filename"],
+            f"Latest file is {params["filename"]}, already have that. Skipping download."
         )
-        return
+        return fname
 
     print("Downloading %s to path %s", api_url, fname)
     urlretrieve(api_url, fname)
+    return fname
 
 
 args = parse_args()
