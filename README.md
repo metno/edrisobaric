@@ -62,7 +62,7 @@ This is only ment for local usage. Use as noted in `Testing it out`.
 
 ## Overview of architecture
 
-*Link to wiki or markdown where you get C4 diagrams with legends and textual descriptions.*
+See [output](docs/Output.md) of all operations.
 
 ## Documentation
 
