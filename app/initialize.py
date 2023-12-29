@@ -1,18 +1,15 @@
-"""Initialize configuration data."""
+"""Initialize configuration data, open grib file."""
 
-import sys
 from functools import lru_cache
-from datetime import datetime
+import os
+import sys
 import argparse
-import pytz
+from datetime import datetime, timedelta
+from urllib.request import urlopen, urlretrieve
 import xarray as xr
+import cgi
 
-from grib import (
-    TEMPERATURE_LABEL,
-    build_gribfile_name,
-    check_gribfile_exists,
-    download_gribfile,
-)
+dataset = xr.Dataset()
 
 
 @lru_cache()
@@ -21,19 +18,36 @@ def get_base_url() -> str:
     return BASE_URL
 
 
+def parse_args() -> argparse.Namespace:
+    """Parse incoming json argument."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--file", help="Grib file to read data from", required=True)
+    parser.add_argument(
+        "--base_url",
+        help="Base URL for API",
+        default="http://localhost:5000/",
+        required=False,
+    )
+
+    return parser.parse_args()
+
+
+def get_datafile() -> str:
+    """Expose path to datafile."""
+    return DATAFILE
+
+
 @lru_cache
-def get_temporal_extent() -> datetime:
-    """Fetch time from grib data."""
-    if len(dataset) == 0:
-        open_grib()
+def get_data_path() -> str:
+    """Returns config parameter object."""
+    return "data"
 
-    initial_time = str(
-        dataset[TEMPERATURE_LABEL].time.data
-    )  # 2023-12-13T00:00:00.000000000
-    timestamp = datetime.strptime(initial_time, "%Y-%m-%dT%H:00:00.000000000")
 
-    print("get_temporal_extent", timestamp.isoformat())
-    return timestamp.replace(tzinfo=pytz.UTC)
+@lru_cache
+def get_filename() -> str:
+    """Returns config parameter object."""
+    # return "data/T_YTNE85_C_ENMI_20231213000000.bin"
+    return get_datafile()
 
 
 def open_grib():
@@ -62,6 +76,7 @@ def open_grib():
             f"Unable to open file {filename}. Check installation of modules cfgrib, eccodes.\n",
             err,
         )
+        print("xarray versions:", xr.show_versions())
         sys.exit(1)
 
 
@@ -72,39 +87,53 @@ def get_dataset():
     return dataset
 
 
-@lru_cache
-def get_data_path() -> str:
-    """Returns config parameter object."""
-    return "data"
+def build_gribfile_name(data_path: str, time: datetime) -> str:
+    """Generate correct name for grib files."""
+    filename_prefix = "T_YTNE85_C_ENMI_"
+    filename_postfix = ".bin"
+
+    if time is None:
+        time = datetime.now()
+
+    while time.hour not in [0, 6, 12, 18, 21]:
+        time = time - timedelta(hours=1)
+
+    filename_date = datetime.strftime(time, "%Y%m%d%H0000")  # "20231212060000"
+    return data_path + os.path.sep + filename_prefix + filename_date + filename_postfix
 
 
-@lru_cache
-def get_filename() -> str:
-    """Returns config parameter object."""
-    # return "data/T_YTNE85_C_ENMI_20231213000000.bin"
-    return get_datafile()
+def check_gribfile_exists(data_path: str, fname: str) -> bool:
+    """Fetch latest grib-file."""
+    if not os.path.isfile(data_path + os.pathsep + fname):
+        print("Datafile with name %s not found", fname)
+        return False
+    return True
 
 
-def parse_args() -> argparse.Namespace:
-    """Parse incoming json argument."""
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--file", help="Grib file to read data from", required=True)
-    parser.add_argument(
-        "--base_url",
-        help="Base URL for API",
-        default="http://localhost:5000/",
-        required=False,
-    )
+def download_gribfile(data_path: str, api_url: str):
+    """Ensure data dir exists, download latest file."""
+    try:
+        os.mkdir(data_path)
+    except FileExistsError:
+        pass
 
-    return parser.parse_args()
+    fname = ""
+    with urlopen(api_url) as remotefile:
+        contentdisposition = remotefile.info()["Content-Disposition"]
+        _, params = cgi.parse_header(contentdisposition)
+        fname = data_path + os.path.sep + params["filename"]
+
+    if os.path.exists(fname):
+        print(
+            "Latest file is %s, already have that. Skipping download.",
+            params["filename"],
+        )
+        return
+
+    print("Downloading %s to path %s", api_url, fname)
+    urlretrieve(api_url, fname)
 
 
-def get_datafile() -> str:
-    """Expose path to datafile."""
-    return DATAFILE
-
-
-dataset = xr.Dataset()
 args = parse_args()
 DATAFILE = args.file
 BASE_URL = args.base_url

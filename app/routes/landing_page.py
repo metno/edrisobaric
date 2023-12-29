@@ -10,16 +10,7 @@ from initialize import get_base_url
 
 @lru_cache
 def create_landing_page(base_url) -> dict:
-    """
-    Creates the landing page based on predefined
-    configuration file.
-
-    Returns:
-    ----------
-    landinge_page: dict
-        EDR landing page response.
-    """
-
+    """Creates the landing page based on predefined configuration file."""
     landing = LandingPageModel(
         title="EDR isobaric from Grib",
         description="An EDR API for isobaric data from Grib files",

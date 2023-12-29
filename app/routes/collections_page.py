@@ -2,7 +2,7 @@
 from functools import lru_cache
 from typing import List
 from datetime import datetime, timedelta, timezone
-from fastapi import APIRouter, status, Response  # , Request
+from fastapi import APIRouter, status, Response
 import edr_pydantic
 from edr_pydantic.collections import Collection
 from pydantic import AwareDatetime
@@ -11,11 +11,12 @@ import covjson_pydantic
 from covjson_pydantic.coverage import Coverage
 from covjson_pydantic.ndarray import NdArray
 
-from initialize import get_base_url, get_temporal_extent, get_dataset
+from initialize import get_base_url, get_dataset
 
 from grib import (
     get_vertical_extent,
     get_spatial_extent,
+    get_temporal_extent,
     TEMPERATURE_LABEL,
     LAT_LABEL,
     LON_LABEL,
@@ -35,6 +36,7 @@ def create_collection(collection_id: str = "") -> dict:
         href=base_url, hreflang="en", rel="self", type="aplication/json"
     )
 
+    dataset = get_dataset()
     vertical_levels = get_vertical_extent()
     collection_url = f"{base_url}collections/isobaric"
 
@@ -74,11 +76,11 @@ def create_collection(collection_id: str = "") -> dict:
             temporal=edr_pydantic.extent.Temporal(
                 interval=[
                     [
-                        get_temporal_extent(),
-                        get_temporal_extent() + timedelta(hours=12),
+                        get_temporal_extent(dataset),
+                        get_temporal_extent(dataset) + timedelta(hours=12),
                     ]
                 ],
-                values=[get_temporal_extent().isoformat()],
+                values=[get_temporal_extent(dataset).isoformat()],
                 trs='TIMECRS["DateTime",TDATUM["Gregorian Calendar"],'
                 + 'CS[TemporalDateTime,1],AXIS["Time (T)",future]',  # opendata.fmi.fi
             ),
