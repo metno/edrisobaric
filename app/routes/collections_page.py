@@ -230,8 +230,8 @@ def create_point(coords: str = "") -> dict:
         domain=covjson_pydantic.domain.Domain(
             domainType=covjson_pydantic.domain.DomainType.vertical_profile,
             axes=covjson_pydantic.domain.Axes(
-                x=covjson_pydantic.domain.ValuesAxis[float](values=[point.y]),
-                y=covjson_pydantic.domain.ValuesAxis[float](values=[point.x]),
+                x=covjson_pydantic.domain.ValuesAxis[float](values=[point.x]),
+                y=covjson_pydantic.domain.ValuesAxis[float](values=[point.y]),
                 z=covjson_pydantic.domain.ValuesAxis[float](values=isobaric_values),
                 t=covjson_pydantic.domain.ValuesAxis[AwareDatetime](
                     values=[datetime.now(tz=timezone.utc)]
