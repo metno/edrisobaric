@@ -4,7 +4,7 @@ channels:
 dependencies:
   - fastapi[all]==0.105.0
   - uvicorn[standard]==0.24.0.post1
-  - eccodes==1.6.1
+  - eccodes
   - cfgrib==0.9.10.4
   - shapely==2.0.1
   - xarray==2023.12.0

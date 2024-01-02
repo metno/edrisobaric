@@ -41,7 +41,7 @@ pip install edr-pydantic covjson-pydantic
 
 ##### Pip
 
-I've had trouble getting the `eccodes` library from pip to work.
+This method might need you to install `libeccodes-dev` from your package manager.
 
 ```bash
 python3 -m venv venv
@@ -56,7 +56,9 @@ cd app
 python3 app.py
 ```
 
-will give these URLs:
+or see `Dockerfile` for how to build and run. A data file will be downloaded on demand.
+
+Staring the app will give these URLs:
 
 - <http://127.0.0.1:5000/>
 - <http://127.0.0.1:5000/docs>
@@ -64,7 +66,7 @@ will give these URLs:
 
 Example position lookup:
 
-- <http://127.0.0.1:5000/collections/isobaric/position?coords=POINT(11.0%2059.0)>
+- <http://127.0.0.1:5000/collections/isobaric/position?coords=POINT(10.718%2059.942)>
 
 ### Use it for production
 
