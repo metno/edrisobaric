@@ -165,7 +165,7 @@ def create_point(coords: str = "") -> dict:
         logger.error(errmsg)
         return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
 
-    logger.info("create_data for coord", point.y, point.x)
+    logger.info("create_data for coord %s, %s", point.y, point.x)
     dataset = get_dataset()
 
     # Sanity checks on coordinates

@@ -65,10 +65,10 @@ def open_grib():
         dataset = xr.open_dataset(filename, engine="cfgrib")
     except ValueError as err:
         logger.error(
-            "Unable to open file %s. Check installation of modules cfgrib, eccodes.\n%s"
-            % (filename, err)
+            "Unable to open file %s. Check installation of modules cfgrib, eccodes.\n%s",
+            filename, err
         )
-        logger.info("xarray versions:", xr.show_versions())
+        logger.info("xarray versions: %s", xr.show_versions())
         sys.exit(1)
     if not validate_grib(dataset):
         sys.exit(1)
@@ -145,10 +145,10 @@ def download_gribfile(data_path: str, api_url: str = API_URL) -> str:
     )
 
     if os.path.exists(fname):
-        logger.info(f"Latest file is {fname}, already have that. Skipping download.")
+        logger.info("Latest file is %s, already have that. Skipping download.", fname)
         return fname
 
-    logger.info(f"Downloading {api_url} to path {fname}")
+    logger.info("Downloading %s to path %s.", api_url, fname)
     with open(fname, "wb") as fd:
         for chunk in response.iter_content(chunk_size=524288):
             fd.write(chunk)
