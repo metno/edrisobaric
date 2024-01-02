@@ -1,7 +1,7 @@
 """Collections page."""
 from functools import lru_cache
 from typing import List
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 from fastapi import APIRouter, status, Response
 import edr_pydantic
 from edr_pydantic.collections import Collection
@@ -333,17 +333,27 @@ def create_point(coords: str = "") -> dict:
 
 @router.get("/collections")
 async def create_collections_page() -> dict:
-    """List of collections."""
+    """List all collections available.
+
+    Returns
+    -------
+        dict: A dictionary with the collection information.
+
+    """
     return create_collection()
 
 
 @router.get("/collections/isobaric/position")
 async def create_isobaric_page(coords: str) -> dict:
-    """Position."""
+    """Position.
+
+    This is the main function of this API. Needs a string with the coordinates, and will return data for the nearest point.
+
+    """
     return create_point(coords=coords)
 
 
 @router.get("/collections/{collection_id}")
 async def create_collection_page(collection_id: str) -> dict:
-    """Show a specific collection."""
+    """Show a specific collection. Isobaric is the only one available. No data is returned, only info about the collection."""
     return create_collection(collection_id)
