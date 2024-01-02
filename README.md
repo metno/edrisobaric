@@ -4,13 +4,13 @@
 
 ## What is EDR-isobaric?
 
-EDR-isobaric is an API for isobaric data (temperature and wind in isobaric layers). The API is based on [OGC Environmental Data Retrieval (EDR)](https://ogcapi.ogc.org/edr/). Data comes from [GRIB](https://en.wikipedia.org/wiki/GRIB) files from <https://api.met.no/weatherapi/isobaricgrib/1.0/documentation>.
+EDR-isobaric is an API for isobaric data (temperature and wind in isobaric layers). The API is based on [OGC Environmental Data Retrieval (EDR)](https://ogcapi.ogc.org/edr/). Data source is [GRIB](https://en.wikipedia.org/wiki/GRIB) files from <https://api.met.no/weatherapi/isobaricgrib/1.0/documentation>.
 
 The resulting API is for people who need vertical environmental data for a single location.
 
 The code is written as an example aimed at API developers at Met.no. See extensive docs around creating an API at [Overview](docs/Overview.md).
 
-Resulting data can be pasted into covjson playground.
+Resulting data can be pasted into covjson playground for visualizing:
 
 ![playground](/img/playground.png "playground")
 
@@ -41,7 +41,7 @@ pip install edr-pydantic covjson-pydantic
 
 ##### Pip
 
-I've had trouble getting eccodes library to work.
+I've had trouble getting the `eccodes` library from pip to work.
 
 ```bash
 python3 -m venv venv
