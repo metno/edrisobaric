@@ -2,6 +2,9 @@
 
 ![Logo](/img/pressure_9189764.png "Logo")
 
+[![CodeQL](https://github.com/metno/edrisobaric/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/metno/edrisobaric/actions/workflows/github-code-scanning/codeql)
+[![trivy](https://github.com/metno/edrisobaric/actions/workflows/trivy.yml/badge.svg)](https://github.com/metno/edrisobaric/actions/workflows/trivy.yml)
+
 ## What is EDR-isobaric?
 
 EDR-isobaric is an API for isobaric data (temperature and wind in isobaric layers). The API is based on [OGC Environmental Data Retrieval (EDR)](https://ogcapi.ogc.org/edr/). Data source is [GRIB](https://en.wikipedia.org/wiki/GRIB) files from <https://api.met.no/weatherapi/isobaricgrib/1.0/documentation>.
