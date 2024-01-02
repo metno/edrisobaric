@@ -7,7 +7,7 @@ from fastapi import APIRouter, status, Response
 import edr_pydantic
 from edr_pydantic.collections import Collection
 from pydantic import AwareDatetime
-from shapely import wkt, GEOSException
+from shapely import wkt, GEOSException, Point
 import covjson_pydantic
 from covjson_pydantic.coverage import Coverage
 from covjson_pydantic.ndarray import NdArray
@@ -39,7 +39,7 @@ def create_collection(collection_id: str = "") -> dict:
     )
 
     dataset = get_dataset()
-    vertical_levels = get_vertical_extent()
+    vertical_levels = get_vertical_extent(dataset)
     collection_url = f"{base_url}collections/isobaric"
 
     isobaric_col = Collection(
@@ -55,7 +55,6 @@ def create_collection(collection_id: str = "") -> dict:
         """,
         keywords=[
             "position",
-            "area",
             "data",
             "api",
             "temperature",
@@ -65,7 +64,7 @@ def create_collection(collection_id: str = "") -> dict:
         ],
         extent=edr_pydantic.extent.Extent(
             spatial=edr_pydantic.extent.Spatial(
-                bbox=[get_spatial_extent()], crs="WGS84"
+                bbox=[get_spatial_extent(dataset)], crs="WGS84"
             ),
             vertical=edr_pydantic.extent.Vertical(
                 interval=[
@@ -154,8 +153,8 @@ def create_collection(collection_id: str = "") -> dict:
 
 
 def create_point(coords: str = "") -> dict:
-    """Fetch data based on coords."""
-    point = None
+    """Return data for all isometric layers at a point."""
+    point = Point()
     try:
         point = wkt.loads(coords)
     except GEOSException:
@@ -166,7 +165,7 @@ def create_point(coords: str = "") -> dict:
         logger.error(errmsg)
         return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
 
-    logger.info("create_data for coord %s, %s" % (point.y, point.x))
+    logger.info("create_data for coord", point.y, point.x)
     dataset = get_dataset()
 
     # Sanity checks on coordinates
@@ -196,24 +195,20 @@ def create_point(coords: str = "") -> dict:
         longitude=point.x, latitude=point.y, method="nearest"
     )
 
-    isobaric_values = temperatures.isobaricInhPa.data
+    isobaric_values = get_vertical_extent(dataset)
     temperature_values: List[float | None] = []
     uwind_values: List[float | None] = []
     vwind_values: List[float | None] = []
 
     for temperature in temperatures:
         temperature_values.append(float(temperature.data))
-        # print(ISOBARIC_LABEL, t[ISOBARIC_LABEL].data)
-        # print("temp", t.data)
 
-        # For same coord and isobaric, fetch wind vectors
         uwind = dataset[UWIND_LABEL].sel(
             longitude=point.x,
             latitude=point.y,
             isobaricInhPa=temperature[ISOBARIC_LABEL].data,
             method="nearest",
         )
-        # print("uwind", uwind.data)
         uwind_values.append(float(uwind.data))
 
         vwind = dataset[VWIND_LABEL].sel(
@@ -222,7 +217,6 @@ def create_point(coords: str = "") -> dict:
             isobaricInhPa=temperature[ISOBARIC_LABEL].data,
             method="nearest",
         )
-        # print("vwind", vwind.data)
         vwind_values.append(float(vwind.data))
 
     cov = Coverage(
