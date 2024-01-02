@@ -61,6 +61,10 @@ will give these URLs:
 - <http://127.0.0.1:5000/docs>
 - <http://127.0.0.1:5000/redoc>
 
+Example position lookup:
+
+- <http://127.0.0.1:5000/collections/isobaric/position?coords=POINT(11.0%2059.0)>
+
 ### Use it for production
 
 This is only ment for local usage. Use as noted in `Testing it out`.
@@ -74,13 +78,6 @@ See [output](docs/Output.md) of all operations.
 - Based on Pydantic EDR- and covjson-libraries by [KNMI](https://github.com/KNMI/)
 - Docs around creating an API at [Overview](docs/Overview.md).
 
-### References
-
-- Icon from <https://www.freepik.com/icon/pressure_9189764#fromView=search&term=air+preassure&track=ais&page=1&position=49&uuid=c5d25f23-4efd-4063-b6ec-2ab35db07d62>
-- <https://spire.com/tutorial/spire-weather-tutorial-intro-to-processing-grib2-data-with-python/>
-- <https://covjson.org/>
-- <https://fastapi.tiangolo.com/tutorial/bigger-applications/>
-
 ### Other APIs for comparison
 
 - <https://opendata.fmi.fi/edr/>
@@ -88,9 +85,15 @@ See [output](docs/Output.md) of all operations.
 - <https://developer.dataplatform.knmi.nl/edr-api>
 - <https://swim.iblsoft.com/data/icon-de/edr/collections/isobaric/>
 
+### References and acknowledgements
+
+- Icon from [freepik.com](https://www.freepik.com/icon/pressure_9189764#fromView=search&term=air+preassure&track=ais&page=1&position=49&uuid=c5d25f23-4efd-4063-b6ec-2ab35db07d62)
+- <https://covjson.org/>
+- <https://fastapi.tiangolo.com/tutorial/bigger-applications/>
+
 ## How to contribute
 
-- Issues, merge-requests.
+- Issues
 
 ## Documentation Template
 
