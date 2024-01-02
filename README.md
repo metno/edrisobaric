@@ -52,7 +52,8 @@ pip install -r requirements.txt
 #### Usage
 
 ```bash
-uvicorn app.main:app --reload
+cd app
+python3 app.py
 ```
 
 will give these URLs:
