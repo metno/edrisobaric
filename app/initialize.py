@@ -65,8 +65,8 @@ def open_grib():
         dataset = xr.open_dataset(filename, engine="cfgrib")
     except ValueError as err:
         logger.error(
-            f"Unable to open file {filename}. Check installation of modules cfgrib, eccodes.\n",
-            err,
+            "Unable to open file %s. Check installation of modules cfgrib, eccodes.\n%s"
+            % (filename, err)
         )
         logger.info("xarray versions:", xr.show_versions())
         sys.exit(1)
