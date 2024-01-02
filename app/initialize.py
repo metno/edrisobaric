@@ -66,7 +66,8 @@ def open_grib():
     except ValueError as err:
         logger.error(
             "Unable to open file %s. Check installation of modules cfgrib, eccodes.\n%s",
-            filename, err
+            filename,
+            err,
         )
         logger.info("xarray versions: %s", xr.show_versions())
         sys.exit(1)
