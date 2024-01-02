@@ -286,8 +286,8 @@ def create_point(coords: str = "") -> dict:
             ),
         },
         parameters={
-            "t": covjson_pydantic.parameter.Parameter(
-                id="t",
+            "temperature": covjson_pydantic.parameter.Parameter(
+                id="temperature",
                 label={"en": "Air temperature"},
                 observedProperty=covjson_pydantic.observed_property.ObservedProperty(
                     id="https://codes.wmo.int/common/quantity-kind/_airTemperature",
@@ -299,8 +299,8 @@ def create_point(coords: str = "") -> dict:
                     symbol="K",
                 ),
             ),
-            "u": covjson_pydantic.parameter.Parameter(
-                id="u",
+            "uwind": covjson_pydantic.parameter.Parameter(
+                id="uwind",
                 label={"en": "U component of wind"},
                 observedProperty=covjson_pydantic.observed_property.ObservedProperty(
                     id="https://codes.wmo.int/bufr4/b/11/_095",
@@ -312,8 +312,8 @@ def create_point(coords: str = "") -> dict:
                     symbol="m/s",
                 ),
             ),
-            "v": covjson_pydantic.parameter.Parameter(
-                id="v",
+            "vwind": covjson_pydantic.parameter.Parameter(
+                id="vwind",
                 label={"en": "V component of wind"},
                 observedProperty=covjson_pydantic.observed_property.ObservedProperty(
                     id="https://codes.wmo.int/bufr4/b/11/_096",
