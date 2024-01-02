@@ -10,6 +10,11 @@ The resulting API is for people who need vertical environmental data for a singl
 
 The code is written as an example aimed at API developers at Met.no. See extensive docs around creating an API at [Overview](docs/Overview.md).
 
+Resulting data can be pasted into covjson playground.
+
+![playground](/img/playground.png "playground")
+
+
 ## Who is responsible?
 
 - <larsfp@met.no>
