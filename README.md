@@ -34,7 +34,16 @@ In development
 
 Choose one of the following:
 
-##### Conda
+##### Pull image from Github registry
+
+```bash
+docker pull ghcr.io/metno/edrisobaric:main
+docker run -it --rm --publish 5000:5000 ghcr.io/metno/edrisobaric:main
+```
+
+##### Build using Conda
+
+Clone repo and run:
 
 ```bash
 conda create --channel conda-forge --file requirements-conda.txt -n edriso
@@ -42,9 +51,9 @@ conda activate edriso
 pip install edr-pydantic covjson-pydantic
 ```
 
-##### Pip
+##### Build using Pip
 
-This method might need you to install `libeccodes-dev` from your package manager.
+This method might need you to install `libeccodes-dev` from your package manager. Clone repo and run:
 
 ```bash
 python3 -m venv venv

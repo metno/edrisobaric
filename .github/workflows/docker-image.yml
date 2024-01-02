@@ -1,4 +1,4 @@
-name: Push to github registry using GitHub Action
+name: Build image and publish at Github Registry
 on:
   push:
     branches: [ "main" ]
