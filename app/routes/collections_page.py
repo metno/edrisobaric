@@ -2,6 +2,7 @@
 from functools import lru_cache
 from typing import List
 from datetime import timedelta
+import logging
 from fastapi import APIRouter, status, Response
 import edr_pydantic
 from edr_pydantic.collections import Collection
@@ -27,6 +28,7 @@ from grib import (
 
 base_url = get_base_url()
 router = APIRouter()
+logger = logging.getLogger()
 
 
 @lru_cache
@@ -161,11 +163,10 @@ def create_point(coords: str = "") -> dict:
             "Error, coords should be a Well Known Text, for example "
             + f'"POINT(11.0 59.0)". You gave "{coords}"'
         )
-        print(errmsg)
+        logger.error(errmsg)
         return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
 
-    print("create_data for coord ", point.y, point.x)
-
+    logger.info("create_data for coord %s, %s" % (point.y, point.x))
     dataset = get_dataset()
 
     # Sanity checks on coordinates
@@ -178,7 +179,7 @@ def create_point(coords: str = "") -> dict:
             + "{dataset[TEMPERATURE_LABEL][LAT_LABEL].values.min()}/"
             + "{dataset[TEMPERATURE_LABEL][LAT_LABEL].values.max()}"
         )
-        print(errmsg)
+        logger.error(errmsg)
         return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
     if (
         point.x > dataset[TEMPERATURE_LABEL][LON_LABEL].values.max()
@@ -187,7 +188,7 @@ def create_point(coords: str = "") -> dict:
         errmsg = f"Error, coord {point.x} out of bounds. Min/max is \
             {dataset[TEMPERATURE_LABEL][LON_LABEL].values.min()}/\
             {dataset[TEMPERATURE_LABEL][LON_LABEL].values.max()}"
-        print(errmsg)
+        logger.error(errmsg)
         return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
 
     # Fetch temperature

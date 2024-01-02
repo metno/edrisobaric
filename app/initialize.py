@@ -5,13 +5,16 @@ import os
 import sys
 import argparse
 from datetime import datetime, timedelta
+import logging
 import xarray as xr
 import requests
 
 from grib import ISOBARIC_LABEL, TEMPERATURE_LABEL
 
+
 API_URL = "https://api.met.no/weatherapi/isobaricgrib/1.0/grib2?area=southern_norway"
 dataset = xr.Dataset()
+logger = logging.getLogger()
 
 
 @lru_cache()
@@ -61,11 +64,11 @@ def open_grib():
     try:
         dataset = xr.open_dataset(filename, engine="cfgrib")
     except ValueError as err:
-        print(
+        logger.error(
             f"Unable to open file {filename}. Check installation of modules cfgrib, eccodes.\n",
             err,
         )
-        print("xarray versions:", xr.show_versions())
+        logger.info("xarray versions:", xr.show_versions())
         sys.exit(1)
     if not validate_grib(dataset):
         sys.exit(1)
@@ -82,10 +85,10 @@ def validate_grib(ds: xr.Dataset) -> bool:
     #     )
 
     if len(ds[ISOBARIC_LABEL]) < 10:
-        print("Error: Count of ISOBARIC_LABEL in file is unexpected")
+        logger.error("Error: Count of ISOBARIC_LABEL in file is unexpected")
         return False
     if ds[TEMPERATURE_LABEL] is None:
-        print("Error: Count of TEMPERATURE_LABEL in file is unexpected")
+        logger.error("Error: Count of TEMPERATURE_LABEL in file is unexpected")
         return False
 
     return True
@@ -119,7 +122,7 @@ def check_gribfile_exists(data_path: str, fname: str) -> bool:
         # print("check_gribfile_exists: No filename given.")
         return False
     if not os.path.isfile(data_path + os.pathsep + fname):
-        print("check_gribfile_exists: Datafile with name %s not found", fname)
+        logger.info("check_gribfile_exists: Datafile with name %s not found", fname)
         return False
     return True
 
@@ -142,15 +145,14 @@ def download_gribfile(data_path: str, api_url: str = API_URL) -> str:
     )
 
     if os.path.exists(fname):
-        print(f"Latest file is {fname}, already have that. Skipping download.")
+        logger.info(f"Latest file is {fname}, already have that. Skipping download.")
         return fname
 
-    print(f"Downloading {api_url} to path {fname}", end="")
+    logger.info(f"Downloading {api_url} to path {fname}")
     with open(fname, "wb") as fd:
         for chunk in response.iter_content(chunk_size=524288):
             fd.write(chunk)
-            print(".", end="")
-    print(" done.")
+    logger.info("Download done.")
     return fname
 
 
