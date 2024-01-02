@@ -17,7 +17,7 @@ Resulting data can be pasted into covjson playground.
 
 ## Who is responsible?
 
-- <larsfp@met.no>
+- larsfp at met.no
 
 ## Status
 
