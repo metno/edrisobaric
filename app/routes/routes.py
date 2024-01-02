@@ -1,3 +1,5 @@
+"""Routes."""
+
 from fastapi import APIRouter
 
 ##############

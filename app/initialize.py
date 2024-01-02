@@ -5,9 +5,9 @@ import os
 import sys
 import argparse
 from datetime import datetime, timedelta
-from urllib.request import urlopen, urlretrieve
 import xarray as xr
 import requests
+
 from grib import ISOBARIC_LABEL, TEMPERATURE_LABEL
 
 API_URL = "https://api.met.no/weatherapi/isobaricgrib/1.0/grib2?area=southern_norway"
