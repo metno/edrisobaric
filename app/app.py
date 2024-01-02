@@ -2,6 +2,7 @@
 
 import logging
 from contextlib import asynccontextmanager
+from typing import AsyncGenerator
 import uvicorn
 from fastapi import FastAPI
 from routes.routes import routes
@@ -12,7 +13,7 @@ logger = logging.getLogger("uvicorn.access")
 
 
 @asynccontextmanager
-async def lifespan():
+async def lifespan() -> AsyncGenerator[None, None]:
     """Runs before startup. Set logging format."""
     console_formatter = uvicorn.logging.ColourizedFormatter(
         "{levelprefix} ({asctime}) : {message}",
@@ -29,4 +30,4 @@ app.include_router(routes)
 
 
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=5000)
+    uvicorn.run("app:app", host="127.0.0.1", port=5000)
