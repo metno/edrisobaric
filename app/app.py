@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 import uvicorn
 from fastapi import FastAPI
+from routes.routes import routes
 
 
 app = FastAPI(openapi_url="/openapi.json", docs_url="/api")
@@ -24,8 +25,6 @@ async def lifespan() -> AsyncGenerator[None, None]:
 
     yield
 
-
-from routes.routes import routes
 
 app.include_router(routes)
 
