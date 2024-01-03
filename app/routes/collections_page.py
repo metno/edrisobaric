@@ -12,7 +12,7 @@ import covjson_pydantic
 from covjson_pydantic.coverage import Coverage
 from covjson_pydantic.ndarray import NdArray
 
-from initialize import get_base_url, get_dataset
+from initialize import get_dataset, BASE_URL
 
 from grib import (
     get_vertical_extent,
@@ -26,7 +26,6 @@ from grib import (
     ISOBARIC_LABEL,
 )
 
-base_url = get_base_url()
 router = APIRouter()
 logger = logging.getLogger()
 
@@ -35,12 +34,12 @@ logger = logging.getLogger()
 def create_collection(collection_id: str = "") -> dict:
     """Creates the collections page."""
     link_self = edr_pydantic.link.Link(
-        href=base_url, hreflang="en", rel="self", type="aplication/json"
+        href=BASE_URL, hreflang="en", rel="self", type="aplication/json"
     )
 
     dataset = get_dataset()
     vertical_levels = get_vertical_extent(dataset)
-    collection_url = f"{base_url}collections/isobaric"
+    collection_url = f"{BASE_URL}collections/isobaric"
 
     isobaric_col = Collection(
         id="isobaric",

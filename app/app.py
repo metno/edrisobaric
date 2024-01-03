@@ -6,7 +6,7 @@ from typing import AsyncGenerator
 import uvicorn
 from fastapi import FastAPI
 from routes.routes import routes
-
+from initialize import BIND_HOST
 
 app = FastAPI(openapi_url="/openapi.json", docs_url="/api")
 logger = logging.getLogger("uvicorn.access")
@@ -30,4 +30,4 @@ app.include_router(routes)
 
 
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=5000)
+    uvicorn.run("app:app", host=BIND_HOST, port=5000)

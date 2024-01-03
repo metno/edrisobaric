@@ -5,7 +5,7 @@ from fastapi import APIRouter
 from edr_pydantic.capabilities import LandingPageModel, Provider, Contact
 from edr_pydantic.link import Link
 
-from initialize import get_base_url
+from initialize import BASE_URL
 
 
 @lru_cache
@@ -57,4 +57,4 @@ router = APIRouter()
 @router.get("/")
 async def get_landing_page():
     """Link path to function."""
-    return create_landing_page(base_url=get_base_url())
+    return create_landing_page(base_url=BASE_URL)

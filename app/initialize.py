@@ -17,12 +17,6 @@ dataset = xr.Dataset()
 logger = logging.getLogger()
 
 
-@lru_cache()
-def get_base_url() -> str:
-    """Return base url."""
-    return BASE_URL
-
-
 def parse_args() -> argparse.Namespace:
     """Parse arguments for grib filename and URL."""
     parser = argparse.ArgumentParser()
@@ -31,6 +25,12 @@ def parse_args() -> argparse.Namespace:
         "--base_url",
         help="Base URL for API",
         default="http://localhost:5000/",
+        required=False,
+    )
+    parser.add_argument(
+        "--bind_host",
+        help="Which host to bind to.",
+        default="0.0.0.0",
         required=False,
     )
     return parser.parse_args()
@@ -53,10 +53,10 @@ def open_grib():
     global dataset
 
     filename = build_gribfile_name(get_data_path(), time=datetime.now())
-    if len(get_filename()) > 0:
-        filename = get_filename()
+    if len(DATAFILE) > 0:
+        filename = DATAFILE
     else:
-        if not check_gribfile_exists(data_path=get_data_path(), fname=get_filename()):
+        if not check_gribfile_exists(data_path=get_data_path(), fname=DATAFILE):
             filename = download_gribfile(data_path=get_data_path())
 
     try:
@@ -158,3 +158,4 @@ def download_gribfile(data_path: str, api_url: str = API_URL) -> str:
 args = parse_args()
 DATAFILE = args.file
 BASE_URL = args.base_url
+BIND_HOST = args.bind_host
