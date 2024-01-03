@@ -33,7 +33,6 @@ def parse_args() -> argparse.Namespace:
         default="http://localhost:5000/",
         required=False,
     )
-
     return parser.parse_args()
 
 
