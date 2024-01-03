@@ -1,7 +1,7 @@
 import unittest
 import os
 from datetime import datetime
-from initialize import build_gribfile_name, download_gribfile
+from initialize import build_gribfile_name, download_gribfile, API_URL
 
 datafile = ""
 
@@ -22,7 +22,7 @@ class TestInitialize(unittest.TestCase):
 
     def test_download_gribfile(self):
         global datafile
-        datafile = download_gribfile(data_path="/tmp")
+        datafile = download_gribfile(data_path="/tmp", api_url=API_URL)
         print(datafile)
         self.assertTrue(os.path.isfile(datafile))
         os.remove(datafile)

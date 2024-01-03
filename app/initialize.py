@@ -11,8 +11,6 @@ import requests
 
 from grib import ISOBARIC_LABEL, TEMPERATURE_LABEL
 
-
-API_URL = "https://api.met.no/weatherapi/isobaricgrib/1.0/grib2?area=southern_norway"
 dataset = xr.Dataset()
 logger = logging.getLogger()
 
@@ -31,6 +29,12 @@ def parse_args() -> argparse.Namespace:
         "--bind_host",
         help="Which host to bind to.",
         default="0.0.0.0",
+        required=False,
+    )
+    parser.add_argument(
+        "--api_url",
+        help="URL to download grib file from",
+        default="https://api.met.no/weatherapi/isobaricgrib/1.0/grib2?area=southern_norway",
         required=False,
     )
     return parser.parse_args()
@@ -57,7 +61,7 @@ def open_grib():
         filename = DATAFILE
     else:
         if not check_gribfile_exists(data_path=get_data_path(), fname=DATAFILE):
-            filename = download_gribfile(data_path=get_data_path())
+            filename = download_gribfile(data_path=get_data_path(), api_url=API_URL)
 
     try:
         dataset = xr.open_dataset(filename, engine="cfgrib")
@@ -126,7 +130,7 @@ def check_gribfile_exists(data_path: str, fname: str) -> bool:
     return True
 
 
-def download_gribfile(data_path: str, api_url: str = API_URL) -> str:
+def download_gribfile(data_path: str, api_url: str) -> str:
     """Ensure data dir exists, download latest file. Returns filename."""
     try:
         os.mkdir(data_path)
@@ -159,3 +163,4 @@ args = parse_args()
 DATAFILE = args.file
 BASE_URL = args.base_url
 BIND_HOST = args.bind_host
+API_URL = args.api_url
