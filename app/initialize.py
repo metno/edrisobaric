@@ -53,7 +53,6 @@ def open_grib():
     """Open grib file."""
     global dataset
 
-    # print("Opening (or downloading) grib file")
     filename = build_gribfile_name(get_data_path(), time=datetime.now())
     if len(get_filename()) > 0:
         filename = get_filename()

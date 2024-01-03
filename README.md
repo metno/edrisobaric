@@ -31,18 +31,16 @@ In development.
 
 ### Test it out
 
-#### Install
-
 Choose one of the following:
 
-##### Pull image from Github registry
+#### Pull image from Github registry
 
 ```bash
 docker pull ghcr.io/metno/edrisobaric:main
 docker run -it --rm --publish 5000:5000 ghcr.io/metno/edrisobaric:main
 ```
 
-##### Build using Conda
+#### Build using Conda
 
 Clone repo and run:
 
@@ -50,9 +48,11 @@ Clone repo and run:
 conda create --channel conda-forge --file requirements-conda.txt -n edriso
 conda activate edriso
 pip install edr-pydantic covjson-pydantic
+cd app
+python3 app.py
 ```
 
-##### Build using Pip
+#### Build using Pip
 
 This method might need you to install `libeccodes-dev` from your package manager. Clone repo and run:
 
@@ -60,16 +60,13 @@ This method might need you to install `libeccodes-dev` from your package manager
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-```
-
-#### Usage
-
-```bash
 cd app
 python3 app.py
 ```
 
-or see `Dockerfile` for how to build and run. A data file will be downloaded on demand.
+#### Usage
+
+A grib data file will be downloaded on demand if none is supplied.
 
 Staring the app will give these URLs:
 
