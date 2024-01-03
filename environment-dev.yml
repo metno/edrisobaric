@@ -10,3 +10,4 @@ dependencies:
   - pylint
   - tox
   - bandit
+  - httpx
