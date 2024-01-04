@@ -10,7 +10,7 @@ from initialize import BASE_URL
 
 @lru_cache
 def create_landing_page(base_url) -> dict:
-    """Creates the landing page based on predefined configuration file."""
+    """Creates the landing page model."""
     landing = LandingPageModel(
         title="EDR isobaric from Grib",
         description="An EDR API for isobaric data from Grib files",
@@ -56,5 +56,5 @@ router = APIRouter()
 
 @router.get("/")
 async def get_landing_page():
-    """Link path to function."""
+    """Returns the landing page as JSON."""
     return create_landing_page(base_url=BASE_URL)

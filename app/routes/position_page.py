@@ -217,11 +217,10 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, str]
 
 
 @router.get("/collections/isobaric/position/")
-async def create_isobaric_page(request: Request, coords: str = "") -> dict:
-    """Position.
+async def get_isobaric_page(request: Request, coords: str = "") -> dict:
+    """Return data closest to a position.
 
-    This is the main function of this API. Needs a string with the coordinates, and will return data for the nearest point.
-
+    This is the main function of this API. Needs a string with the coordinates, formated as a WKT. Example POINT(11.9384 60.1699).
     """
     if len(coords) == 0:
         return {
@@ -231,13 +230,12 @@ async def create_isobaric_page(request: Request, coords: str = "") -> dict:
 
 
 @router.get("/collections/isobaric/instances/{instance_id}/position")
-async def create_instance_isobaric_page(
+async def get_instance_isobaric_page(
     request: Request, coords: str = "", instance_id: str = ""
 ) -> dict:
-    """Position.
+    """Return data closest to a position.
 
-    This is the main function of this API. Needs a string with the coordinates, and will return data for the nearest point.
-
+    Same as "Get Isobaric Page", but with selectable instance ID. See "Get Isobaric Instances Page" for a list of valid instance IDs.
     """
     if len(coords) == 0:
         return {

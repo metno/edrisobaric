@@ -161,7 +161,7 @@ def download_gribfile(data_path: str, api_url: str) -> str:
 
 
 def format_instance_id(timestamp: datetime) -> str:
-    return timestamp.strftime("%Y%m%d%H%M%S")
+    return timestamp.strftime("%Y%m%d%H0000")
 
 
 def check_instance_exists(ds: xr.Dataset, instance_id: str) -> Tuple[bool, str]:

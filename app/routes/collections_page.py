@@ -152,24 +152,20 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
 
 
 @router.get("/collections/")
-async def create_collections_page() -> dict:
-    """List all collections available.
-
-    Returns
-    -------
-        dict: A dictionary with the collection information.
-
-    """
+async def get_collections_page() -> dict:
+    """List collections as JSON. Isobaric is the only one available. No data is returned, only info about the collection."""
     return create_collection()
 
 
 @router.get("/collections/{collection_id}/")
-async def create_collection_page(collection_id: str) -> dict:
-    """Show a specific collection. Isobaric is the only one available. No data is returned, only info about the collection."""
+async def get_collection_page(collection_id: str = "") -> dict:
+    """List a specific collection as JSON. Isobaric is the only one available. No data is returned, only info about the collection.."""
     return create_collection(collection_id)
 
 
 @router.get("/collections/{collection_id}/instances/{instance}/")
-async def create_instance_collection_page(collection_id: str, instance: str) -> dict:
-    """Show a specific instance of a collection. Isobaric is the only one available, and the date in current file is the only instance available. No data is returned, only info about the collection."""
+async def get_instance_collection_page(
+    collection_id: str = "", instance: str = ""
+) -> dict:
+    """Return a specific instance of a collection. Isobaric is the only collection available. The date in current grib file is only instance available, format %Y%m%d%H0000. No data is returned, only info about the instance."""
     return create_collection(collection_id, instance)

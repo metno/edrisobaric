@@ -21,5 +21,5 @@ router = APIRouter()
 
 @router.get("/conformance/")
 async def get_conformance_page():
-    """Link path to function."""
+    """Returns the conformance page as JSON."""
     return create_conformance_page()

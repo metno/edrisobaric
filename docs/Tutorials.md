@@ -6,7 +6,7 @@ In EDR a conformance page is a list of standards our API adheres to.
 
 In this tutorial we will create a json output representing a conformance page.
 
-It is assumed you have basic terminal knowledge and are on an Ubuntu workstation.
+It is assumed you have basic terminal knowledge, python knowledge and an Ubuntu environment.
 
 ### Create a venv and install necessary tools
 

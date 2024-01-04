@@ -124,6 +124,6 @@ def create_instances() -> dict:
 
 
 @router.get("/collections/isobaric/instances/")
-async def create_isobaric_instances_page() -> dict:
-    """List available instances."""
+async def get_isobaric_instances_page() -> dict:
+    """Return list of available instances as JSON."""
     return create_instances()

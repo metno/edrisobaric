@@ -71,12 +71,12 @@ A grib data file will be downloaded on demand if none is supplied.
 Staring the app will give these URLs:
 
 - <http://127.0.0.1:5000/>
-- <http://127.0.0.1:5000/docs>
+- <http://127.0.0.1:5000/api>
 - <http://127.0.0.1:5000/redoc>
 
 Example position lookup:
 
-- <http://127.0.0.1:5000/collections/isobaric/position?coords=POINT(10.718%2059.942)>
+- <http://127.0.0.1:5000/collections/isobaric/position?coords=POINT(11.9384 60.1699)>
 
 ### Use it for production
 

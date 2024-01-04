@@ -87,6 +87,10 @@ class TestApp(unittest.TestCase):
             response.text,
         )
 
+    def test_api(self):
+        response = client.get("/api")
+        self.assertEqual(response.status_code, 200)
+
 
 if __name__ == "__main__":
     unittest.main()
