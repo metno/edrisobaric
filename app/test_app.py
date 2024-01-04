@@ -26,40 +26,58 @@ class TestApp(unittest.TestCase):
     def test_collections(self):
         response = client.get("/collections")
         self.assertEqual(response.status_code, 200)
-        self.assertIn(
-            '{"links":[{"href":"http://localhost:5000/","hreflang":"en","rel":"self","type":"aplication/json"}],"collections":[{"id":"isobaric","title":"',
-            response.text,
-        )
+        self.assertTrue(response.json()["collections"][0]["id"] == "isobaric")
+        # '{"links":[{"href":"http://localhost:5000/collections/","hreflang":"en","rel":"self","type":"aplication/json"}],"collections":[{"id":"isobaric","title":"IsobaricGRIB - GRIB files"...
 
     def test_point(self):
-        response = client.get(f"/collections/position?{sample_coords}")
+        response = client.get(f"/collections/isobaric/position?{sample_coords}")
         self.assertEqual(response.status_code, 200)
-        self.assertIn(
-            '"vertical":{"interval":[["850.0"],["100.0"]],"values":["850.0","750.0","700.0","600.0","500.0","450.0","400.0","350.0","300.0","275.0","250.0","225.0","200.0","150.0","100.0"],"vrs":"Vertical Reference System: PressureLevel"}},',
-            response.text,
+        # Test for values in range -> temperature
+        self.assertTrue(
+            len(str(response.json()["ranges"]["temperature"]["values"][0])) > 1
+        )
+        # Test for values in range -> uwind
+        self.assertTrue(len(str(response.json()["ranges"]["uwind"]["values"][0])) > 1)
+        # Test for values in range -> vwind
+        self.assertTrue(len(str(response.json()["ranges"]["vwind"]["values"][0])) > 1)
+        # Test for values in domain -> z -> values
+        self.assertTrue(
+            len(str(response.json()["domain"]["axes"]["z"]["values"][0])) > 1
         )
 
     def test_instances(self):
+        """Test a variety of URLs related to instances."""
+        # Test list of instances.
         response = client.get("/collections/isobaric/instances")
         self.assertEqual(response.status_code, 200)
 
+        # Find current instance.
         json_response = response.json()
         instance_id = json_response["instances"][0]["id"]
 
-        self.assertIn(
-            f"http://localhost:5000/collections/isobaric/instances/{instance_id}/position",
-            response.text,
+        # Test link to current instance.
+        self.assertTrue(
+            json_response["instances"][0]["links"][0]["href"]
+            == f"http://localhost:5000/collections/isobaric/instances/{instance_id}/"
         )
 
-        # Test instance
-        response = client.get("/collections/isobaric/instances/{instance_id}")
+        # Test asking for a specific instance.
+        response = client.get(f"/collections/isobaric/instances/{instance_id}")
         self.assertEqual(response.status_code, 200)
-        self.assertIn(
-            '"id":"isobaric","title":"',
-            response.text,
-        )
+        self.assertTrue(response.json()["id"] == "isobaric")
+        self.assertIn(instance_id, response.json()["links"][0]["href"])
 
-        # Test a point in instance
+        # Test asking for non-existing instance.
+        response = client.get("/collections/isobaric/instances/1234567890/")
+        self.assertEqual(response.status_code, 400)
+
+        # Test asking for data in a non-existing instance.
+        response = client.get(
+            f"/collections/isobaric/instances/1234567890/position?{sample_coords}"
+        )
+        self.assertEqual(response.status_code, 400)
+
+        # Test asking for a sample point in current instance.
         response = client.get(
             f"/collections/isobaric/instances/{instance_id}/position?{sample_coords}"
         )

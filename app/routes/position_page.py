@@ -9,7 +9,7 @@ import covjson_pydantic
 from covjson_pydantic.coverage import Coverage
 from covjson_pydantic.ndarray import NdArray
 
-from initialize import get_dataset, format_instance_id
+from initialize import get_dataset, check_instance_exists
 
 from grib import (
     get_vertical_extent,
@@ -49,9 +49,10 @@ def create_point(coords: str = "", instance_id: str = "") -> dict:
         return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
 
     # Sanity check on instance id
-    instance_ok, errmsg = check_instance_exists(dataset, instance_id)
-    if not instance_ok:
-        return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
+    if len(instance_id) > 0:
+        instance_ok, errmsg = check_instance_exists(dataset, instance_id)
+        if not instance_ok:
+            return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
 
     # Fetch temperature
     temperatures = dataset[TEMPERATURE_LABEL].sel(
@@ -213,22 +214,6 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, str]
         logger.error(errmsg)
         return False, errmsg
     return True, ""
-
-
-def check_instance_exists(ds: xr.Dataset, instance_id: str) -> Tuple[bool, str]:
-    """Check instance id exists in dataset."""
-    instance_dates = [get_temporal_extent(ds)]
-    for d in instance_dates:
-        if format_instance_id(d) == instance_id:
-            logger.info("instance_id %s is valid", instance_id)
-            return True, ""
-
-    logger.error("instance_id %s does not exist in dataset", instance_id)
-    valid_dates = [format_instance_id(x) for x in instance_dates]
-    return (
-        False,
-        f"instance_id {instance_id} does not exist in dataset. Valid dates are {valid_dates}.",
-    )
 
 
 @router.get("/collections/isobaric/position")

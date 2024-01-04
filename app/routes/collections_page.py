@@ -2,11 +2,11 @@
 from functools import lru_cache
 from datetime import timedelta
 import logging
-from fastapi import APIRouter
+from fastapi import APIRouter, status, Response
 import edr_pydantic
 from edr_pydantic.collections import Collection
 
-from initialize import get_dataset, BASE_URL
+from initialize import get_dataset, BASE_URL, check_instance_exists
 
 from grib import (
     get_vertical_extent,
@@ -34,6 +34,11 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
     vertical_levels = get_vertical_extent(dataset)
     collection_url = f"{BASE_URL}collections/isobaric/"
     if len(instance_id) > 0:
+        # Sanity check on instance id
+        instance_ok, errmsg = check_instance_exists(dataset, instance_id)
+        if not instance_ok:
+            return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
+
         collection_url = instance_url
 
     isobaric_col = Collection(

@@ -4,12 +4,13 @@ from functools import lru_cache
 import os
 import sys
 import argparse
+from typing import Tuple
 from datetime import datetime, timedelta
 import logging
 import xarray as xr
 import requests
 
-from grib import ISOBARIC_LABEL, TEMPERATURE_LABEL
+from grib import ISOBARIC_LABEL, TEMPERATURE_LABEL, get_temporal_extent
 
 dataset = xr.Dataset()
 logger = logging.getLogger()
@@ -151,7 +152,7 @@ def download_gribfile(data_path: str, api_url: str) -> str:
         logger.info("Latest file is %s, already have that. Skipping download.", fname)
         return fname
 
-    logger.info("Downloading %s to path %s.", api_url, fname)
+    logger.warning("Downloading %s to path %s.", api_url, fname)
     with open(fname, "wb") as fd:
         for chunk in response.iter_content(chunk_size=524288):
             fd.write(chunk)
@@ -161,6 +162,22 @@ def download_gribfile(data_path: str, api_url: str) -> str:
 
 def format_instance_id(timestamp: datetime) -> str:
     return timestamp.strftime("%Y%m%d%H%M%S")
+
+
+def check_instance_exists(ds: xr.Dataset, instance_id: str) -> Tuple[bool, str]:
+    """Check instance id exists in dataset."""
+    instance_dates = [get_temporal_extent(ds)]
+    for d in instance_dates:
+        if format_instance_id(d) == instance_id:
+            logger.info("instance_id %s is valid", instance_id)
+            return True, ""
+
+    logger.error("instance_id %s does not exist in dataset", instance_id)
+    valid_dates = [format_instance_id(x) for x in instance_dates]
+    return (
+        False,
+        f"instance_id {instance_id} does not exist in dataset. Valid dates are {valid_dates}.",
+    )
 
 
 args = parse_args()
