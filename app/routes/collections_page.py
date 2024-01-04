@@ -105,7 +105,7 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
             # Get posision in default instance
             position=edr_pydantic.data_queries.EDRQuery(
                 link=edr_pydantic.data_queries.EDRQueryLink(
-                    href=f"{collection_url}position/",
+                    href=f"{collection_url}position",
                     rel="data",
                     variables=edr_pydantic.variables.Variables(
                         query_type="position",

@@ -216,13 +216,17 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, str]
     return True, ""
 
 
-@router.get("/collections/isobaric/position")
-async def create_isobaric_page(coords: str) -> dict:
+@router.get("/collections/isobaric/position/")
+async def create_isobaric_page(request: Request, coords: str = "") -> dict:
     """Position.
 
     This is the main function of this API. Needs a string with the coordinates, and will return data for the nearest point.
 
     """
+    if len(coords) == 0:
+        return {
+            "body": f'Error: No coordinates provided. Example: {str(request.base_url)[0:-1]}{request.scope["path"]}?coords=POINT(11 59)'
+        }
     return create_point(coords=coords)
 
 
