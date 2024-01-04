@@ -19,18 +19,22 @@ logger = logging.getLogger()
 
 
 @lru_cache
-def create_collection(collection_id: str = "", instance: str = "") -> dict:
+def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
     """Creates the collections page."""
-
-    # TODO: Check for instance
+    instance_url = f"{BASE_URL}collections/isobaric/instances/{instance_id}/"
 
     link_self = edr_pydantic.link.Link(
-        href=BASE_URL, hreflang="en", rel="self", type="aplication/json"
+        href=f"{BASE_URL}collections/",
+        hreflang="en",
+        rel="self",
+        type="aplication/json",
     )
 
     dataset = get_dataset()
     vertical_levels = get_vertical_extent(dataset)
-    collection_url = f"{BASE_URL}collections/isobaric"
+    collection_url = f"{BASE_URL}collections/isobaric/"
+    if len(instance_id) > 0:
+        collection_url = instance_url
 
     isobaric_col = Collection(
         id="isobaric",
@@ -79,14 +83,14 @@ def create_collection(collection_id: str = "", instance: str = "") -> dict:
         links=[
             edr_pydantic.link.Link(
                 href=collection_url,
-                rel="service-doc",
+                rel="collection",
             )
         ],
         data_queries=edr_pydantic.data_queries.DataQueries(
             # List instances
             instances=edr_pydantic.data_queries.EDRQuery(
                 link=edr_pydantic.data_queries.EDRQueryLink(
-                    href=f"{collection_url}/instances",
+                    href=f"{collection_url}instances/",
                     rel="data",
                     variables=edr_pydantic.variables.Variables(
                         query_type="instances", output_formats=["CoverageJSON"]
@@ -96,7 +100,7 @@ def create_collection(collection_id: str = "", instance: str = "") -> dict:
             # Get posision in default instance
             position=edr_pydantic.data_queries.EDRQuery(
                 link=edr_pydantic.data_queries.EDRQueryLink(
-                    href=f"{collection_url}/position",
+                    href=f"{collection_url}position/",
                     rel="data",
                     variables=edr_pydantic.variables.Variables(
                         query_type="position",
@@ -142,7 +146,7 @@ def create_collection(collection_id: str = "", instance: str = "") -> dict:
     return isobaric_col.model_dump(exclude_none=True)
 
 
-@router.get("/collections")
+@router.get("/collections/")
 async def create_collections_page() -> dict:
     """List all collections available.
 
@@ -154,7 +158,7 @@ async def create_collections_page() -> dict:
     return create_collection()
 
 
-@router.get("/collections/{collection_id}")
+@router.get("/collections/{collection_id}/")
 async def create_collection_page(collection_id: str) -> dict:
     """Show a specific collection. Isobaric is the only one available. No data is returned, only info about the collection."""
     return create_collection(collection_id)

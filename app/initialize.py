@@ -159,6 +159,10 @@ def download_gribfile(data_path: str, api_url: str) -> str:
     return fname
 
 
+def format_instance_id(timestamp: datetime) -> str:
+    return timestamp.strftime("%Y%m%d%H%M%S")
+
+
 args = parse_args()
 DATAFILE = args.file
 BASE_URL = args.base_url

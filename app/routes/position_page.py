@@ -1,14 +1,15 @@
 """Collections page."""
-from typing import List
+from typing import List, Tuple
 import logging
 from fastapi import APIRouter, status, Response, Request
+import xarray as xr
 from pydantic import AwareDatetime
 from shapely import wkt, GEOSException, Point
 import covjson_pydantic
 from covjson_pydantic.coverage import Coverage
 from covjson_pydantic.ndarray import NdArray
 
-from initialize import get_dataset
+from initialize import get_dataset, format_instance_id
 
 from grib import (
     get_vertical_extent,
@@ -25,9 +26,9 @@ router = APIRouter()
 logger = logging.getLogger()
 
 
-def create_point(coords: str = "", instance: str = "") -> dict:
+def create_point(coords: str = "", instance_id: str = "") -> dict:
     """Return data for all isometric layers at a point."""
-    # TODO: check instance
+    # Parse coordinates given as WKT
     point = Point()
     try:
         point = wkt.loads(coords)
@@ -42,26 +43,14 @@ def create_point(coords: str = "", instance: str = "") -> dict:
     logger.info("create_data for coord %s, %s", point.y, point.x)
     dataset = get_dataset()
 
-    # Sanity checks on coordinates
-    if (
-        point.y > dataset[TEMPERATURE_LABEL][LAT_LABEL].values.max()
-        or point.y < dataset[TEMPERATURE_LABEL][LAT_LABEL].values.min()
-    ):
-        errmsg = (
-            f"Error, coord {point.y} out of bounds. Min/max is "
-            + "{dataset[TEMPERATURE_LABEL][LAT_LABEL].values.min()}/"
-            + "{dataset[TEMPERATURE_LABEL][LAT_LABEL].values.max()}"
-        )
-        logger.error(errmsg)
+    # Sanity check on coordinates
+    coords_ok, errmsg = check_coords_within_bounds(dataset, point)
+    if not coords_ok:
         return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
-    if (
-        point.x > dataset[TEMPERATURE_LABEL][LON_LABEL].values.max()
-        or point.x < dataset[TEMPERATURE_LABEL][LON_LABEL].values.min()
-    ):
-        errmsg = f"Error, coord {point.x} out of bounds. Min/max is \
-            {dataset[TEMPERATURE_LABEL][LON_LABEL].values.min()}/\
-            {dataset[TEMPERATURE_LABEL][LON_LABEL].values.max()}"
-        logger.error(errmsg)
+
+    # Sanity check on instance id
+    instance_ok, errmsg = check_instance_exists(dataset, instance_id)
+    if not instance_ok:
         return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
 
     # Fetch temperature
@@ -200,8 +189,50 @@ def create_point(coords: str = "", instance: str = "") -> dict:
     return cov.model_dump(exclude_none=True)
 
 
+def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, str]:
+    """Check coordinates are within bounds of dataset."""
+    if (
+        point.y > ds[TEMPERATURE_LABEL][LAT_LABEL].values.max()
+        or point.y < ds[TEMPERATURE_LABEL][LAT_LABEL].values.min()
+    ):
+        errmsg = (
+            f"Error, coord {point.y} out of bounds. Min/max is "
+            + "{dataset[TEMPERATURE_LABEL][LAT_LABEL].values.min()}/"
+            + "{dataset[TEMPERATURE_LABEL][LAT_LABEL].values.max()}"
+        )
+        logger.error(errmsg)
+        return False, errmsg
+
+    if (
+        point.x > ds[TEMPERATURE_LABEL][LON_LABEL].values.max()
+        or point.x < ds[TEMPERATURE_LABEL][LON_LABEL].values.min()
+    ):
+        errmsg = f"Error, coord {point.x} out of bounds. Min/max is \
+            {ds[TEMPERATURE_LABEL][LON_LABEL].values.min()}/\
+            {ds[TEMPERATURE_LABEL][LON_LABEL].values.max()}"
+        logger.error(errmsg)
+        return False, errmsg
+    return True, ""
+
+
+def check_instance_exists(ds: xr.Dataset, instance_id: str) -> Tuple[bool, str]:
+    """Check instance id exists in dataset."""
+    instance_dates = [get_temporal_extent(ds)]
+    for d in instance_dates:
+        if format_instance_id(d) == instance_id:
+            logger.info("instance_id %s is valid", instance_id)
+            return True, ""
+
+    logger.error("instance_id %s does not exist in dataset", instance_id)
+    valid_dates = [format_instance_id(x) for x in instance_dates]
+    return (
+        False,
+        f"instance_id {instance_id} does not exist in dataset. Valid dates are {valid_dates}.",
+    )
+
+
 @router.get("/collections/isobaric/position")
-async def create_isobaric_page(coords: str, instance: str = "") -> dict:
+async def create_isobaric_page(coords: str) -> dict:
     """Position.
 
     This is the main function of this API. Needs a string with the coordinates, and will return data for the nearest point.
@@ -210,9 +241,9 @@ async def create_isobaric_page(coords: str, instance: str = "") -> dict:
     return create_point(coords=coords)
 
 
-@router.get("/collections/isobaric/instances/{instance}/position")
+@router.get("/collections/isobaric/instances/{instance_id}/position")
 async def create_instance_isobaric_page(
-    request: Request, coords: str = "", instance: str = ""
+    request: Request, coords: str = "", instance_id: str = ""
 ) -> dict:
     """Position.
 
@@ -224,4 +255,4 @@ async def create_instance_isobaric_page(
             "body": f'Error: No coordinates provided. Example: {str(request.base_url)[0:-1]}{request.scope["path"]}?coords=POINT(11 59)'
         }
 
-    return create_point(coords=coords, instance=instance)
+    return create_point(coords=coords, instance_id=instance_id)

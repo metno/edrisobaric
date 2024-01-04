@@ -19,7 +19,7 @@ def create_conformance_page() -> dict:
 router = APIRouter()
 
 
-@router.get("/conformance")
+@router.get("/conformance/")
 async def get_conformance_page():
     """Link path to function."""
     return create_conformance_page()

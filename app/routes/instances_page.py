@@ -5,7 +5,7 @@ from fastapi import APIRouter
 import edr_pydantic
 from edr_pydantic.collections import Instances, Instance
 
-from initialize import get_dataset, BASE_URL
+from initialize import get_dataset, BASE_URL, format_instance_id
 
 from grib import (
     get_vertical_extent,
@@ -21,20 +21,20 @@ def create_instances() -> dict:
     """List all instances (dates) available in data file."""
     dataset = get_dataset()
     vertical_levels = get_vertical_extent(dataset)
-    collection_url = f"{BASE_URL}collections/isobaric"
+    collection_url = f"{BASE_URL}collections/isobaric/"
     instance_dates = [get_temporal_extent(dataset)]
 
     instance_list = []
     for d in instance_dates:
-        formatted_date = d.strftime("%Y%m%d%H0000")
+        formatted_date = format_instance_id(d)
         instance_list.append(
             Instance(
                 id=formatted_date,
                 title=formatted_date,
-                description=f"Data from {formatted_date}",
+                description=f"Data from date {formatted_date}, formatted as %Y%m%d%H0000.",
                 links=[
                     edr_pydantic.link.Link(
-                        href=f"{collection_url}/instances/",
+                        href=f"{collection_url}instances/{formatted_date}/",
                         hreflang="en",
                         rel="self",
                         type="aplication/json",
@@ -111,7 +111,7 @@ def create_instances() -> dict:
     isobaric_inst = Instances(
         links=[
             edr_pydantic.link.Link(
-                href=f"{collection_url}/instances/",
+                href=f"{collection_url}instances/",
                 hreflang="en",
                 rel="self",
                 type="aplication/json",
@@ -123,7 +123,7 @@ def create_instances() -> dict:
     return isobaric_inst.model_dump(exclude_none=True)
 
 
-@router.get("/collections/isobaric/instances")
+@router.get("/collections/isobaric/instances/")
 async def create_isobaric_instances_page() -> dict:
     """List available instances."""
     return create_instances()
