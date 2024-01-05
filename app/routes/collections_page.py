@@ -3,7 +3,8 @@ from functools import lru_cache
 from datetime import timedelta
 import logging
 from typing import Annotated
-from fastapi import APIRouter, status, Response, Body
+from enum import Enum
+from fastapi import APIRouter, status, Response, Path
 import edr_pydantic
 from edr_pydantic.collections import Collection
 
@@ -15,24 +16,11 @@ from grib import (
     get_temporal_extent,
 )
 
+class CollectionID(str, Enum):
+    isobaric = "isobaric"
+
 router = APIRouter()
 logger = logging.getLogger()
-
-class CollectionWithExamples(Collection):
-    """Collection with examples."""
-
-    model_config = {
-        "json_schema_extra": {
-            "examples": [
-                {
-                    "name": "Foo",
-                    "description": "A very nice Item",
-                    "price": 35.4,
-                    "tax": 3.2,
-                }
-            ]
-        }
-    }
 
 
 @lru_cache
@@ -58,7 +46,19 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
 
         collection_url = instance_url
 
-    isobaric_col = CollectionWithExamples(
+    isobaric_col = Collection(
+        # model_config= {
+        #     "json_schema_extra": {
+        #         "examples": [
+        #             {
+        #                 "name": "Foo",
+        #                 "description": "A very nice Item",
+        #                 "price": 35.4,
+        #                 "tax": 3.2,
+        #             }
+        #         ]
+        #     }
+        # },
         id="isobaric",
         title="IsobaricGRIB - GRIB files",
         description="""
@@ -164,8 +164,8 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
         collections_page = edr_pydantic.collections.Collections(
             links=[link_self], collections=[isobaric_col]
         )
-        return collections_page.model_dump()#exclude_none=True)
-    return isobaric_col #.model_dump(exclude_none=True)
+        return collections_page.model_dump(exclude_none=True)
+    return isobaric_col.model_dump(exclude_none=True)
 
 
 @router.get("/collections/")
@@ -175,7 +175,7 @@ async def get_collections_page() -> dict:
 
 
 @router.get("/collections/{collection_id}/")
-async def get_collection_page(collection_id: str = "") -> dict:
+async def get_collection_page(collection_id: CollectionID) -> dict:
     """List a specific collection as JSON. Isobaric is the only one available. No data is returned, only info about the collection.."""
     return create_collection(collection_id)
 

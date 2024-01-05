@@ -1,7 +1,7 @@
 """Collections page."""
-from typing import List, Tuple
+from typing import List, Tuple, Annotated
 import logging
-from fastapi import APIRouter, status, Response, Request
+from fastapi import APIRouter, status, Response, Request, Query
 import xarray as xr
 from pydantic import AwareDatetime
 from shapely import wkt, GEOSException, Point
@@ -26,7 +26,7 @@ router = APIRouter()
 logger = logging.getLogger()
 
 
-def create_point(coords: str = "", instance_id: str = "") -> dict:
+def create_point(coords: str, instance_id: str = "") -> dict:
     """Return data for all isometric layers at a point."""
     # Parse coordinates given as WKT
     point = Point()
@@ -217,7 +217,7 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, str]
 
 
 @router.get("/collections/isobaric/position/")
-async def get_isobaric_page(request: Request, coords: str = "") -> dict:
+async def get_isobaric_page(request: Request, coords: Annotated[str, Query(min_length=9, max_length=50, pattern="^POINT\(")]) -> dict:
     """Return data closest to a position.
 
     This is the main function of this API. Needs a string with the coordinates, formated as a WKT. Example POINT(11.9384 60.1699).
