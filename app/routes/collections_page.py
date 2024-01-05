@@ -2,7 +2,8 @@
 from functools import lru_cache
 from datetime import timedelta
 import logging
-from fastapi import APIRouter, status, Response
+from typing import Annotated
+from fastapi import APIRouter, status, Response, Body
 import edr_pydantic
 from edr_pydantic.collections import Collection
 
@@ -16,6 +17,22 @@ from grib import (
 
 router = APIRouter()
 logger = logging.getLogger()
+
+class CollectionWithExamples(Collection):
+    """Collection with examples."""
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "name": "Foo",
+                    "description": "A very nice Item",
+                    "price": 35.4,
+                    "tax": 3.2,
+                }
+            ]
+        }
+    }
 
 
 @lru_cache
@@ -41,7 +58,7 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
 
         collection_url = instance_url
 
-    isobaric_col = Collection(
+    isobaric_col = CollectionWithExamples(
         id="isobaric",
         title="IsobaricGRIB - GRIB files",
         description="""
@@ -147,8 +164,8 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
         collections_page = edr_pydantic.collections.Collections(
             links=[link_self], collections=[isobaric_col]
         )
-        return collections_page.model_dump(exclude_none=True)
-    return isobaric_col.model_dump(exclude_none=True)
+        return collections_page.model_dump()#exclude_none=True)
+    return isobaric_col #.model_dump(exclude_none=True)
 
 
 @router.get("/collections/")
