@@ -7,3 +7,4 @@ prospector==1.10.0
 tox==4.11.4
 bandit==1.7.5
 setuptools
+schemathesis

@@ -220,7 +220,13 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, str]
 async def get_isobaric_page(
     request: Request,
     coords: Annotated[
-        str, Query(min_length=9, max_length=50, pattern="^POINT\\(\\d+.?\\d \\d+.?\\d\\)$", title="Coordinates, formated as WKT POINT(11.9384 60.1699)")
+        str,
+        Query(
+            min_length=9,
+            max_length=50,
+            pattern="^POINT\\(\\d+.?\\d+ \\d+.?\\d+\\)$",
+            title="Coordinates, formated as WKT POINT(11.9384 60.1699)",
+        ),
     ],
 ) -> dict:
     """Return data closest to a position.
@@ -234,7 +240,9 @@ async def get_isobaric_page(
     return create_point(coords=coords)
 
 
-@router.get("/collections/isobaric/instances/{instance_id}/position", response_model=Coverage)
+@router.get(
+    "/collections/isobaric/instances/{instance_id}/position", response_model=Coverage
+)
 async def get_instance_isobaric_page(
     request: Request,
     instance_id: Annotated[
@@ -247,8 +255,11 @@ async def get_instance_isobaric_page(
         ),
     ],
     coords: Annotated[
-        str, Query(min_length=9, max_length=50, pattern="^POINT\\(\\d+.?\\d \\d+.?\\d\\)$")
-    ]
+        str,
+        Query(
+            min_length=9, max_length=50, pattern="^POINT\\(\\d+.?\\d+ \\d+.?\\d+\\)$"
+        ),
+    ],
 ) -> dict:
     """Return data closest to a position.
 

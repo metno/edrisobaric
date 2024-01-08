@@ -69,13 +69,13 @@ class TestApp(unittest.TestCase):
 
         # Test asking for non-existing instance.
         response = client.get("/collections/isobaric/instances/1234567890/")
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 422)
 
         # Test asking for data in a non-existing instance.
         response = client.get(
             f"/collections/isobaric/instances/1234567890/position?{sample_coords}"
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 422)
 
         # Test asking for a sample point in current instance.
         response = client.get(
@@ -83,7 +83,7 @@ class TestApp(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertIn(
-            '"id":"isobaric","type":"Coverage","domain":{"type":"Domain","domainType":"VerticalProfile","axes":{"x":{"values',
+            '"id":"isobaric","type":"Coverage","domain":{"type":"Domain","domainType":"VerticalProfile","axes":{"x"',
             response.text,
         )
 

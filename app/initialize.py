@@ -18,7 +18,9 @@ logger = logging.getLogger()
 
 
 class CollectionID(str, Enum):
+
     """List of collections. Could be dynamic, but we only have one."""
+
     isobaric = "isobaric"
     blank = ""
 

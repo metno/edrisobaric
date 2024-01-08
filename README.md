@@ -14,7 +14,6 @@ Resulting data can be pasted into covjson playground for visualizing:
 
 ![playground](/img/playground.png "playground")
 
-
 ## Who is responsible?
 
 - larsfp at met.no
@@ -24,6 +23,7 @@ Resulting data can be pasted into covjson playground for visualizing:
 [![CodeQL](https://github.com/metno/edrisobaric/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/metno/edrisobaric/actions/workflows/github-code-scanning/codeql)
 [![trivy](https://github.com/metno/edrisobaric/actions/workflows/trivy.yml/badge.svg)](https://github.com/metno/edrisobaric/actions/workflows/trivy.yml)
 [![Build image and publish at Github Registry](https://github.com/metno/edrisobaric/actions/workflows/docker-image.yml/badge.svg)](https://github.com/metno/edrisobaric/actions/workflows/docker-image.yml)
+[![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/pylint-dev/pylint)
 
 In development.
 
