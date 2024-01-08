@@ -90,6 +90,7 @@ See [output](docs/Output.md) of all operations.
 
 - Based on Pydantic EDR- and covjson-libraries by [KNMI](https://github.com/KNMI/)
 - Docs around creating an API at [Overview](docs/Overview.md).
+- This app will not download _new_ data unless restarted.
 
 ### Other APIs for comparison
 

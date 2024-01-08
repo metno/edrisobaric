@@ -3,21 +3,17 @@ from functools import lru_cache
 from datetime import timedelta
 import logging
 from typing import Annotated
-from enum import Enum
 from fastapi import APIRouter, status, Response, Path
 import edr_pydantic
 from edr_pydantic.collections import Collection
 
-from initialize import get_dataset, BASE_URL, check_instance_exists
+from initialize import get_dataset, BASE_URL, check_instance_exists, CollectionID
 
 from grib import (
     get_vertical_extent,
     get_spatial_extent,
     get_temporal_extent,
 )
-
-class CollectionID(str, Enum):
-    isobaric = "isobaric"
 
 router = APIRouter()
 logger = logging.getLogger()
@@ -180,9 +176,18 @@ async def get_collection_page(collection_id: CollectionID) -> dict:
     return create_collection(collection_id)
 
 
-@router.get("/collections/{collection_id}/instances/{instance}/")
+@router.get("/collections/{collection_id}/instances/{instance_id}/")
 async def get_instance_collection_page(
-    collection_id: str = "", instance: str = ""
+    collection_id: CollectionID,
+    instance_id: Annotated[
+        str,
+        Path(
+            min_length=14,
+            max_length=14,
+            pattern="^\\d{10}0{4}$",
+            title="Instance ID, consisting of date in format %Y%m%d%H0000",
+        ),
+    ],
 ) -> dict:
-    """Return a specific instance of a collection. Isobaric is the only collection available. The date in current grib file is only instance available, format %Y%m%d%H0000. No data is returned, only info about the instance."""
-    return create_collection(collection_id, instance)
+    """Return a specific instance of a collection. Isobaric is the only collection available. The date in current grib file is only instance available, format %Y%m%d%H0000, so string has to be 14 characters, where first 8 are a number and last 6 are all zeros, example 20240104000000. No data is returned, only info about the instance."""
+    return create_collection(collection_id, instance_id)

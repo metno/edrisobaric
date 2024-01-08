@@ -1,7 +1,7 @@
 """Collections page."""
 from typing import List, Tuple, Annotated
 import logging
-from fastapi import APIRouter, status, Response, Request, Query
+from fastapi import APIRouter, status, Response, Request, Query, Path
 import xarray as xr
 from pydantic import AwareDatetime
 from shapely import wkt, GEOSException, Point
@@ -217,10 +217,15 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, str]
 
 
 @router.get("/collections/isobaric/position/")
-async def get_isobaric_page(request: Request, coords: Annotated[str, Query(min_length=9, max_length=50, pattern="^POINT\(")]) -> dict:
+async def get_isobaric_page(
+    request: Request,
+    coords: Annotated[
+        str, Query(min_length=9, max_length=50, pattern="^POINT\\(\\d+.?\\d \\d+.?\\d\\)$", title="Coordinates, formated as WKT POINT(11.9384 60.1699)")
+    ],
+) -> dict:
     """Return data closest to a position.
 
-    This is the main function of this API. Needs a string with the coordinates, formated as a WKT. Example POINT(11.9384 60.1699).
+    This is the main function of this API. Needs a string with the coordinates, formated as a WKT. Example: POINT(11.9384 60.1699) or POINT(11 60).
     """
     if len(coords) == 0:
         return {
@@ -231,7 +236,19 @@ async def get_isobaric_page(request: Request, coords: Annotated[str, Query(min_l
 
 @router.get("/collections/isobaric/instances/{instance_id}/position")
 async def get_instance_isobaric_page(
-    request: Request, coords: str = "", instance_id: str = ""
+    request: Request,
+    instance_id: Annotated[
+        str,
+        Path(
+            min_length=14,
+            max_length=14,
+            pattern="^\\d{10}0{4}$",
+            title="Instance ID, consisting of date in format %Y%m%d%H0000",
+        ),
+    ],
+    coords: Annotated[
+        str, Query(min_length=9, max_length=50, pattern="^POINT\\(\\d+.?\\d \\d+.?\\d\\)$")
+    ]
 ) -> dict:
     """Return data closest to a position.
 

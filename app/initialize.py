@@ -6,6 +6,7 @@ import sys
 import argparse
 from typing import Tuple
 from datetime import datetime, timedelta
+from enum import Enum
 import logging
 import xarray as xr
 import requests
@@ -14,6 +15,11 @@ from grib import ISOBARIC_LABEL, TEMPERATURE_LABEL, get_temporal_extent
 
 dataset = xr.Dataset()
 logger = logging.getLogger()
+
+
+class CollectionID(str, Enum):
+    """List of collections. Could be dynamic, but we only have one."""
+    isobaric = "isobaric"
 
 
 def parse_args() -> argparse.Namespace:
