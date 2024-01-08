@@ -54,7 +54,7 @@ def create_landing_page(base_url) -> dict:
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("/", response_model=LandingPageModel)
 async def get_landing_page():
     """Returns the landing page as JSON."""
     return create_landing_page(base_url=BASE_URL)

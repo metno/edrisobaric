@@ -2,10 +2,16 @@
 from functools import lru_cache
 from datetime import timedelta
 import logging
-from typing import Annotated
+from typing import Annotated, Optional, List
 from fastapi import APIRouter, status, Response, Path
 import edr_pydantic
 from edr_pydantic.collections import Collection
+from edr_pydantic.data_queries import DataQueries
+from edr_pydantic.link import Link
+from edr_pydantic.extent import Extent
+from edr_pydantic.parameter import Parameters
+from edr_pydantic.base_model import EdrBaseModel
+from pydantic import ConfigDict
 
 from initialize import get_dataset, BASE_URL, check_instance_exists, CollectionID
 
@@ -14,6 +20,31 @@ from grib import (
     get_spatial_extent,
     get_temporal_extent,
 )
+
+class CollectionWithExamples(EdrBaseModel):
+    id: str
+    title: Optional[str] = None
+    description: Optional[str] = None
+    keywords: Optional[List[str]] = None
+    links: List[Link]
+    extent: Extent
+    data_queries: Optional[DataQueries] = None
+    crs: Optional[List[str]] = None
+    output_formats: Optional[List[str]] = None
+    parameter_names: Parameters
+    distanceunits: Optional[List[str]] = None
+    model_config = ConfigDict(
+        str_strip_whitespace=True,
+        extra="allow",
+        str_min_length=1,
+        validate_default=True,
+        validate_assignment=True,
+        strict=True,
+    )
+
+class CollectionsWithExamples(EdrBaseModel):
+    links: List[Link]
+    collections: List[CollectionWithExamples]
 
 router = APIRouter()
 logger = logging.getLogger()
@@ -42,19 +73,7 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
 
         collection_url = instance_url
 
-    isobaric_col = Collection(
-        # model_config= {
-        #     "json_schema_extra": {
-        #         "examples": [
-        #             {
-        #                 "name": "Foo",
-        #                 "description": "A very nice Item",
-        #                 "price": 35.4,
-        #                 "tax": 3.2,
-        #             }
-        #         ]
-        #     }
-        # },
+    isobaric_col = CollectionWithExamples(
         id="isobaric",
         title="IsobaricGRIB - GRIB files",
         description="""
@@ -154,29 +173,41 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
                 ),
             }
         ),
+        model_config = ConfigDict(
+            from_attributes=True,
+            json_schema_extra={
+                "example": {
+                    "id": "1234",
+                    "name": "Foo",
+                }
+            },
+        )
     )
 
+    print(isobaric_col.model_config)
+
     if len(collection_id) == 0:
-        collections_page = edr_pydantic.collections.Collections(
+        print(isobaric_col.model_dump_json(indent=4))
+        collections_page = CollectionsWithExamples(
             links=[link_self], collections=[isobaric_col]
         )
         return collections_page.model_dump(exclude_none=True)
     return isobaric_col.model_dump(exclude_none=True)
 
 
-@router.get("/collections/")
+@router.get("/collections/", response_model=CollectionsWithExamples)
 async def get_collections_page() -> dict:
     """List collections as JSON. Isobaric is the only one available. No data is returned, only info about the collection."""
     return create_collection()
 
 
-@router.get("/collections/{collection_id}/")
+@router.get("/collections/{collection_id}/", response_model=CollectionsWithExamples)
 async def get_collection_page(collection_id: CollectionID) -> dict:
     """List a specific collection as JSON. Isobaric is the only one available. No data is returned, only info about the collection.."""
     return create_collection(collection_id)
 
 
-@router.get("/collections/{collection_id}/instances/{instance_id}/")
+@router.get("/collections/{collection_id}/instances/{instance_id}/", response_model=CollectionsWithExamples)
 async def get_instance_collection_page(
     collection_id: CollectionID,
     instance_id: Annotated[

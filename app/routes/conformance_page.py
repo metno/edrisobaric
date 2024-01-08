@@ -19,7 +19,7 @@ def create_conformance_page() -> dict:
 router = APIRouter()
 
 
-@router.get("/conformance/")
+@router.get("/conformance/", response_model=ConformanceModel)
 async def get_conformance_page():
     """Returns the conformance page as JSON."""
     return create_conformance_page()

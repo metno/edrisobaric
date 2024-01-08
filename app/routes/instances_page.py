@@ -123,7 +123,7 @@ def create_instances() -> dict:
     return isobaric_inst.model_dump(exclude_none=True)
 
 
-@router.get("/collections/isobaric/instances/")
+@router.get("/collections/isobaric/instances/", response_model=Instances)
 async def get_isobaric_instances_page() -> dict:
     """Return list of available instances as JSON."""
     return create_instances()
