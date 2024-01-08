@@ -18,7 +18,6 @@ logger = logging.getLogger()
 
 
 class CollectionID(str, Enum):
-
     """List of collections. Could be dynamic, but we only have one."""
 
     isobaric = "isobaric"
@@ -75,6 +74,7 @@ def open_grib():
 
     try:
         dataset = xr.open_dataset(filename, engine="cfgrib")
+        logger.info("Opened data file %s", filename)
     except ValueError as err:
         logger.error(
             "Unable to open file %s. Check installation of modules cfgrib, eccodes.\n%s",

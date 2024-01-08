@@ -198,8 +198,8 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, str]
     ):
         errmsg = (
             f"Error, coord {point.y} out of bounds. Min/max is "
-            + "{dataset[TEMPERATURE_LABEL][LAT_LABEL].values.min()}/"
-            + "{dataset[TEMPERATURE_LABEL][LAT_LABEL].values.max()}"
+            + f"{ds[TEMPERATURE_LABEL][LAT_LABEL].values.min()}/"
+            + f"{ds[TEMPERATURE_LABEL][LAT_LABEL].values.max()}"
         )
         logger.error(errmsg)
         return False, errmsg
@@ -208,9 +208,11 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, str]
         point.x > ds[TEMPERATURE_LABEL][LON_LABEL].values.max()
         or point.x < ds[TEMPERATURE_LABEL][LON_LABEL].values.min()
     ):
-        errmsg = f"Error, coord {point.x} out of bounds. Min/max is \
-            {ds[TEMPERATURE_LABEL][LON_LABEL].values.min()}/\
-            {ds[TEMPERATURE_LABEL][LON_LABEL].values.max()}"
+        errmsg = (
+            f"Error, coord {point.x} out of bounds. Min/max is "
+            + f"{ds[TEMPERATURE_LABEL][LON_LABEL].values.min()}/ "
+            + f"{ds[TEMPERATURE_LABEL][LON_LABEL].values.max()}"
+        )
         logger.error(errmsg)
         return False, errmsg
     return True, ""
