@@ -1,9 +1,9 @@
 # In addition to requirements.txt
 types-pytz
 types-requests
-black
-mypy
-prospector
-pylint
-tox
-bandit
+black==23.12.1
+mypy==1.8.0
+prospector==1.10.0
+tox==4.11.4
+bandit==1.7.5
+setuptools
