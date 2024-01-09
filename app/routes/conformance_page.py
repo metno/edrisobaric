@@ -9,9 +9,12 @@ def create_conformance_page() -> dict:
     """Creates the conformance page."""
     return ConformanceModel(
         conformsTo=[
-            "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/core",
-            "http://www.opengis.net/spec/ogcapi-common-2/1.0/conf/collections",
             "http://www.opengis.net/spec/ogcapi-edr-1/1.0/conf/core",
+            "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/core",
+            "http://www.opengis.net/spec/ogcapi-edr-1/1.0/conf/collections",
+            "http://www.opengis.net/spec/ogcapi-edr-1/1.0/conf/json",
+            "http://www.opengis.net/spec/ogcapi-edr-1/1.0/conf/covjson",
+            "http://www.opengis.net/spec/ogcapi-edr-1/1.0/conf/queries",
         ],
     ).model_dump(exclude_none=True)
 
