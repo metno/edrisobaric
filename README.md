@@ -24,6 +24,9 @@ Resulting data can be pasted into covjson playground for visualizing:
 [![trivy](https://github.com/metno/edrisobaric/actions/workflows/trivy.yml/badge.svg)](https://github.com/metno/edrisobaric/actions/workflows/trivy.yml)
 [![Build image and publish at Github Registry](https://github.com/metno/edrisobaric/actions/workflows/docker-image.yml/badge.svg)](https://github.com/metno/edrisobaric/actions/workflows/docker-image.yml)
 [![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/pylint-dev/pylint)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/metno/edrisobaric/blob/main/LICENSE)
 
 In development.
 
