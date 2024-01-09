@@ -3,3 +3,4 @@ __pycache__
 data
 venv
 testfiles/
+test_data/
