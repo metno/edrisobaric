@@ -1,7 +1,7 @@
 """Collections page."""
 from typing import List, Tuple, Annotated
 import logging
-from fastapi import APIRouter, status, Response, Request, Query
+from fastapi import APIRouter, status, Response, Request, Query, Path
 import xarray as xr
 from pydantic import AwareDatetime
 from shapely import wkt, GEOSException, Point
@@ -25,6 +25,13 @@ from grib import (
 router = APIRouter()
 logger = logging.getLogger()
 
+# There is only one instance available. Load and lock.
+instance_path = Path(
+    min_length=14,
+    max_length=14,
+    pattern=get_temporal_extent(get_dataset()).strftime("%Y%m%d%H0000"),
+    title="Instance ID, consisting of date in format %Y%m%d%H0000",
+)
 
 def create_point(coords: str, instance_id: str = "") -> dict:
     """Return data for all isometric layers at a point."""
@@ -229,7 +236,7 @@ async def get_isobaric_page(
             pattern="^POINT\\(\\d+.?\\d+ \\d+.?\\d+\\)$",
             title="Coordinates, formated as WKT POINT(11.9384 60.1699)",
         ),
-    ],
+    ] = "POINT(11.9384 60.1699)",
 ) -> dict:
     """Return data closest to a position.
 
@@ -237,7 +244,7 @@ async def get_isobaric_page(
     """
     if len(coords) == 0:
         return {
-            "body": f'Error: No coordinates provided. Example: {str(request.base_url)[0:-1]}{request.scope["path"]}?coords=POINT(11 59)'
+            "body": f'Error: No coordinates provided. Example: {str(request.base_url)[0:-1]}{request.scope["path"]}?coords=POINT(11.9384 60.1699)'
         }
     return create_point(coords=coords)
 
@@ -247,13 +254,22 @@ async def get_isobaric_page(
 )
 async def get_instance_isobaric_page(
     request: Request,
-    instance_id: str,  # InstanceID,
+    instance_id: Annotated[
+        str,
+        instance_path,
+    ],
     coords: Annotated[
         str,
         Query(
-            min_length=9, max_length=50, pattern="^POINT\\(\\d+.?\\d+ \\d+.?\\d+\\)$"
+            min_length=9, max_length=50, pattern="^POINT\\(\\d+.?\\d+ \\d+.?\\d+\\)$",
+            examples={
+                "example1": {
+                        "summary": "First example",
+                        "coords": "POINT(11.9384 60.1699)",
+                },
+            },
         ),
-    ],
+    ] = "POINT(11.9384 60.1699)",
 ) -> dict:
     """Return data closest to a position.
 
@@ -261,7 +277,7 @@ async def get_instance_isobaric_page(
     """
     if len(coords) == 0:
         return {
-            "body": f'Error: No coordinates provided. Example: {str(request.base_url)[0:-1]}{request.scope["path"]}?coords=POINT(11 59)'
+            "body": f'Error: No coordinates provided. Example: {str(request.base_url)[0:-1]}{request.scope["path"]}?coords=POINT(11.9384 60.1699)'
         }
 
     return create_point(coords=coords, instance_id=instance_id)

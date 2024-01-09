@@ -20,12 +20,10 @@ router = APIRouter()
 logger = logging.getLogger()
 
 # There is only one instance available. Load and lock.
-ds = get_dataset()
-d = get_temporal_extent(ds)
 instance_path = Path(
     min_length=14,
     max_length=14,
-    pattern=d.strftime("%Y%m%d%H0000"),
+    pattern=get_temporal_extent(get_dataset()).strftime("%Y%m%d%H0000"),
     title="Instance ID, consisting of date in format %Y%m%d%H0000",
 )
 
