@@ -37,7 +37,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--bind_host",
         help="Which host to bind to.",
-        default="0.0.0.0",
+        default="127.0.0.1",
         required=False,
     )
     parser.add_argument(
@@ -61,7 +61,7 @@ def get_filename() -> str:
     return DATAFILE
 
 
-def open_grib():
+def open_grib() -> None:
     """Open grib file."""
     global dataset
 
