@@ -10,12 +10,12 @@ sample_coords = "coords=POINT(11.9384 60.1699)"
 
 
 class TestApp(unittest.TestCase):
-    def test_landingpage(self):
+    def test_landingpage(self) -> None:
         response = client.get("/")
         self.assertEqual(response.status_code, 200)
         self.assertIn("EDR isobaric from Grib", response.text)
 
-    def test_conformance(self):
+    def test_conformance(self) -> None:
         response = client.get("/conformance")
         self.assertEqual(response.status_code, 200)
         self.assertIn(
@@ -23,13 +23,13 @@ class TestApp(unittest.TestCase):
             response.text,
         )
 
-    def test_collections(self):
+    def test_collections(self) -> None:
         response = client.get("/collections")
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.json()["collections"][0]["id"] == "isobaric")
         # '{"links":[{"href":"http://localhost:5000/collections/","hreflang":"en","rel":"self","type":"aplication/json"}],"collections":[{"id":"isobaric","title":"IsobaricGRIB - GRIB files"...
 
-    def test_point(self):
+    def test_point(self) -> None:
         response = client.get(f"/collections/isobaric/position?{sample_coords}")
         self.assertEqual(response.status_code, 200)
         # Test for values in range -> temperature
@@ -45,7 +45,7 @@ class TestApp(unittest.TestCase):
             len(str(response.json()["domain"]["axes"]["z"]["values"][0])) > 1
         )
 
-    def test_instances(self):
+    def test_instances(self) -> None:
         """Test a variety of URLs related to instances."""
         # Test list of instances.
         response = client.get("/collections/isobaric/instances")
@@ -75,7 +75,7 @@ class TestApp(unittest.TestCase):
         response = client.get(
             f"/collections/isobaric/instances/1234567890/position?{sample_coords}"
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 422)
 
         # Test asking for a sample point in current instance.
         response = client.get(
@@ -87,7 +87,7 @@ class TestApp(unittest.TestCase):
             response.text,
         )
 
-    def test_api(self):
+    def test_api(self) -> None:
         response = client.get("/api")
         self.assertEqual(response.status_code, 200)
 
