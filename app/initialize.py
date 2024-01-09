@@ -173,19 +173,28 @@ def format_instance_id(timestamp: datetime) -> str:
     return timestamp.strftime("%Y%m%d%H0000")
 
 
-def check_instance_exists(ds: xr.Dataset, instance_id: str) -> Tuple[bool, str]:
+def check_instance_exists(ds: xr.Dataset, instance_id: str) -> Tuple[bool, dict]:
     """Check instance id exists in dataset."""
     instance_dates = [get_temporal_extent(ds)]
     for d in instance_dates:
         if format_instance_id(d) == instance_id:
             logger.info("instance_id %s is valid", instance_id)
-            return True, ""
+            return True, {}
 
     logger.error("instance_id %s does not exist in dataset", instance_id)
     valid_dates = [format_instance_id(x) for x in instance_dates]
     return (
         False,
-        f"instance_id {instance_id} does not exist in dataset. Valid dates are {valid_dates}.",
+        {
+            "detail": [
+                {
+                    "type": "string",
+                    "loc": ["query", "instance"],
+                    "msg": f"instance_id {instance_id} does not exist in dataset. Valid dates are {valid_dates}.",
+                    "input": instance_id,
+                }
+            ]
+        },
     )
 
 
@@ -194,11 +203,3 @@ DATAFILE = args.file
 BASE_URL = args.base_url
 BIND_HOST = args.bind_host
 API_URL = args.api_url
-
-# Open datafile at start
-# _ = get_dataset()
-
-# class InstanceID(str, Enum):
-#     """List of instances, created when opening data file."""
-#     blank = ""
-#     default = get_temporal_extent(get_dataset()).strftime("%Y%m%d%H0000")

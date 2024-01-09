@@ -30,6 +30,14 @@ class TestApp(unittest.TestCase):
         # '{"links":[{"href":"http://localhost:5000/collections/","hreflang":"en","rel":"self","type":"aplication/json"}],"collections":[{"id":"isobaric","title":"IsobaricGRIB - GRIB files"...
 
     def test_point(self) -> None:
+        # Test various coord formats, which should all work
+        response = client.get(f"/collections/isobaric/position?coords=POINT(11 60)")
+        self.assertEqual(response.status_code, 200)
+        response = client.get(f"/collections/isobaric/position?coords=POINT(11.0 60.0)")
+        self.assertEqual(response.status_code, 200)
+        response = client.get(f"/collections/isobaric/position?coords=POINT(11. 60.)")
+        self.assertEqual(response.status_code, 200)
+
         response = client.get(f"/collections/isobaric/position?{sample_coords}")
         self.assertEqual(response.status_code, 200)
         # Test for values in range -> temperature

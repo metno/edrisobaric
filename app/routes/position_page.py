@@ -2,6 +2,7 @@
 from typing import List, Tuple, Annotated
 import logging
 from fastapi import APIRouter, status, Response, Request, Query, Path
+from fastapi.responses import JSONResponse
 import xarray as xr
 from pydantic import AwareDatetime
 from shapely import wkt, GEOSException, Point
@@ -22,6 +23,8 @@ from grib import (
     ISOBARIC_LABEL,
 )
 
+POINT_REGEX = "^POINT\\(\\d+\\.?\\d* \\d+\\.?\\d*\\)$"
+
 router = APIRouter()
 logger = logging.getLogger()
 
@@ -33,6 +36,7 @@ instance_path = Path(
     title="Instance ID, consisting of date in format %Y%m%d%H0000",
 )
 
+
 def create_point(coords: str, instance_id: str = "") -> dict:
     """Return data for all isometric layers at a point."""
     # Parse coordinates given as WKT
@@ -42,10 +46,22 @@ def create_point(coords: str, instance_id: str = "") -> dict:
     except GEOSException:
         errmsg = (
             "Error, coords should be a Well Known Text, for example "
-            + f'"POINT(11.0 59.0)". You gave "{coords}"'
+            + f"POINT(11.0 59.0). You gave <{coords}>"
         )
         logger.error(errmsg)
-        return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content={
+                "detail": [
+                    {
+                        "type": "string",
+                        "loc": ["query", "coords"],
+                        "msg": errmsg,
+                        "input": coords,
+                    }
+                ]
+            },
+        )
 
     logger.info("create_data for coord %s, %s", point.y, point.x)
     dataset = get_dataset()
@@ -53,7 +69,9 @@ def create_point(coords: str, instance_id: str = "") -> dict:
     # Sanity check on coordinates
     coords_ok, errmsg = check_coords_within_bounds(dataset, point)
     if not coords_ok:
-        return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content=errmsg
+        )
 
     # Sanity check on instance id
     if len(instance_id) > 0:
@@ -197,17 +215,22 @@ def create_point(coords: str, instance_id: str = "") -> dict:
     return cov.model_dump(exclude_none=True)
 
 
-def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, str]:
+def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, dict]:
     """Check coordinates are within bounds of dataset."""
     if (
         point.y > ds[TEMPERATURE_LABEL][LAT_LABEL].values.max()
         or point.y < ds[TEMPERATURE_LABEL][LAT_LABEL].values.min()
     ):
-        errmsg = (
-            f"Error, coord {point.y} out of bounds. Min/max is "
-            + f"{ds[TEMPERATURE_LABEL][LAT_LABEL].values.min()}/"
-            + f"{ds[TEMPERATURE_LABEL][LAT_LABEL].values.max()}"
-        )
+        errmsg = {
+            "detail": [
+                {
+                    "loc": ["string", 0],
+                    "msg": f"Error, coord {point.y} out of bounds. Min/max is {ds[TEMPERATURE_LABEL][LAT_LABEL].values.min()}/{ds[TEMPERATURE_LABEL][LAT_LABEL].values.max()}",
+                    "type": "string",
+                    "input": point.y,
+                }
+            ]
+        }
         logger.error(errmsg)
         return False, errmsg
 
@@ -215,14 +238,19 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, str]
         point.x > ds[TEMPERATURE_LABEL][LON_LABEL].values.max()
         or point.x < ds[TEMPERATURE_LABEL][LON_LABEL].values.min()
     ):
-        errmsg = (
-            f"Error, coord {point.x} out of bounds. Min/max is "
-            + f"{ds[TEMPERATURE_LABEL][LON_LABEL].values.min()}/ "
-            + f"{ds[TEMPERATURE_LABEL][LON_LABEL].values.max()}"
-        )
+        errmsg = {
+            "detail": [
+                {
+                    "loc": ["string", 0],
+                    "msg": f"Error, coord {point.x} out of bounds. Min/max is {ds[TEMPERATURE_LABEL][LON_LABEL].values.min()}/{ds[TEMPERATURE_LABEL][LON_LABEL].values.max()}",
+                    "type": "string",
+                    "input": point.x,
+                }
+            ]
+        }
         logger.error(errmsg)
         return False, errmsg
-    return True, ""
+    return True, {}
 
 
 @router.get("/collections/isobaric/position/", response_model=Coverage)
@@ -233,8 +261,8 @@ async def get_isobaric_page(
         Query(
             min_length=9,
             max_length=50,
-            pattern="^POINT\\(\\d+.?\\d+ \\d+.?\\d+\\)$",
-            title="Coordinates, formated as WKT POINT(11.9384 60.1699)",
+            pattern=POINT_REGEX,
+            title="Coordinates, formated as a WKT point: POINT(11.9384 60.1699)",
         ),
     ] = "POINT(11.9384 60.1699)",
 ) -> dict:
@@ -243,9 +271,21 @@ async def get_isobaric_page(
     This is the main function of this API. Needs a string with the coordinates, formated as a WKT. Example: POINT(11.9384 60.1699) or POINT(11 60).
     """
     if len(coords) == 0:
-        return {
-            "body": f'Error: No coordinates provided. Example: {str(request.base_url)[0:-1]}{request.scope["path"]}?coords=POINT(11.9384 60.1699)'
-        }
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content={
+                "body": {
+                    "detail": [
+                        {
+                            "loc": ["string", 0],
+                            "msg": f'Error: No coordinates provided. Example: {str(request.base_url)[0:-1]}{request.scope["path"]}?coords=POINT(11.9384 60.1699)',
+                            "type": "string",
+                        }
+                    ]
+                }
+            },
+        )
+
     return create_point(coords=coords)
 
 
@@ -261,13 +301,15 @@ async def get_instance_isobaric_page(
     coords: Annotated[
         str,
         Query(
-            min_length=9, max_length=50, pattern="^POINT\\(\\d+.?\\d+ \\d+.?\\d+\\)$",
-            examples={
-                "example1": {
-                        "summary": "First example",
-                        "coords": "POINT(11.9384 60.1699)",
-                },
-            },
+            min_length=9,
+            max_length=50,
+            pattern=POINT_REGEX,
+            # examples={
+            #     "example1": {
+            #         "summary": "First example",
+            #         "values": "POINT(11.9384 60.1699)",
+            #     },
+            # },
         ),
     ] = "POINT(11.9384 60.1699)",
 ) -> dict:
