@@ -79,7 +79,7 @@ Staring the app will give these URLs:
 
 Example position lookup:
 
-- <http://127.0.0.1:5000/collections/isobaric/position?coords=POINT(11.9384 60.1699)>
+- <http://127.0.0.1:5000/collections/isobaric/position?coords=POINT(11.9384%2060.1699)>
 
 ### Use it for production
 

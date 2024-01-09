@@ -278,7 +278,7 @@ async def get_isobaric_page(
                     "detail": [
                         {
                             "loc": ["string", 0],
-                            "msg": f'Error: No coordinates provided. Example: {str(request.base_url)[0:-1]}{request.scope["path"]}?coords=POINT(11.9384 60.1699)',
+                            "msg": f'Error: No coordinates provided. Example: {str(request.base_url)[0:-1]}{request.scope["path"]}?coords=POINT(11.9384%2060.1699)',
                             "type": "string",
                         }
                     ]
@@ -319,7 +319,7 @@ async def get_instance_isobaric_page(
     """
     if len(coords) == 0:
         return {
-            "body": f'Error: No coordinates provided. Example: {str(request.base_url)[0:-1]}{request.scope["path"]}?coords=POINT(11.9384 60.1699)'
+            "body": f'Error: No coordinates provided. Example: {str(request.base_url)[0:-1]}{request.scope["path"]}?coords=POINT(11.9384%2060.1699)'
         }
 
     return create_point(coords=coords, instance_id=instance_id)
