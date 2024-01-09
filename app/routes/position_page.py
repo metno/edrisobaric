@@ -253,7 +253,11 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, dict
     return True, {}
 
 
-@router.get("/collections/isobaric/position/", response_model=Coverage)
+@router.get(
+    "/collections/isobaric/position/",
+    response_model=Coverage,
+    response_model_exclude_unset=True,
+)
 async def get_isobaric_page(
     request: Request,
     coords: Annotated[
@@ -290,7 +294,9 @@ async def get_isobaric_page(
 
 
 @router.get(
-    "/collections/isobaric/instances/{instance_id}/position", response_model=Coverage
+    "/collections/isobaric/instances/{instance_id}/position",
+    response_model=Coverage,
+    response_model_exclude_unset=True,
 )
 async def get_instance_isobaric_page(
     request: Request,

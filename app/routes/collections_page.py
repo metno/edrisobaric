@@ -159,20 +159,28 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
     return isobaric_col.model_dump(exclude_none=True)
 
 
-@router.get("/collections/", response_model=Collections)
+@router.get(
+    "/collections/", response_model=Collections, response_model_exclude_unset=True
+)
 async def get_collections_page() -> dict:
     """List collections as JSON. Isobaric is the only one available. No data is returned, only info about the collection."""
     return create_collection()
 
 
-@router.get("/collections/{collection_id}/", response_model=Collection)
+@router.get(
+    "/collections/{collection_id}/",
+    response_model=Collection,
+    response_model_exclude_unset=True,
+)
 async def get_collection_page(collection_id: CollectionID) -> dict:
     """List a specific collection as JSON. Isobaric is the only one available. No data is returned, only info about the collection.."""
     return create_collection(collection_id)
 
 
 @router.get(
-    "/collections/{collection_id}/instances/{instance_id}/", response_model=Collection
+    "/collections/{collection_id}/instances/{instance_id}/",
+    response_model=Collection,
+    response_model_exclude_unset=True,
 )
 async def get_instance_collection_page(
     collection_id: CollectionID,
