@@ -1,7 +1,7 @@
 """Collections page."""
 from typing import List, Tuple, Annotated
 import logging
-from fastapi import APIRouter, status, Response, Request, Query, Path
+from fastapi import APIRouter, status, Response, Request, Query
 import xarray as xr
 from pydantic import AwareDatetime
 from shapely import wkt, GEOSException, Point
@@ -247,15 +247,7 @@ async def get_isobaric_page(
 )
 async def get_instance_isobaric_page(
     request: Request,
-    instance_id: Annotated[
-        str,
-        Path(
-            min_length=14,
-            max_length=14,
-            pattern="^\\d{10}0{4}$",
-            title="Instance ID, consisting of date in format %Y%m%d%H0000",
-        ),
-    ],
+    instance_id: str,  # InstanceID,
     coords: Annotated[
         str,
         Query(

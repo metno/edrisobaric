@@ -107,7 +107,7 @@ def validate_grib(ds: xr.Dataset) -> bool:
     return True
 
 
-def get_dataset():
+def get_dataset() -> xr.Dataset:
     """Get grib dataset."""
     if len(dataset) == 0:
         open_grib()
@@ -194,3 +194,11 @@ DATAFILE = args.file
 BASE_URL = args.base_url
 BIND_HOST = args.bind_host
 API_URL = args.api_url
+
+# Open datafile at start
+# _ = get_dataset()
+
+# class InstanceID(str, Enum):
+#     """List of instances, created when opening data file."""
+#     blank = ""
+#     default = get_temporal_extent(get_dataset()).strftime("%Y%m%d%H0000")

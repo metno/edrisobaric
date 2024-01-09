@@ -6,7 +6,7 @@ from typing import AsyncGenerator
 import uvicorn
 from fastapi import FastAPI
 from routes.routes import routes
-from initialize import BIND_HOST, get_dataset
+from initialize import BIND_HOST
 
 app = FastAPI(openapi_url="/openapi.json", docs_url="/api")
 logger = logging.getLogger("uvicorn.access")
@@ -22,7 +22,6 @@ async def lifespan() -> AsyncGenerator[None, None]:
         use_colors=True,
     )
     logger.handlers[0].setFormatter(console_formatter)
-
     yield
 
 
@@ -30,7 +29,4 @@ app.include_router(routes)
 
 
 if __name__ == "__main__":
-    # Open datafile at start
-    _ = get_dataset()
-
     uvicorn.run("app:app", host=BIND_HOST, port=5000)

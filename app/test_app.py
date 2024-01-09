@@ -75,7 +75,7 @@ class TestApp(unittest.TestCase):
         response = client.get(
             f"/collections/isobaric/instances/1234567890/position?{sample_coords}"
         )
-        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.status_code, 400)
 
         # Test asking for a sample point in current instance.
         response = client.get(

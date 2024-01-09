@@ -19,6 +19,16 @@ from grib import (
 router = APIRouter()
 logger = logging.getLogger()
 
+# There is only one instance available. Load and lock.
+ds = get_dataset()
+d = get_temporal_extent(ds)
+instance_path = Path(
+    min_length=14,
+    max_length=14,
+    pattern=d.strftime("%Y%m%d%H0000"),
+    title="Instance ID, consisting of date in format %Y%m%d%H0000",
+)
+
 
 @lru_cache
 def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
@@ -170,12 +180,7 @@ async def get_instance_collection_page(
     collection_id: CollectionID,
     instance_id: Annotated[
         str,
-        Path(
-            min_length=14,
-            max_length=14,
-            pattern="^\\d{10}0{4}$",
-            title="Instance ID, consisting of date in format %Y%m%d%H0000",
-        ),
+        instance_path,
     ],
 ) -> dict:
     """Return a specific instance of a collection. Isobaric is the only collection available. The date in current grib file is only instance available, format %Y%m%d%H0000, so string has to be 14 characters, where first 8 are a number and last 6 are all zeros, example 20240104000000. No data is returned, only info about the instance."""
