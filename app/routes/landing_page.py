@@ -22,7 +22,7 @@ def create_landing_page(base_url) -> dict:
                 title="Landing Page",
             ),
             Link(
-                href=f"{base_url}api",
+                href=f"{base_url}openapi.json",
                 rel="service-desc",
                 type="application/json",
                 title="OpenAPI document",

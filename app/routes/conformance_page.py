@@ -23,7 +23,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/conformance/", response_model=ConformanceModel, response_model_exclude_unset=True
+    "/conformance", response_model=ConformanceModel, response_model_exclude_unset=True
 )
 async def get_conformance_page() -> dict:
     """Returns the conformance page as JSON."""

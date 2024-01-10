@@ -209,6 +209,7 @@ def create_point(coords: str, instance_id: str = "") -> dict:
 
 def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, dict]:
     """Check coordinates are within bounds of dataset."""
+    errmsg = {}
     if (
         point.y > ds[TEMPERATURE_LABEL][LAT_LABEL].values.max()
         or point.y < ds[TEMPERATURE_LABEL][LAT_LABEL].values.min()
@@ -242,11 +243,11 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, dict
         }
         logger.error(errmsg)
         return False, errmsg
-    return True, {}
+    return True, errmsg
 
 
 @router.get(
-    "/collections/isobaric/position/",
+    "/collections/isobaric/position",
     response_model=Coverage,
     response_model_exclude_unset=True,
 )
@@ -260,7 +261,7 @@ async def get_isobaric_page(
             pattern=POINT_REGEX,
             title="Coordinates, formated as a WKT point: POINT(11.9384 60.1699)",
         ),
-    ] = "POINT(11.9384 60.1699)",
+    ],  # = "POINT(11.9384 60.1699)",
 ) -> dict:
     """Return data closest to a position.
 
@@ -303,14 +304,8 @@ async def get_instance_isobaric_page(
             max_length=50,
             pattern=POINT_REGEX,
             title="Coordinates, formated as a WKT point. Default is POINT(11.9384 60.1699)",
-            # examples={
-            #     "example1": {
-            #         "summary": "First example",
-            #         "values": "POINT(11.9384 60.1699)",
-            #     },
-            # },
         ),
-    ] = "POINT(11.9384 60.1699)",
+    ],  # = "POINT(11.9384 60.1699)",
 ) -> dict:
     """Return data closest to a position.
 
