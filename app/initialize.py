@@ -6,22 +6,15 @@ import sys
 import argparse
 from typing import Tuple
 from datetime import datetime, timedelta
-from enum import Enum
 import logging
 import xarray as xr
 import requests
+from fastapi import Path
 
 from grib import ISOBARIC_LABEL, TEMPERATURE_LABEL, get_temporal_extent
 
 dataset = xr.Dataset()
 logger = logging.getLogger()
-
-
-class CollectionID(str, Enum):
-    """List of collections. Could be dynamic, but we only have one."""
-
-    isobaric = "isobaric"
-    blank = ""
 
 
 def parse_args() -> argparse.Namespace:
@@ -203,3 +196,14 @@ DATAFILE = args.file
 BASE_URL = args.base_url
 BIND_HOST = args.bind_host
 API_URL = args.api_url
+
+
+# There is only one instance available. Load and lock.
+instance_id = get_temporal_extent(get_dataset()).strftime("%Y%m%d%H0000")
+instance_path = Path(
+    min_length=14,
+    max_length=14,
+    pattern="^" + instance_id + "$",
+    title="Instance ID, consisting of date in format %Y%m%d%H0000",
+    description=f"Only available instance is {instance_id}",
+)

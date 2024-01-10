@@ -1,7 +1,7 @@
 """Collections page."""
 from typing import List, Tuple, Annotated
 import logging
-from fastapi import APIRouter, status, Response, Request, Query, Path
+from fastapi import APIRouter, status, Response, Request, Query
 from fastapi.responses import JSONResponse
 import xarray as xr
 from pydantic import AwareDatetime
@@ -10,7 +10,7 @@ import covjson_pydantic
 from covjson_pydantic.coverage import Coverage
 from covjson_pydantic.ndarray import NdArray
 
-from initialize import get_dataset, check_instance_exists
+from initialize import get_dataset, check_instance_exists, instance_path
 
 from grib import (
     get_vertical_extent,
@@ -27,14 +27,6 @@ POINT_REGEX = "^POINT\\(\\d+\\.?\\d* \\d+\\.?\\d*\\)$"
 
 router = APIRouter()
 logger = logging.getLogger()
-
-# There is only one instance available. Load and lock.
-instance_path = Path(
-    min_length=14,
-    max_length=14,
-    pattern=get_temporal_extent(get_dataset()).strftime("%Y%m%d%H0000"),
-    title="Instance ID, consisting of date in format %Y%m%d%H0000",
-)
 
 
 def create_point(coords: str, instance_id: str = "") -> dict:
@@ -310,6 +302,7 @@ async def get_instance_isobaric_page(
             min_length=9,
             max_length=50,
             pattern=POINT_REGEX,
+            title="Coordinates, formated as a WKT point. Default is POINT(11.9384 60.1699)",
             # examples={
             #     "example1": {
             #         "summary": "First example",

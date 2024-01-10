@@ -1,4 +1,5 @@
 """Collections page."""
+from functools import lru_cache
 from datetime import timedelta
 import logging
 from fastapi import APIRouter
@@ -17,6 +18,7 @@ router = APIRouter()
 logger = logging.getLogger()
 
 
+@lru_cache
 def create_instances() -> dict:
     """List all instances (dates) available in data file."""
     dataset = get_dataset()

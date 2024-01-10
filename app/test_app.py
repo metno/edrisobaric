@@ -52,9 +52,7 @@ class TestApp(unittest.TestCase):
             len(str(response.json()["domain"]["axes"]["z"]["values"][0])) > 1
         )
         # Test for null in data
-        self.assertFalse(
-            "null" in response.text
-        )
+        self.assertFalse("null" in response.text)
 
     def test_instances(self) -> None:
         """Test a variety of URLs related to instances."""

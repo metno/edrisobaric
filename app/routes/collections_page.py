@@ -3,12 +3,12 @@ from functools import lru_cache
 from datetime import timedelta
 import logging
 from typing import Annotated
-from fastapi import APIRouter, status, Response, Path
+from fastapi import APIRouter, status, Response
 import edr_pydantic
 from edr_pydantic.collections import Collection
 from edr_pydantic.collections import Collections
 
-from initialize import get_dataset, BASE_URL, check_instance_exists, CollectionID
+from initialize import get_dataset, BASE_URL, check_instance_exists, instance_path
 
 from grib import (
     get_vertical_extent,
@@ -19,14 +19,6 @@ from grib import (
 router = APIRouter()
 logger = logging.getLogger()
 
-# There is only one instance available. Load and lock.
-instance_path = Path(
-    min_length=14,
-    max_length=14,
-    pattern=get_temporal_extent(get_dataset()).strftime("%Y%m%d%H0000"),
-    title="Instance ID, consisting of date in format %Y%m%d%H0000",
-)
-
 
 @lru_cache
 def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
@@ -34,7 +26,7 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
     instance_url = f"{BASE_URL}collections/isobaric/instances/{instance_id}/"
 
     link_self = edr_pydantic.link.Link(
-        href=f"{BASE_URL}collections/",
+        href=f"{BASE_URL}collections",
         hreflang="en",
         rel="self",
         type="aplication/json",
@@ -98,15 +90,19 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
         links=[
             edr_pydantic.link.Link(
                 href=collection_url,
-                rel="collection",
-            )
+                rel="data",
+            ),
+            edr_pydantic.link.Link(
+                href=f"{collection_url}instances",
+                rel="alternate",
+            ),
         ],
         data_queries=edr_pydantic.data_queries.DataQueries(
             # List instances
             instances=edr_pydantic.data_queries.EDRQuery(
                 link=edr_pydantic.data_queries.EDRQueryLink(
-                    href=f"{collection_url}instances/",
-                    rel="data",
+                    href=f"{collection_url}instances",
+                    rel="alternate",
                     variables=edr_pydantic.variables.Variables(
                         query_type="instances", output_formats=["CoverageJSON"]
                     ),
@@ -160,7 +156,7 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
 
 
 @router.get(
-    "/collections/", response_model=Collections, response_model_exclude_unset=True
+    "/collections", response_model=Collections, response_model_exclude_unset=True
 )
 async def get_collections_page() -> dict:
     """List collections as JSON. Isobaric is the only one available. No data is returned, only info about the collection."""
@@ -168,26 +164,25 @@ async def get_collections_page() -> dict:
 
 
 @router.get(
-    "/collections/{collection_id}/",
-    response_model=Collection,
+    "/collections/isobaric",
+    response_model=Collection | Collections,
     response_model_exclude_unset=True,
 )
-async def get_collection_page(collection_id: CollectionID) -> dict:
-    """List a specific collection as JSON. Isobaric is the only one available. No data is returned, only info about the collection.."""
-    return create_collection(collection_id)
+async def get_collection_page() -> dict:
+    """List a specific collection as JSON. Isobaric is the only one available. No data is returned, only info about the collection."""
+    return create_collection(collection_id="isobaric")
 
 
 @router.get(
-    "/collections/{collection_id}/instances/{instance_id}/",
+    "/collections/isobaric/instances/{instance_id}",
     response_model=Collection,
     response_model_exclude_unset=True,
 )
 async def get_instance_collection_page(
-    collection_id: CollectionID,
     instance_id: Annotated[
         str,
         instance_path,
     ],
 ) -> dict:
     """Return a specific instance of a collection. Isobaric is the only collection available. The date in current grib file is only instance available, format %Y%m%d%H0000, so string has to be 14 characters, where first 8 are a number and last 6 are all zeros, example 20240104000000. No data is returned, only info about the instance."""
-    return create_collection(collection_id, instance_id)
+    return create_collection("isobaric", instance_id)
