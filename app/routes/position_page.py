@@ -261,7 +261,7 @@ async def get_isobaric_page(
             pattern=POINT_REGEX,
             title="Coordinates, formated as a WKT point: POINT(11.9384 60.1699)",
         ),
-    ],  # = "POINT(11.9384 60.1699)",
+    ],
 ) -> dict:
     """Return data closest to a position.
 
@@ -305,7 +305,7 @@ async def get_instance_isobaric_page(
             pattern=POINT_REGEX,
             title="Coordinates, formated as a WKT point. Default is POINT(11.9384 60.1699)",
         ),
-    ],  # = "POINT(11.9384 60.1699)",
+    ],
 ) -> dict:
     """Return data closest to a position.
 

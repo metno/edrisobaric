@@ -1,7 +1,7 @@
 import unittest
 import os
 from datetime import datetime
-from initialize import build_gribfile_name, download_gribfile, API_URL
+from initialize import build_gribfile_name, download_gribfile, API_URL, TIME_FORMAT
 
 datafile = ""
 data_path = "test_data"

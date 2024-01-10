@@ -8,7 +8,13 @@ import edr_pydantic
 from edr_pydantic.collections import Collection
 from edr_pydantic.collections import Collections
 
-from initialize import get_dataset, BASE_URL, check_instance_exists, instance_path
+from initialize import (
+    get_dataset,
+    BASE_URL,
+    check_instance_exists,
+    instance_path,
+    TIME_FORMAT,
+)
 
 from grib import (
     get_vertical_extent,
@@ -42,6 +48,21 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
             return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
 
         collection_url = instance_url
+
+    links = [
+        edr_pydantic.link.Link(
+            href=collection_url,
+            rel="data",
+        )
+    ]
+    # If we're listing anything but instances, link to /instances
+    if len(instance_id) == 0:
+        links.append(
+            edr_pydantic.link.Link(
+                href=f"{collection_url}instances",
+                rel="alternate",
+            )
+        )
 
     isobaric_col = Collection(
         id="isobaric",
@@ -87,16 +108,7 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
                 + 'CS[TemporalDateTime,1],AXIS["Time (T)",future]',  # opendata.fmi.fi
             ),
         ),
-        links=[
-            edr_pydantic.link.Link(
-                href=collection_url,
-                rel="data",
-            ),
-            edr_pydantic.link.Link(
-                href=f"{collection_url}instances",
-                rel="alternate",
-            ),
-        ],
+        links=links,
         data_queries=edr_pydantic.data_queries.DataQueries(
             # List instances
             instances=edr_pydantic.data_queries.EDRQuery(
@@ -184,5 +196,5 @@ async def get_instance_collection_page(
         instance_path,
     ],
 ) -> dict:
-    """Return a specific instance of a collection. Isobaric is the only collection available. The date in current grib file is only instance available, format %Y%m%d%H0000, so string has to be 14 characters, where first 8 are a number and last 6 are all zeros, example 20240104000000. No data is returned, only info about the instance."""
+    f"""Return a specific instance of a collection. Isobaric is the only collection available. The date in current grib file is only instance available, format {TIME_FORMAT}, so string has to be 14 characters, where first 8 are a number and last 6 are all zeros, example 20240104000000. No data is returned, only info about the instance."""
     return create_collection("isobaric", instance_id)
