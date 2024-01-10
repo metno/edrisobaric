@@ -13,7 +13,6 @@ from initialize import (
     BASE_URL,
     check_instance_exists,
     instance_path,
-    TIME_FORMAT,
 )
 
 from grib import (
@@ -196,5 +195,5 @@ async def get_instance_collection_page(
         instance_path,
     ],
 ) -> dict:
-    f"""Return a specific instance of a collection. Isobaric is the only collection available. The date in current grib file is only instance available, format {TIME_FORMAT}, so string has to be 14 characters, where first 8 are a number and last 6 are all zeros, example 20240104000000. No data is returned, only info about the instance."""
+    """Return a specific instance of a collection. Isobaric is the only collection available. The date in current grib file is only instance available, so string has to match. No data is returned, only info about the instance."""
     return create_collection("isobaric", instance_id)

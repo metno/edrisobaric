@@ -59,17 +59,19 @@ def create_point(coords: str, instance_id: str = "") -> dict:
     dataset = get_dataset()
 
     # Sanity check on coordinates
-    coords_ok, errmsg = check_coords_within_bounds(dataset, point)
+    coords_ok, errcoords = check_coords_within_bounds(dataset, point)
     if not coords_ok:
         return JSONResponse(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content=errmsg
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content=errcoords
         )
 
     # Sanity check on instance id
     if len(instance_id) > 0:
-        instance_ok, errmsg = check_instance_exists(dataset, instance_id)
+        instance_ok, errinstance = check_instance_exists(dataset, instance_id)
         if not instance_ok:
-            return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
+            return Response(
+                status_code=status.HTTP_400_BAD_REQUEST, content=errinstance
+            )
 
     # Fetch temperature
     temperatures = dataset[TEMPERATURE_LABEL].sel(

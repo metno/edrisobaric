@@ -26,15 +26,14 @@ class TestApp(unittest.TestCase):
         response = client.get("/collections")
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.json()["collections"][0]["id"] == "isobaric")
-        # '{"links":[{"href":"http://localhost:5000/collections/","hreflang":"en","rel":"self","type":"aplication/json"}],"collections":[{"id":"isobaric","title":"IsobaricGRIB - GRIB files"...
 
     def test_point(self) -> None:
         # Test various coord formats, which should all work
-        response = client.get(f"/collections/isobaric/position?coords=POINT(11 60)")
+        response = client.get("/collections/isobaric/position?coords=POINT(11 60)")
         self.assertEqual(response.status_code, 200)
-        response = client.get(f"/collections/isobaric/position?coords=POINT(11.0 60.0)")
+        response = client.get("/collections/isobaric/position?coords=POINT(11.0 60.0)")
         self.assertEqual(response.status_code, 200)
-        response = client.get(f"/collections/isobaric/position?coords=POINT(11. 60.)")
+        response = client.get("/collections/isobaric/position?coords=POINT(11. 60.)")
         self.assertEqual(response.status_code, 200)
 
         response = client.get(f"/collections/isobaric/position?{sample_coords}")

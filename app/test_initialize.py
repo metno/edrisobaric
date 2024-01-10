@@ -22,7 +22,6 @@ class TestInitialize(unittest.TestCase):
     def test_download_gribfile(self):
         global datafile
         datafile = download_gribfile(data_path=data_path, api_url=API_URL)
-        print(datafile)
         self.assertTrue(os.path.isfile(datafile))
         os.remove(datafile)
 
