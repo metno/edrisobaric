@@ -9,7 +9,7 @@ from shapely import wkt, GEOSException, Point
 import covjson_pydantic
 from covjson_pydantic.coverage import Coverage
 from covjson_pydantic.ndarray import NdArray
-from covjson_pydantic.domain import ValuesAxis, DomainType
+from covjson_pydantic.domain import ValuesAxis, DomainType, Axes
 
 from initialize import get_dataset, check_instance_exists, instance_path
 
@@ -29,7 +29,13 @@ POINT_REGEX = "^POINT\\(\\d+\\.?\\d* \\d+\\.?\\d*\\)$"
 router = APIRouter()
 logger = logging.getLogger()
 
-class AxesND(covjson_pydantic.domain.Axes):
+# class ValuesAxisND(ValuesAxis, Generic[ValuesT], extra="forbid", strict=True):
+#     dataType: Optional[str]
+#     coordinates: Optional[List[str]] = None
+#     values: List[ValuesT]
+#     bounds: Optional[List[ValuesT]] = None
+
+class AxesND(Axes):
     x: ValuesAxis[float]
     y: ValuesAxis[float]
     z: ValuesAxis[float]
@@ -38,6 +44,9 @@ class AxesND(covjson_pydantic.domain.Axes):
 class DomainND(covjson_pydantic.domain.Domain, extra="forbid"):
     domainType: DomainType
     axes: AxesND
+
+class CoverageND(Coverage, extra="forbid"):
+    domain: DomainND
 
 
 def create_point(coords: str, instance_id: str = "") -> dict:
@@ -113,13 +122,13 @@ def create_point(coords: str, instance_id: str = "") -> dict:
         )
         vwind_values.append(float(vwind.data))
 
-    cov = Coverage(
+    cov = CoverageND(
         id="isobaric",
         type="Coverage",
         domain=DomainND(
             domainType=DomainType.vertical_profile,
             axes=AxesND(
-                x=ValuesAxis[float](values=[point.x]),
+                x=ValuesAxis[float](values=[point.x], dataType="float", coordinates=["x"]),
                 y=ValuesAxis[float](values=[point.y]),
                 z=ValuesAxis[float](values=isobaric_values),
                 t=ValuesAxis[AwareDatetime](
