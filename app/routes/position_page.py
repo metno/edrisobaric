@@ -1,5 +1,5 @@
 """Collections page."""
-from typing import List, Tuple, Annotated
+from typing import List, Tuple, Annotated, Optional, Union, Literal
 import logging
 from fastapi import APIRouter, status, Response, Request, Query
 from fastapi.responses import JSONResponse
@@ -9,6 +9,7 @@ from shapely import wkt, GEOSException, Point
 import covjson_pydantic
 from covjson_pydantic.coverage import Coverage
 from covjson_pydantic.ndarray import NdArray
+from covjson_pydantic.domain import ValuesAxis, DomainType
 
 from initialize import get_dataset, check_instance_exists, instance_path
 
@@ -27,6 +28,16 @@ POINT_REGEX = "^POINT\\(\\d+\\.?\\d* \\d+\\.?\\d*\\)$"
 
 router = APIRouter()
 logger = logging.getLogger()
+
+class AxesND(covjson_pydantic.domain.Axes):
+    x: ValuesAxis[float]
+    y: ValuesAxis[float]
+    z: ValuesAxis[float]
+    t: ValuesAxis[AwareDatetime]
+
+class DomainND(covjson_pydantic.domain.Domain, extra="forbid"):
+    domainType: DomainType
+    axes: AxesND
 
 
 def create_point(coords: str, instance_id: str = "") -> dict:
@@ -105,13 +116,13 @@ def create_point(coords: str, instance_id: str = "") -> dict:
     cov = Coverage(
         id="isobaric",
         type="Coverage",
-        domain=covjson_pydantic.domain.Domain(
-            domainType=covjson_pydantic.domain.DomainType.vertical_profile,
-            axes=covjson_pydantic.domain.Axes(
-                x=covjson_pydantic.domain.ValuesAxis[float](values=[point.x]),
-                y=covjson_pydantic.domain.ValuesAxis[float](values=[point.y]),
-                z=covjson_pydantic.domain.ValuesAxis[float](values=isobaric_values),
-                t=covjson_pydantic.domain.ValuesAxis[AwareDatetime](
+        domain=DomainND(
+            domainType=DomainType.vertical_profile,
+            axes=AxesND(
+                x=ValuesAxis[float](values=[point.x]),
+                y=ValuesAxis[float](values=[point.y]),
+                z=ValuesAxis[float](values=isobaric_values),
+                t=ValuesAxis[AwareDatetime](
                     values=[get_temporal_extent(dataset)]
                 ),
             ),
@@ -250,7 +261,7 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, dict
 
 @router.get(
     "/collections/isobaric/position",
-    response_model=Coverage,
+    # response_model=Coverage,
     response_model_exclude_unset=True,
 )
 async def get_isobaric_page(
