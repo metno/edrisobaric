@@ -6,7 +6,7 @@ from typing import AsyncGenerator
 import uvicorn
 from fastapi import FastAPI
 from routes.routes import routes
-from initialize import BIND_HOST, TIME_FORMAT
+from initialize import BIND_HOST
 
 app = FastAPI(
     openapi_url="/api",

@@ -239,7 +239,9 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, dict
             "detail": [
                 {
                     "loc": ["string", 0],
-                    "msg": f"Error, coord {point.y} out of bounds. Min/max is {ds[TEMPERATURE_LABEL][LAT_LABEL].values.min()}/{ds[TEMPERATURE_LABEL][LAT_LABEL].values.max()}",
+                    "msg": f"Error, coord {point.y} out of bounds. Min/max is "
+                    + f"{ds[TEMPERATURE_LABEL][LAT_LABEL].values.min()}/"
+                    + f"{ds[TEMPERATURE_LABEL][LAT_LABEL].values.max()}",
                     "type": "string",
                     "input": point.y,
                 }
@@ -256,7 +258,9 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, dict
             "detail": [
                 {
                     "loc": ["string", 0],
-                    "msg": f"Error, coord {point.x} out of bounds. Min/max is {ds[TEMPERATURE_LABEL][LON_LABEL].values.min()}/{ds[TEMPERATURE_LABEL][LON_LABEL].values.max()}",
+                    "msg": "Error, coord {point.x} out of bounds. Min/max is "
+                    + f"{ds[TEMPERATURE_LABEL][LON_LABEL].values.min()}/"
+                    + f"{ds[TEMPERATURE_LABEL][LON_LABEL].values.max()}",
                     "type": "string",
                     "input": point.x,
                 }
@@ -286,7 +290,9 @@ async def get_isobaric_page(
                     "detail": [
                         {
                             "loc": ["string", 0],
-                            "msg": f'Error: No coordinates provided. Example: {str(request.base_url)[0:-1]}{request.scope["path"]}?coords=POINT(11.9384%2060.1699)',
+                            "msg": "Error: No coordinates provided. Example: "
+                            + f'{str(request.base_url)[0:-1]}{request.scope["path"]}'
+                            + "?coords=POINT(11.9384%2060.1699)",
                             "type": "string",
                         }
                     ]

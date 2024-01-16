@@ -63,17 +63,22 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
             )
         )
 
+    description = (
+        "These files are used by Avinor ATM systems but possibly also of "
+        "interest to others. They contain temperature and wind forecasts for a "
+        "set of isobaric layers (i.e. altitudes having the same pressure). The "
+        "files are (normally) produced every 6 hours. You can check the time "
+        "when generated using the Last-Modified header or the `updated` key in "
+        "`available`. These files are in GRIB2 format (filetype BIN) for the "
+        "following regions: southern_norway"
+        "    Area 64.25N -1.45W 55.35S 14.51E, resolution .1 degrees? (km?) FIXME"
+        "    It includes every odd-numbered isobaric layer from 1 to 137 (in hundreds of feet?)"
+    )
+
     isobaric_col = Collection(
         id="isobaric",
         title="IsobaricGRIB - GRIB files",
-        description="""
-            These files are used by Avinor ATM systems but possibly also of interest to others. They contain temperature and wind forecasts for a set of isobaric layers (i.e. altitudes having the same pressure). The files are (normally) produced every 6 hours. You can check the time when generated using the Last-Modified header or the `updated` key in `available`. These files are in GRIB2 format (filetype BIN) for the following regions:
-
-            southern_norway
-                Area 64.25N -1.45W 55.35S 14.51E, resolution .1 degrees? (km?) FIXME
-
-            It includes every odd-numbered isobaric layer from 1 to 137 (in hundreds of feet?)
-        """,
+        description=description,
         keywords=[
             "position",
             "data",
