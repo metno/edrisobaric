@@ -250,6 +250,7 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, dict
 
 @router.get(
     "/collections/isobaric/position",
+    tags=["coords"],
     response_model=Coverage,
     response_model_exclude_unset=True,
 )
@@ -265,10 +266,7 @@ async def get_isobaric_page(
         ),
     ],
 ) -> dict:
-    """Return data closest to a position.
-
-    This is the main function of this API. Needs a string with the coordinates, formated as a WKT. Example: POINT(11.9384 60.1699) or POINT(11 60).
-    """
+    """Return data closest to a position. This is the main function of this API."""
     if len(coords) == 0:
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -290,10 +288,11 @@ async def get_isobaric_page(
 
 @router.get(
     "/collections/isobaric/instances/{instance_id}/position",
+    tags=["coords", "instance_id"],
     response_model=Coverage,
     response_model_exclude_unset=True,
 )
-async def get_instance_isobaric_page(
+async def get_instance_of_isobaric_page(
     request: Request,
     instance_id: Annotated[
         str,
@@ -311,7 +310,7 @@ async def get_instance_isobaric_page(
 ) -> dict:
     """Return data closest to a position.
 
-    Same as "Get Isobaric Page", but with selectable instance ID. See "Get Isobaric Instances Page" for a list of valid instance IDs.
+    Same as "Get Isobaric Page", but with selectable instance ID.
     """
     if len(coords) == 0:
         return {

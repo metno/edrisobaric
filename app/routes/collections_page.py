@@ -167,33 +167,38 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
 
 
 @router.get(
-    "/collections", response_model=Collections, response_model_exclude_unset=True
+    "/collections",
+    tags=["collection"],
+    response_model=Collections,
+    response_model_exclude_unset=True,
 )
 async def get_collections_page() -> dict:
-    """List collections as JSON. Isobaric is the only one available. No data is returned, only info about the collection."""
+    """List collections as JSON. No data is returned, only info about the collection."""
     return create_collection()
 
 
 @router.get(
     "/collections/isobaric",
+    tags=["collection"],
     response_model=Collection | Collections,
     response_model_exclude_unset=True,
 )
 async def get_collection_page() -> dict:
-    """List a specific collection as JSON. Isobaric is the only one available. No data is returned, only info about the collection."""
+    """List a specific collection as JSON. No data is returned, only info about the collection."""
     return create_collection(collection_id="isobaric")
 
 
 @router.get(
     "/collections/isobaric/instances/{instance_id}",
+    tags=["instance_id", "collection"],
     response_model=Collection,
     response_model_exclude_unset=True,
 )
-async def get_instance_collection_page(
+async def get_instance_of_collection_page(
     instance_id: Annotated[
         str,
         instance_path,
     ],
 ) -> dict:
-    """Return a specific instance of a collection. Isobaric is the only collection available. The date in current grib file is only instance available, so string has to match. No data is returned, only info about the instance."""
+    """Return a specific instance of a collection. No data is returned, only info about the instance."""
     return create_collection("isobaric", instance_id)
