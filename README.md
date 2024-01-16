@@ -75,6 +75,7 @@ Staring the app will give these URLs:
 
 - <http://127.0.0.1:5000/>
 - <http://127.0.0.1:5000/api>
+- <http://127.0.0.1:5000/doc>
 - <http://127.0.0.1:5000/redoc>
 
 Example position lookup:
