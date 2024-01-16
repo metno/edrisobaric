@@ -10,7 +10,7 @@ from initialize import BIND_HOST, TIME_FORMAT
 
 app = FastAPI(
     openapi_url="/api",
-    docs_url="/doc",
+    docs_url="/docs",
     title="edr-isobaric",
     summary="EDR API for isobaric data",
     description="See <https://api.met.no/weatherapi/isobaricgrib/1.0/documentation>",

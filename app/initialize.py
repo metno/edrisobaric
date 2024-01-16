@@ -24,7 +24,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--file", help="Grib file to read data from", default="")
     parser.add_argument(
         "--base_url",
-        help="Base URL for API",
+        help="Base URL for API, with a trailing slash.",
         default="http://localhost:5000/",
         required=False,
     )

@@ -1,6 +1,6 @@
 # Output
 
-## Landing page:
+## Landing page
 
 ```json
 {
@@ -12,6 +12,12 @@
       "rel": "self",
       "type": "application/json",
       "title": "Landing Page"
+    },
+    {
+      "href": "http://localhost:5000/api",
+      "rel": "service-desc",
+      "type": "application/json",
+      "title": "OpenAPI document"
     },
     {
       "href": "http://localhost:5000/conformance",
@@ -47,7 +53,7 @@
 {
   "links": [
     {
-      "href": "http://localhost:5000/",
+      "href": "http://localhost:5000/collections",
       "hreflang": "en",
       "rel": "self",
       "type": "aplication/json"
@@ -60,7 +66,6 @@
       "description": "These files are used by Avinor ATM systems but possibly also of interest to others. They contain temperature and wind forecasts for a set of isobaric layers (i.e. altitudes having the same pressure). The files are (normally) produced every 6 hours. You can check the time when generated using the Last-Modified header or the `updated` key in `available`. These files are in GRIB2 format (filetype BIN) for the following regions:\n\n            southern_norway\n                Area 64.25N -1.45W 55.35S 14.51E, resolution .1 degrees? (km?) FIXME\n\n            It includes every odd-numbered isobaric layer from 1 to 137 (in hundreds of feet?)",
       "keywords": [
         "position",
-        "area",
         "data",
         "api",
         "temperature",
@@ -70,18 +75,22 @@
       ],
       "links": [
         {
-          "href": "http://localhost:5000/collections/isobaric",
-          "rel": "service-doc"
+          "href": "http://localhost:5000/collections/isobaric/",
+          "rel": "data"
+        },
+        {
+          "href": "http://localhost:5000/collections/isobaric/instances",
+          "rel": "alternate"
         }
       ],
       "extent": {
         "spatial": {
           "bbox": [
             [
-              64.25,
-              -1.45,
+              -1.4499999999999886,
               55.35,
-              14.51
+              14.449999999999964,
+              64.25000000000011
             ]
           ],
           "crs": "WGS84"
@@ -89,35 +98,40 @@
         "temporal": {
           "interval": [
             [
-              "2023-12-13T00:00:00Z",
-              "2023-12-13T12:00:00Z"
+              "2024-01-16T00:00:00Z",
+              "2024-01-16T12:00:00Z"
             ]
           ],
           "values": [
-            "2023-12-13T00:00:00+00:00"
+            "2024-01-16T00:00:00+00:00"
           ],
           "trs": "TIMECRS[\"DateTime\",TDATUM[\"Gregorian Calendar\"],CS[TemporalDateTime,1],AXIS[\"Time (T)\",future]"
         },
         "vertical": {
           "interval": [
             [
-              "850"
+              "850.0"
             ],
             [
-              "70"
+              "100.0"
             ]
           ],
           "values": [
-            "850",
-            "700",
-            "500",
-            "400",
-            "300",
-            "250",
-            "200",
-            "150",
-            "100",
-            "70"
+            "850.0",
+            "750.0",
+            "700.0",
+            "600.0",
+            "500.0",
+            "450.0",
+            "400.0",
+            "350.0",
+            "300.0",
+            "275.0",
+            "250.0",
+            "225.0",
+            "200.0",
+            "150.0",
+            "100.0"
           ],
           "vrs": "Vertical Reference System: PressureLevel"
         }
@@ -138,9 +152,9 @@
         "instances": {
           "link": {
             "href": "http://localhost:5000/collections/isobaric/instances",
-            "rel": "data",
+            "rel": "alternate",
             "variables": {
-              "query_type": "instance",
+              "query_type": "instances",
               "output_formats": [
                 "CoverageJSON"
               ]
@@ -190,7 +204,6 @@
   "description": "These files are used by Avinor ATM systems but possibly also of interest to others. They contain temperature and wind forecasts for a set of isobaric layers (i.e. altitudes having the same pressure). The files are (normally) produced every 6 hours. You can check the time when generated using the Last-Modified header or the `updated` key in `available`. These files are in GRIB2 format (filetype BIN) for the following regions:\n\n            southern_norway\n                Area 64.25N -1.45W 55.35S 14.51E, resolution .1 degrees? (km?) FIXME\n\n            It includes every odd-numbered isobaric layer from 1 to 137 (in hundreds of feet?)",
   "keywords": [
     "position",
-    "area",
     "data",
     "api",
     "temperature",
@@ -200,18 +213,22 @@
   ],
   "links": [
     {
-      "href": "http://localhost:5000/collections/isobaric",
-      "rel": "service-doc"
+      "href": "http://localhost:5000/collections/isobaric/",
+      "rel": "data"
+    },
+    {
+      "href": "http://localhost:5000/collections/isobaric/instances",
+      "rel": "alternate"
     }
   ],
   "extent": {
     "spatial": {
       "bbox": [
         [
-          64.25,
-          -1.45,
+          -1.4499999999999886,
           55.35,
-          14.51
+          14.449999999999964,
+          64.25000000000011
         ]
       ],
       "crs": "WGS84"
@@ -219,35 +236,40 @@
     "temporal": {
       "interval": [
         [
-          "2023-12-13T00:00:00Z",
-          "2023-12-13T12:00:00Z"
+          "2024-01-16T00:00:00Z",
+          "2024-01-16T12:00:00Z"
         ]
       ],
       "values": [
-        "2023-12-13T00:00:00+00:00"
+        "2024-01-16T00:00:00+00:00"
       ],
       "trs": "TIMECRS[\"DateTime\",TDATUM[\"Gregorian Calendar\"],CS[TemporalDateTime,1],AXIS[\"Time (T)\",future]"
     },
     "vertical": {
       "interval": [
         [
-          "850"
+          "850.0"
         ],
         [
-          "70"
+          "100.0"
         ]
       ],
       "values": [
-        "850",
-        "700",
-        "500",
-        "400",
-        "300",
-        "250",
-        "200",
-        "150",
-        "100",
-        "70"
+        "850.0",
+        "750.0",
+        "700.0",
+        "600.0",
+        "500.0",
+        "450.0",
+        "400.0",
+        "350.0",
+        "300.0",
+        "275.0",
+        "250.0",
+        "225.0",
+        "200.0",
+        "150.0",
+        "100.0"
       ],
       "vrs": "Vertical Reference System: PressureLevel"
     }
@@ -268,9 +290,9 @@
     "instances": {
       "link": {
         "href": "http://localhost:5000/collections/isobaric/instances",
-        "rel": "data",
+        "rel": "alternate",
         "variables": {
-          "query_type": "instance",
+          "query_type": "instances",
           "output_formats": [
             "CoverageJSON"
           ]
@@ -350,7 +372,7 @@
       },
       "t": {
         "values": [
-          "2024-01-02T00:00:00Z"
+          "2024-01-16T00:00:00Z"
         ]
       }
     },
@@ -470,21 +492,21 @@
         15
       ],
       "values": [
-        265.2215576171875,
-        259.9833679199219,
-        257.7770080566406,
-        251.81332397460938,
-        241.3728790283203,
-        235.02456665039062,
-        228.87094116210938,
-        223.64459228515625,
-        219.7703857421875,
-        217.16880798339844,
-        215.72781372070312,
-        216.06739807128906,
-        216.294677734375,
-        216.29222106933594,
-        213.58628845214844
+        259.9708557128906,
+        255.4127655029297,
+        251.11085510253906,
+        241.6421661376953,
+        232.36569213867188,
+        227.9706573486328,
+        221.93441772460938,
+        215.32928466796875,
+        211.61489868164062,
+        211.59326171875,
+        211.47825622558594,
+        211.1735076904297,
+        211.833251953125,
+        208.94456481933594,
+        204.8937530517578
       ]
     },
     "uwind": {
@@ -497,21 +519,21 @@
         15
       ],
       "values": [
-        -9.472707748413086,
-        -5.6416473388671875,
-        -8.608570098876953,
-        -2.9874706268310547,
-        -2.010671615600586,
-        -1.089141845703125,
-        3.077432632446289,
-        7.741827011108398,
-        15.359514236450195,
-        14.823564529418945,
-        15.586624145507812,
-        16.409372329711914,
-        16.006080627441406,
-        14.155519485473633,
-        14.394664764404297
+        10.003143310546875,
+        6.364622116088867,
+        6.2812418937683105,
+        8.020271301269531,
+        9.430185317993164,
+        9.842438697814941,
+        10.665620803833008,
+        13.8545560836792,
+        20.12831687927246,
+        23.134765625,
+        23.885570526123047,
+        21.438627243041992,
+        22.899555206298828,
+        25.33365249633789,
+        27.79376983642578
       ]
     },
     "vwind": {
@@ -524,21 +546,21 @@
         15
       ],
       "values": [
-        7.1608076095581055,
-        3.1872730255126953,
-        3.172501802444458,
-        4.89569091796875,
-        6.060311794281006,
-        6.570158004760742,
-        4.772284507751465,
-        0.407745361328125,
-        -4.047607421875,
-        -4.984434127807617,
-        -5.65689754486084,
-        -6.880097389221191,
-        -7.920446395874023,
-        -11.362939834594727,
-        -18.519521713256836
+        5.889827728271484,
+        0.17238855361938477,
+        -0.34173011779785156,
+        -2.2754268646240234,
+        -1.5704689025878906,
+        0.13471412658691406,
+        0.9284391403198242,
+        -0.3315868377685547,
+        -9.34195327758789,
+        -11.123899459838867,
+        -10.690530776977539,
+        -11.88523006439209,
+        -12.98432445526123,
+        -12.6998291015625,
+        -13.967351913452148
       ]
     }
   }
