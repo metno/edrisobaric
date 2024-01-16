@@ -3,7 +3,7 @@ from functools import lru_cache
 from datetime import timedelta
 import logging
 from typing import Annotated
-from fastapi import APIRouter, status, Response
+from fastapi import APIRouter, status, Response, Path
 import edr_pydantic
 from edr_pydantic.collections import Collection
 from edr_pydantic.collections import Collections
@@ -168,29 +168,44 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
 
 @router.get(
     "/collections",
-    tags=["collection"],
+    tags=["Collection Metadata"],
     response_model=Collections,
     response_model_exclude_unset=True,
 )
-async def get_collections_page() -> dict:
-    """List collections as JSON. No data is returned, only info about the collection."""
+async def describe_all_collections() -> dict:
+    """Describes all collections."""
     return create_collection()
 
 
 @router.get(
-    "/collections/isobaric",
-    tags=["collection"],
+    "/collections/{collection_id}",
+    tags=["Collection Metadata"],
     response_model=Collection | Collections,
     response_model_exclude_unset=True,
 )
-async def get_collection_page() -> dict:
-    """List a specific collection as JSON. No data is returned, only info about the collection."""
-    return create_collection(collection_id="isobaric")
+async def describe_a_collection(
+    collection_id: Annotated[
+        str,
+        Path(
+            pattern="^isobaric$",
+            description="Only available collection is isobaric",
+            openapi_examples={
+                "Isobaric": {
+                    "summary": "The only available collection, isobaric",
+                    "description": "Describe collection **isobaric**",
+                    "value": "isobaric",
+                },
+            },
+        ),
+    ],
+) -> dict:
+    """Describe a specific collection."""
+    return create_collection(collection_id=collection_id)
 
 
 @router.get(
     "/collections/isobaric/instances/{instance_id}",
-    tags=["instance_id", "collection"],
+    tags=["Instance Metadata"],
     response_model=Collection,
     response_model_exclude_unset=True,
 )

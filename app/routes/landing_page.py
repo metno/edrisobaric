@@ -60,7 +60,12 @@ def create_landing_page(base_url) -> dict:
 router = APIRouter()
 
 
-@router.get("/", response_model=LandingPageModel, response_model_exclude_unset=True)
-async def get_landing_page() -> dict:
-    """Returns the landing page as JSON."""
+@router.get(
+    "/",
+    tags=["Capabilities"],
+    response_model=LandingPageModel,
+    response_model_exclude_unset=True,
+)
+async def landing_page_of_this_API() -> dict:
+    """Provides links to the API definition, the conformance statements and the description of the datasets exposed by this service."""
     return create_landing_page(base_url=BASE_URL)

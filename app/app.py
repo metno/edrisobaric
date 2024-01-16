@@ -27,20 +27,24 @@ app = FastAPI(
     version="0.9.0",
     openapi_tags=[
         {
-            "name": "coords",
-            "description": "Coordinates are given as Well Known Text (WKT) with lon, lat. Example POINT(11.9384 60.1699)",
-            "externalDocs": {
-                "description": "WKT at Wikipedia",
-                "url": "https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry",
-            },
+            "name": "Capabilities",
+            "description": "Essential characteristics of the API",
         },
         {
-            "name": "instance_id",
-            "description": f"The date in the current data file is the only instance available, so the instance string has to match that. See /collections/isobaric/instances for list of instances. Format is {TIME_FORMAT}",
+            "name": "Collection Metadata",
+            "description": "Description of collections",
         },
         {
-            "name": "collection",
-            "description": 'This API only has one collection, "isobaric".',
+            "name": "Collection Data",
+            "description": "Data queries on collections",
+        },
+        {
+            "name": "Instance Metadata",
+            "description": "Description of instances",
+        },
+        {
+            "name": "Instance Data",
+            "description": "Data queries on instances",
         },
     ],
 )

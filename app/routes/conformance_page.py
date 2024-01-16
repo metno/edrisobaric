@@ -22,8 +22,11 @@ router = APIRouter()
 
 
 @router.get(
-    "/conformance", response_model=ConformanceModel, response_model_exclude_unset=True
+    "/conformance",
+    tags=["Capabilities"],
+    response_model=ConformanceModel,
+    response_model_exclude_unset=True,
 )
-async def get_conformance_page() -> dict:
-    """Returns the conformance page as JSON."""
+async def describe_standards_this_API_conforms_to() -> dict:
+    """Provides a list of all requirements classes this service conforms to."""
     return create_conformance_page()

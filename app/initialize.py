@@ -205,6 +205,12 @@ instance_path = Path(
     min_length=20,
     max_length=20,
     pattern="^" + instance_id + "$",
-    title=f"Instance ID, consisting of date in format {TIME_FORMAT}",
-    description=f"Only available instance is {instance_id}",
+    description=f"Instance ID, consisting of date in format {TIME_FORMAT}. Only available instance is {instance_id}",
+    openapi_examples={
+        "Date": {
+            "summary": f"The only available instance, {instance_id}",
+            "description": "Fetch data for a position in Oslo",
+            "value": instance_id,
+        },
+    },
 )

@@ -28,6 +28,25 @@ POINT_REGEX = "^POINT\\(\\d+\\.?\\d* \\d+\\.?\\d*\\)$"
 router = APIRouter()
 logger = logging.getLogger()
 
+# Query for both position routes
+coords_query = Query(
+    min_length=9,
+    pattern=POINT_REGEX,
+    description="Coordinates, formated as a WKT point: POINT(11.9384 60.1699)",
+    openapi_examples={
+        "Oslo": {
+            "summary": "Henrik Mohns Plass 1",
+            "description": "Fetch data for a position in Oslo",
+            "value": "POINT(11.9384 60.1699)",
+        },
+        "Asker": {
+            "summary": "Asker",
+            "description": "Fetch data for a position in Asker",
+            "value": "POINT(10.45 59.83)",
+        },
+    },
+)
+
 
 def create_point(coords: str, instance_id: str = "") -> dict:
     """Return data for all isometric layers at a point."""
@@ -250,23 +269,15 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, dict
 
 @router.get(
     "/collections/isobaric/position",
-    tags=["coords"],
+    tags=["Collection Data"],
     response_model=Coverage,
     response_model_exclude_unset=True,
 )
 async def get_isobaric_page(
     request: Request,
-    coords: Annotated[
-        str,
-        Query(
-            min_length=9,
-            max_length=50,
-            pattern=POINT_REGEX,
-            title="Coordinates, formated as a WKT point: POINT(11.9384 60.1699)",
-        ),
-    ],
+    coords: Annotated[str, coords_query],
 ) -> dict:
-    """Return data closest to a position. This is the main function of this API."""
+    """Return data closest to a position."""
     if len(coords) == 0:
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -288,7 +299,7 @@ async def get_isobaric_page(
 
 @router.get(
     "/collections/isobaric/instances/{instance_id}/position",
-    tags=["coords", "instance_id"],
+    tags=["Collection Data", "Instance Data"],
     response_model=Coverage,
     response_model_exclude_unset=True,
 )
@@ -298,19 +309,11 @@ async def get_instance_of_isobaric_page(
         str,
         instance_path,
     ],
-    coords: Annotated[
-        str,
-        Query(
-            min_length=9,
-            max_length=50,
-            pattern=POINT_REGEX,
-            title="Coordinates, formated as a WKT point. Default is POINT(11.9384 60.1699)",
-        ),
-    ],
+    coords: Annotated[str, coords_query],
 ) -> dict:
     """Return data closest to a position.
 
-    Same as "Get Isobaric Page", but with selectable instance ID.
+    Same as "/collections/isobaric/position", but with selectable instance ID.
     """
     if len(coords) == 0:
         return {

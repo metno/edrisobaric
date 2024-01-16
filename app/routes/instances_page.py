@@ -127,7 +127,7 @@ def create_instances() -> dict:
 
 @router.get(
     "/collections/isobaric/instances",
-    tags=["instance_id"],
+    tags=["Instance Metadata"],
     response_model=Instances,
     response_model_exclude_unset=True,
 )
