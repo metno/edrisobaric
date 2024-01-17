@@ -14,6 +14,10 @@ Resulting data can be pasted into covjson playground for visualizing:
 
 ![playground](/img/playground.png "playground")
 
+The area covered by the source:
+
+![playground](/img/extent.jpg "extent")
+
 ## Who is responsible?
 
 - larsfp at met.no
