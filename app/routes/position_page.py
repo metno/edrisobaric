@@ -1,5 +1,5 @@
 """Collections page."""
-from typing import List, Tuple, Annotated, Optional, Union, Literal
+from typing import List, Tuple, Annotated, Union
 import logging
 from fastapi import APIRouter, status, Response, Request, Query
 from fastapi.responses import JSONResponse
@@ -9,7 +9,7 @@ from shapely import wkt, GEOSException, Point
 import covjson_pydantic
 from covjson_pydantic.coverage import Coverage
 from covjson_pydantic.ndarray import NdArray
-from covjson_pydantic.domain import ValuesAxis, DomainType, Axes
+from covjson_pydantic.domain import ValuesAxis, DomainType, Axes, CompactAxis, Domain
 
 from initialize import get_dataset, check_instance_exists, instance_path
 
@@ -29,23 +29,36 @@ POINT_REGEX = "^POINT\\(\\d+\\.?\\d* \\d+\\.?\\d*\\)$"
 router = APIRouter()
 logger = logging.getLogger()
 
-# class ValuesAxisND(ValuesAxis, Generic[ValuesT], extra="forbid", strict=True):
-#     dataType: Optional[str]
-#     coordinates: Optional[List[str]] = None
-#     values: List[ValuesT]
-#     bounds: Optional[List[ValuesT]] = None
+
+"""
+    Workaround for nulls.
+
+    The following classes overrides Axes from having optional values. In 
+    pydantic v2 optinal values causes "anyOf null" in the openapi schema.
+    This breaks validation.
+
+    My workaround is unsustainable, as there are about 117 more nulls in my
+    current schema.
+
+    Ref.
+    - https://github.com/KNMI/covjson-pydantic/issues/8
+    - https://github.com/tiangolo/fastapi/pull/9873
+"""
+
 
 class AxesND(Axes):
-    x: ValuesAxis[float]
-    y: ValuesAxis[float]
-    z: ValuesAxis[float]
+    x: Union[ValuesAxis[float], CompactAxis]
+    y: Union[ValuesAxis[float], CompactAxis]
+    z: Union[ValuesAxis[float], CompactAxis]
     t: ValuesAxis[AwareDatetime]
 
-class DomainND(covjson_pydantic.domain.Domain, extra="forbid"):
+
+class DomainND(covjson_pydantic.domain.Domain):
     domainType: DomainType
     axes: AxesND
 
-class CoverageND(Coverage, extra="forbid"):
+
+class CoverageND(Coverage):
     domain: DomainND
 
 
@@ -122,18 +135,18 @@ def create_point(coords: str, instance_id: str = "") -> dict:
         )
         vwind_values.append(float(vwind.data))
 
-    cov = CoverageND(
+    cov = Coverage(
         id="isobaric",
         type="Coverage",
-        domain=DomainND(
+        domain=Domain(
             domainType=DomainType.vertical_profile,
             axes=AxesND(
-                x=ValuesAxis[float](values=[point.x], dataType="float", coordinates=["x"]),
+                x=ValuesAxis[float](
+                    values=[point.x], dataType="float", coordinates=["x"]
+                ),
                 y=ValuesAxis[float](values=[point.y]),
                 z=ValuesAxis[float](values=isobaric_values),
-                t=ValuesAxis[AwareDatetime](
-                    values=[get_temporal_extent(dataset)]
-                ),
+                t=ValuesAxis[AwareDatetime](values=[get_temporal_extent(dataset)]),
             ),
             referencing=[
                 covjson_pydantic.reference_system.ReferenceSystemConnectionObject(
@@ -270,7 +283,7 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, dict
 
 @router.get(
     "/collections/isobaric/position",
-    # response_model=Coverage,
+    response_model=CoverageND,
     response_model_exclude_unset=True,
 )
 async def get_isobaric_page(
@@ -310,7 +323,7 @@ async def get_isobaric_page(
 
 @router.get(
     "/collections/isobaric/instances/{instance_id}/position",
-    response_model=Coverage,
+    response_model=CoverageND,
     response_model_exclude_unset=True,
 )
 async def get_instance_isobaric_page(
