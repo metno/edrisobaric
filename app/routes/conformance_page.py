@@ -14,6 +14,7 @@ def create_conformance_page() -> dict:
             "http://www.opengis.net/spec/ogcapi-edr-1/1.0/conf/collections",
             "http://www.opengis.net/spec/ogcapi-edr-1/1.0/conf/covjson",
             "http://www.opengis.net/spec/ogcapi-edr-1/1.0/conf/queries",
+            "https://github.com/metno/edr-profile/blob/main/profile_weather_forecast_timeseries.md#Conformance"
         ],
     ).model_dump(exclude_none=True)
 
