@@ -16,6 +16,7 @@ from grib import ISOBARIC_LABEL, TEMPERATURE_LABEL, get_temporal_extent
 dataset = xr.Dataset()
 logger = logging.getLogger()
 TIME_FORMAT = "%Y-%m-%dT%H:00:00Z"  #  RFC3339 date-time
+INSTANCE_FORMAT = "%Y%m%dT%H0000Z"
 
 
 def parse_args() -> argparse.Namespace:
@@ -164,7 +165,7 @@ def download_gribfile(data_path: str, api_url: str) -> str:
 
 
 def format_instance_id(timestamp: datetime) -> str:
-    return timestamp.strftime(TIME_FORMAT)
+    return timestamp.strftime(INSTANCE_FORMAT)
 
 
 def check_instance_exists(ds: xr.Dataset, instance_id: str) -> Tuple[bool, dict]:
@@ -200,12 +201,10 @@ API_URL = args.api_url
 
 
 # There is only one instance available. Load and lock.
-instance_id = get_temporal_extent(get_dataset()).strftime(TIME_FORMAT)
+instance_id = get_temporal_extent(get_dataset()).strftime(INSTANCE_FORMAT)
 instance_path = Path(
-    min_length=20,
-    max_length=20,
     pattern="^" + instance_id + "$",
-    description=f"Instance ID, consisting of date in format {TIME_FORMAT}. Only available instance is {instance_id}",
+    description=f"Instance ID, consisting of date in format {INSTANCE_FORMAT}. Only available instance is {instance_id}",
     openapi_examples={
         "Date": {
             "summary": f"The only available instance, {instance_id}",

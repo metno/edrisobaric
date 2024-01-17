@@ -32,7 +32,6 @@ def get_spatial_extent(dataset: xr.Dataset) -> list[float]:
     crs query parameter. If crs is not defined, the values will be assumed to
     be WGS84 longitude/latitude coordinates and heights will be assumed to be
     in meters above mean sea level, or below for negative values.
-
     """
     return [
         dataset.coords[LON_LABEL].data.min(),

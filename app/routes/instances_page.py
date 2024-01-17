@@ -6,7 +6,7 @@ from fastapi import APIRouter
 import edr_pydantic
 from edr_pydantic.collections import Instances, Instance
 
-from initialize import get_dataset, BASE_URL, format_instance_id, TIME_FORMAT
+from initialize import get_dataset, BASE_URL, format_instance_id, INSTANCE_FORMAT
 
 from grib import (
     get_vertical_extent,
@@ -33,7 +33,7 @@ def create_instances() -> dict:
             Instance(
                 id=formatted_date,
                 title=formatted_date,
-                description=f"Data from date {formatted_date}, formatted as {TIME_FORMAT}.",
+                description=f"Data from date {formatted_date}, formatted as {INSTANCE_FORMAT}.",
                 links=[
                     edr_pydantic.link.Link(
                         href=f"{collection_url}instances/{formatted_date}/",
