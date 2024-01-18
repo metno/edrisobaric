@@ -7,9 +7,9 @@ import xarray as xr
 from pydantic import AwareDatetime
 from shapely import wkt, GEOSException, Point
 import covjson_pydantic
-from covjson_pydantic.coverage import Coverage
+import covjson_pydantic.coverage
 from covjson_pydantic.ndarray import NdArray
-from covjson_pydantic.domain import ValuesAxis, DomainType, Axes, CompactAxis, Domain
+from covjson_pydantic.domain import ValuesAxis, DomainType
 
 from initialize import get_dataset, check_instance_exists, instance_path
 
@@ -46,20 +46,21 @@ logger = logging.getLogger()
 """
 
 
-class AxesND(Axes):
-    x: Union[ValuesAxis[float], CompactAxis]
-    y: Union[ValuesAxis[float], CompactAxis]
-    z: Union[ValuesAxis[float], CompactAxis]
+class Axes(covjson_pydantic.domain.Axes):
+    x: ValuesAxis[float]
+    y: ValuesAxis[float]
+    z: ValuesAxis[float]
     t: ValuesAxis[AwareDatetime]
+    composite: bool = False
 
 
-class DomainND(covjson_pydantic.domain.Domain):
+class Domain(covjson_pydantic.domain.Domain):
     domainType: DomainType
-    axes: AxesND
+    axes: Axes
 
 
-class CoverageND(Coverage):
-    domain: DomainND
+class Coverage(covjson_pydantic.coverage.Coverage):
+    domain: Domain
 
 
 def create_point(coords: str, instance_id: str = "") -> dict:
@@ -140,7 +141,7 @@ def create_point(coords: str, instance_id: str = "") -> dict:
         type="Coverage",
         domain=Domain(
             domainType=DomainType.vertical_profile,
-            axes=AxesND(
+            axes=Axes(
                 x=ValuesAxis[float](
                     values=[point.x], dataType="float", coordinates=["x"]
                 ),
@@ -283,7 +284,7 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, dict
 
 @router.get(
     "/collections/isobaric/position",
-    response_model=CoverageND,
+    response_model=Coverage,
     response_model_exclude_unset=True,
 )
 async def get_isobaric_page(
@@ -323,7 +324,7 @@ async def get_isobaric_page(
 
 @router.get(
     "/collections/isobaric/instances/{instance_id}/position",
-    response_model=CoverageND,
+    response_model=Coverage,
     response_model_exclude_unset=True,
 )
 async def get_instance_isobaric_page(
