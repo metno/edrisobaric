@@ -20,6 +20,10 @@ INSTANCE_FORMAT = "%Y%m%dT%H0000Z"
 CELSIUS_SYMBOL = "˚C"
 CELSIUS_ID = "https://codes.wmo.int/common/unit/_Cel"
 AIRTEMP_ID = "http://vocab.met.no/CFSTDN/en/page/air_temperature"
+WINDDIR_ID = "http://vocab.met.no/CFSTDN/en/page/wind_from_direction"
+WINDSPEED_ID = "http://vocab.met.no/CFSTDN/en/page/wind_speed"
+DEGREE_SYMBOL = "˚"
+DEGREE_ID = "https://codes.wmo.int/common/unit/_degree_(angle)"
 
 
 def parse_args() -> argparse.Namespace:

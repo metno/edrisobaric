@@ -16,6 +16,10 @@ from initialize import (
     CELSIUS_SYMBOL,
     CELSIUS_ID,
     AIRTEMP_ID,
+    WINDDIR_ID,
+    WINDSPEED_ID,
+    DEGREE_SYMBOL,
+    DEGREE_ID,
 )
 
 from grib import (
@@ -142,16 +146,22 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
         ),
         parameter_names=edr_pydantic.parameter.Parameters(
             {
-                "WindUMS": edr_pydantic.parameter.Parameter(
+                "wind_from_direction": edr_pydantic.parameter.Parameter(
+                    id="wind_from_direction",
+                    unit=edr_pydantic.unit.Unit(
+                        symbol=edr_pydantic.unit.Symbol(
+                            value=DEGREE_SYMBOL, type=DEGREE_ID
+                        )
+                    ),
                     observedProperty=edr_pydantic.observed_property.ObservedProperty(
-                        id="http://vocab.met.no/CFSTDN/en/page/eastward_wind",
-                        label="eastward_wind",
-                    )
+                        id=WINDDIR_ID,
+                        label="Wind from direction",
+                    ),
                 ),
-                "WindVMS": edr_pydantic.parameter.Parameter(
+                "wind_speed": edr_pydantic.parameter.Parameter(
                     observedProperty=edr_pydantic.observed_property.ObservedProperty(
-                        id="http://vocab.met.no/CFSTDN/en/page/northward_wind",
-                        label="northward_wind",
+                        id=WINDSPEED_ID,
+                        label="Wind speed",
                     )
                 ),
                 "Air temperature": edr_pydantic.parameter.Parameter(

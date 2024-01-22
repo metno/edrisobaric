@@ -42,10 +42,14 @@ class TestApp(unittest.TestCase):
         self.assertTrue(
             len(str(response.json()["ranges"]["temperature"]["values"][0])) > 1
         )
-        # Test for values in range -> uwind
-        self.assertTrue(len(str(response.json()["ranges"]["uwind"]["values"][0])) > 1)
-        # Test for values in range -> vwind
-        self.assertTrue(len(str(response.json()["ranges"]["vwind"]["values"][0])) > 1)
+        # Test for values in range -> wind_from_direction
+        self.assertTrue(
+            len(str(response.json()["ranges"]["wind_from_direction"]["values"][0])) > 1
+        )
+        # Test for values in range -> wind_speed
+        self.assertTrue(
+            len(str(response.json()["ranges"]["wind_speed"]["values"][0])) > 1
+        )
         # Test for values in domain -> z -> values
         self.assertTrue(
             len(str(response.json()["domain"]["axes"]["z"]["values"][0])) > 1

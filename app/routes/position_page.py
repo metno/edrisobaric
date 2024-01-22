@@ -9,6 +9,7 @@ from shapely import wkt, GEOSException, Point
 import covjson_pydantic
 from covjson_pydantic.coverage import Coverage
 from covjson_pydantic.ndarray import NdArray
+from math import atan2, pi, sqrt
 
 from initialize import (
     get_dataset,
@@ -16,6 +17,8 @@ from initialize import (
     instance_path,
     CELSIUS_SYMBOL,
     CELSIUS_ID,
+    DEGREE_SYMBOL,
+    DEGREE_ID,
 )
 
 from grib import (
@@ -53,6 +56,18 @@ coords_query = Query(
         },
     },
 )
+
+
+def wind_speed_from_u_v(u, v):
+    # https://spire.com/tutorial/how-to-process-grib2-weather-data-for-wind-turbine-applications-shapefile/
+    return sqrt(pow(u, 2) + pow(v, 2))
+
+
+def wind_direction_from_u_v(u, v):
+    # https://spire.com/tutorial/how-to-process-grib2-weather-data-for-wind-turbine-applications-shapefile/
+    if (u, v) == (0.0, 0.0):
+        return 0.0
+    return (180.0 / pi) * atan2(u, v) + 180.0
 
 
 def create_point(coords: str, instance_id: str = "") -> dict:
@@ -99,27 +114,28 @@ def create_point(coords: str, instance_id: str = "") -> dict:
                 status_code=status.HTTP_400_BAD_REQUEST, content=errinstance
             )
 
-    # Fetch temperature
+    # Fetch temperature data for point
     temperatures = dataset[TEMPERATURE_LABEL].sel(
         longitude=point.x, latitude=point.y, method="nearest"
     )
 
     isobaric_values = get_vertical_extent(dataset)
-    temperature_values: List[float | None] = []
-    uwind_values: List[float | None] = []
-    vwind_values: List[float | None] = []
+    temperature_values: List[float] = []
+    wind_dir: List[float] = []
+    wind_speed: List[float] = []
 
+    # For each temperature value found:
     for temperature in temperatures:
         # Convert temperature from Kelvin to Celsius
         temperature_values.append(float(temperature.data) - 273.15)
 
+        # Fetch wind
         uwind = dataset[UWIND_LABEL].sel(
             longitude=point.x,
             latitude=point.y,
             isobaricInhPa=temperature[ISOBARIC_LABEL].data,
             method="nearest",
         )
-        uwind_values.append(float(uwind.data))
 
         vwind = dataset[VWIND_LABEL].sel(
             longitude=point.x,
@@ -127,7 +143,9 @@ def create_point(coords: str, instance_id: str = "") -> dict:
             isobaricInhPa=temperature[ISOBARIC_LABEL].data,
             method="nearest",
         )
-        vwind_values.append(float(vwind.data))
+
+        wind_dir.append(wind_direction_from_u_v(uwind.data, vwind.data))
+        wind_speed.append(wind_speed_from_u_v(uwind.data, vwind.data))
 
     cov = Coverage(
         id="isobaric",
@@ -179,15 +197,15 @@ def create_point(coords: str, instance_id: str = "") -> dict:
                 shape=[len(isobaric_values)],
                 values=temperature_values,
             ),
-            "uwind": NdArray(
+            "wind_from_direction": NdArray(
                 axisNames=["z"],
                 shape=[len(isobaric_values)],
-                values=uwind_values,
+                values=wind_dir,
             ),
-            "vwind": NdArray(
+            "wind_speed": NdArray(
                 axisNames=["z"],
                 shape=[len(isobaric_values)],
-                values=vwind_values,
+                values=wind_speed,
             ),
         },
         parameters={
@@ -204,25 +222,25 @@ def create_point(coords: str, instance_id: str = "") -> dict:
                     symbol=CELSIUS_SYMBOL,
                 ),
             ),
-            "uwind": covjson_pydantic.parameter.Parameter(
-                id="uwind",
-                label={"en": "U component of wind"},
+            "wind_from_direction": covjson_pydantic.parameter.Parameter(
+                id="wind_from_direction",
+                label={"en": "Wind from direction"},
                 observedProperty=covjson_pydantic.observed_property.ObservedProperty(
-                    id="http://vocab.met.no/CFSTDN/en/page/eastward_wind",
-                    label={"en": "eastward_wind"},
+                    id="http://vocab.met.no/CFSTDN/en/page/wind_from_direction",
+                    label={"en": "wind_from_direction"},
                 ),
                 unit=covjson_pydantic.unit.Unit(
-                    id="https://codes.wmo.int/common/unit/_m_s-1",
-                    label={"en": "m/s"},
-                    symbol="m/s",
+                    id=DEGREE_ID,
+                    label={"en": "degree"},
+                    symbol=DEGREE_SYMBOL,
                 ),
             ),
-            "vwind": covjson_pydantic.parameter.Parameter(
-                id="vwind",
-                label={"en": "V component of wind"},
+            "wind_speed": covjson_pydantic.parameter.Parameter(
+                id="wind_speed",
+                label={"en": "Wind speed"},
                 observedProperty=covjson_pydantic.observed_property.ObservedProperty(
-                    id="http://vocab.met.no/CFSTDN/en/page/northward_wind",
-                    label={"en": "northward_wind"},
+                    id="http://vocab.met.no/CFSTDN/en/page/wind_speed",
+                    label={"en": "Wind speed"},
                 ),
                 unit=covjson_pydantic.unit.Unit(
                     id="https://codes.wmo.int/common/unit/_m_s-1",
