@@ -5,7 +5,7 @@ import os
 import sys
 import argparse
 from typing import Tuple
-from datetime import datetime, timedelta
+from datetime import datetime
 import logging
 import xarray as xr
 import requests
@@ -67,12 +67,11 @@ def open_grib() -> None:
     """Open grib file."""
     global dataset
 
-    filename = build_gribfile_name(get_data_path(), time=datetime.now())
+    filename = ""
     if len(DATAFILE) > 0:
         filename = DATAFILE
     else:
-        if not check_gribfile_exists(data_path=get_data_path(), fname=DATAFILE):
-            filename = download_gribfile(data_path=get_data_path(), api_url=API_URL)
+        filename = download_gribfile(data_path=get_data_path(), api_url=API_URL)
 
     try:
         dataset = xr.open_dataset(filename, engine="cfgrib")
@@ -116,32 +115,6 @@ def get_dataset() -> xr.Dataset:
     return dataset
 
 
-def build_gribfile_name(data_path: str, time: datetime) -> str:
-    """Generate correct name for grib files."""
-    filename_prefix = "T_YTNE85_C_ENMI_"
-    filename_postfix = ".bin"
-
-    if time is None:
-        time = datetime.now()
-
-    while time.hour not in [0, 6, 12, 18, 21]:
-        time = time - timedelta(hours=1)
-
-    filename_date = datetime.strftime(time, "%Y%m%d%H0000")  # "20231212060000"
-    return data_path + os.path.sep + filename_prefix + filename_date + filename_postfix
-
-
-def check_gribfile_exists(data_path: str, fname: str) -> bool:
-    """Check if grib file exists."""
-    if len(fname) == 0:
-        # print("check_gribfile_exists: No filename given.")
-        return False
-    if not os.path.isfile(data_path + os.pathsep + fname):
-        logger.info("check_gribfile_exists: Datafile with name %s not found", fname)
-        return False
-    return True
-
-
 def download_gribfile(data_path: str, api_url: str) -> str:
     """Ensure data dir exists, download latest file. Returns filename."""
     try:
@@ -160,7 +133,9 @@ def download_gribfile(data_path: str, api_url: str) -> str:
     )
 
     if os.path.exists(fname):
-        logger.info("Latest file is %s, already have that. Skipping download.", fname)
+        print(
+            f"download_gribfile: Latest file is {fname}, already have that. Skipping download."
+        )
         return fname
 
     logger.warning("Downloading %s to path %s.", api_url, fname)
