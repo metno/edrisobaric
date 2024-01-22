@@ -33,6 +33,7 @@ from grib import (
 )
 
 POINT_REGEX = "^POINT\\(\\d+\\.?\\d* \\d+\\.?\\d*\\)$"
+PRECISION = 2
 
 router = APIRouter()
 logger = logging.getLogger()
@@ -59,12 +60,12 @@ coords_query = Query(
 
 
 def wind_speed_from_u_v(u, v):
-    # https://spire.com/tutorial/how-to-process-grib2-weather-data-for-wind-turbine-applications-shapefile/
+    """Calculate wind speed from u and v wind components. Example copied from <https://spire.com/tutorial/how-to-process-grib2-weather-data-for-wind-turbine-applications-shapefile/>."""
     return sqrt(pow(u, 2) + pow(v, 2))
 
 
 def wind_direction_from_u_v(u, v):
-    # https://spire.com/tutorial/how-to-process-grib2-weather-data-for-wind-turbine-applications-shapefile/
+    """Calculate wind direction from u and v wind components. Example copied from <https://spire.com/tutorial/how-to-process-grib2-weather-data-for-wind-turbine-applications-shapefile/>."""
     if (u, v) == (0.0, 0.0):
         return 0.0
     return (180.0 / pi) * atan2(u, v) + 180.0
@@ -127,7 +128,7 @@ def create_point(coords: str, instance_id: str = "") -> dict:
     # For each temperature value found:
     for temperature in temperatures:
         # Convert temperature from Kelvin to Celsius
-        temperature_values.append(float(temperature.data) - 273.15)
+        temperature_values.append(round(float(temperature.data) - 273.15, PRECISION))
 
         # Fetch wind
         uwind = dataset[UWIND_LABEL].sel(
@@ -144,8 +145,8 @@ def create_point(coords: str, instance_id: str = "") -> dict:
             method="nearest",
         )
 
-        wind_dir.append(wind_direction_from_u_v(uwind.data, vwind.data))
-        wind_speed.append(wind_speed_from_u_v(uwind.data, vwind.data))
+        wind_dir.append(round(wind_direction_from_u_v(uwind.data, vwind.data), PRECISION))
+        wind_speed.append(round(wind_speed_from_u_v(uwind.data, vwind.data), PRECISION))
 
     cov = Coverage(
         id="isobaric",
