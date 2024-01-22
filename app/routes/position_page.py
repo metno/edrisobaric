@@ -187,7 +187,7 @@ def create_point(coords: str, instance_id: str = "") -> dict:
                 id="temperature",
                 label={"en": "Air temperature"},
                 observedProperty=covjson_pydantic.observed_property.ObservedProperty(
-                    id="https://codes.wmo.int/common/quantity-kind/_airTemperature",
+                    id="http://vocab.met.no/CFSTDN/en/page/air_temperature",
                     label={"en": "Air temperature"},
                 ),
                 unit=covjson_pydantic.unit.Unit(
@@ -200,8 +200,8 @@ def create_point(coords: str, instance_id: str = "") -> dict:
                 id="uwind",
                 label={"en": "U component of wind"},
                 observedProperty=covjson_pydantic.observed_property.ObservedProperty(
-                    id="https://codes.wmo.int/bufr4/b/11/_095",
-                    label={"en": "u-component of wind"},
+                    id="http://vocab.met.no/CFSTDN/en/page/eastward_wind",
+                    label={"en": "eastward_wind"},
                 ),
                 unit=covjson_pydantic.unit.Unit(
                     id="https://codes.wmo.int/common/unit/_m_s-1",
@@ -213,12 +213,12 @@ def create_point(coords: str, instance_id: str = "") -> dict:
                 id="vwind",
                 label={"en": "V component of wind"},
                 observedProperty=covjson_pydantic.observed_property.ObservedProperty(
-                    id="https://codes.wmo.int/bufr4/b/11/_096",
-                    label={"en": "v-component of wind"},
+                    id="http://vocab.met.no/CFSTDN/en/page/northward_wind",
+                    label={"en": "northward_wind"},
                 ),
                 unit=covjson_pydantic.unit.Unit(
                     id="https://codes.wmo.int/common/unit/_m_s-1",
-                    label={"en": "m/s"},
+                    label={"en": "metres per second "},
                     symbol="m/s",
                 ),
             ),

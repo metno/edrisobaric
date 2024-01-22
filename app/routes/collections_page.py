@@ -141,12 +141,14 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
             {
                 "WindUMS": edr_pydantic.parameter.Parameter(
                     observedProperty=edr_pydantic.observed_property.ObservedProperty(
-                        label="WindUMS"
+                        id="http://vocab.met.no/CFSTDN/en/page/eastward_wind",
+                        label="eastward_wind",
                     )
                 ),
                 "WindVMS": edr_pydantic.parameter.Parameter(
                     observedProperty=edr_pydantic.observed_property.ObservedProperty(
-                        label="WindVMS"
+                        id="http://vocab.met.no/CFSTDN/en/page/northward_wind",
+                        label="northward_wind",
                     )
                 ),
                 "Air temperature": edr_pydantic.parameter.Parameter(
@@ -157,8 +159,8 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
                         )
                     ),
                     observedProperty=edr_pydantic.observed_property.ObservedProperty(
-                        id="https://codes.wmo.int/common/quantity-kind/_airTemperature",
-                        label="Kelvin",
+                        id="http://vocab.met.no/CFSTDN/en/page/air_temperature",
+                        label="Air temperature",
                     ),
                 ),
             }
