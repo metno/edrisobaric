@@ -6,7 +6,15 @@ from fastapi import APIRouter
 import edr_pydantic
 from edr_pydantic.collections import Instances, Instance
 
-from initialize import get_dataset, BASE_URL, format_instance_id, INSTANCE_FORMAT
+from initialize import (
+    get_dataset,
+    BASE_URL,
+    format_instance_id,
+    INSTANCE_FORMAT,
+    CELSIUS_SYMBOL,
+    CELSIUS_ID,
+    AIRTEMP_ID,
+)
 
 from grib import (
     get_vertical_extent,
@@ -96,13 +104,13 @@ def create_instances() -> dict:
                             id="Temperature",
                             unit=edr_pydantic.unit.Unit(
                                 symbol=edr_pydantic.unit.Symbol(
-                                    value="K",
-                                    type="https://codes.wmo.int/common/unit/_K",
+                                    value=CELSIUS_SYMBOL,
+                                    type=CELSIUS_ID,
                                 )
                             ),
                             observedProperty=edr_pydantic.observed_property.ObservedProperty(
-                                id="https://codes.wmo.int/common/quantity-kind/_airTemperature",
-                                label="Kelvin",
+                                id=AIRTEMP_ID,
+                                label="Air temperature",
                             ),
                         ),
                     }

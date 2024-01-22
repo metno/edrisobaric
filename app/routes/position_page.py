@@ -10,7 +10,13 @@ import covjson_pydantic
 from covjson_pydantic.coverage import Coverage
 from covjson_pydantic.ndarray import NdArray
 
-from initialize import get_dataset, check_instance_exists, instance_path
+from initialize import (
+    get_dataset,
+    check_instance_exists,
+    instance_path,
+    CELSIUS_SYMBOL,
+    CELSIUS_ID,
+)
 
 from grib import (
     get_vertical_extent,
@@ -27,6 +33,7 @@ POINT_REGEX = "^POINT\\(\\d+\\.?\\d* \\d+\\.?\\d*\\)$"
 
 router = APIRouter()
 logger = logging.getLogger()
+
 
 # Query for both position routes
 coords_query = Query(
@@ -103,7 +110,8 @@ def create_point(coords: str, instance_id: str = "") -> dict:
     vwind_values: List[float | None] = []
 
     for temperature in temperatures:
-        temperature_values.append(float(temperature.data))
+        # Convert temperature from Kelvin to Celsius
+        temperature_values.append(float(temperature.data) - 273.15)
 
         uwind = dataset[UWIND_LABEL].sel(
             longitude=point.x,
@@ -191,9 +199,9 @@ def create_point(coords: str, instance_id: str = "") -> dict:
                     label={"en": "Air temperature"},
                 ),
                 unit=covjson_pydantic.unit.Unit(
-                    id="https://codes.wmo.int/common/unit/_K",
-                    label={"en": "Kelvin"},
-                    symbol="K",
+                    id=CELSIUS_ID,
+                    label={"en": "degree Celsius"},
+                    symbol=CELSIUS_SYMBOL,
                 ),
             ),
             "uwind": covjson_pydantic.parameter.Parameter(

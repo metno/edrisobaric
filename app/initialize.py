@@ -17,6 +17,9 @@ dataset = xr.Dataset()
 logger = logging.getLogger()
 TIME_FORMAT = "%Y-%m-%dT%H:00:00Z"  #  RFC3339 date-time
 INSTANCE_FORMAT = "%Y%m%dT%H0000Z"
+CELSIUS_SYMBOL = "˚C"
+CELSIUS_ID = "https://codes.wmo.int/common/unit/_Cel"
+AIRTEMP_ID = "http://vocab.met.no/CFSTDN/en/page/air_temperature"
 
 
 def parse_args() -> argparse.Namespace:

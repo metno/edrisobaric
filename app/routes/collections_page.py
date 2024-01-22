@@ -13,6 +13,9 @@ from initialize import (
     BASE_URL,
     check_instance_exists,
     instance_path,
+    CELSIUS_SYMBOL,
+    CELSIUS_ID,
+    AIRTEMP_ID,
 )
 
 from grib import (
@@ -155,11 +158,11 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
                     id="Temperature",
                     unit=edr_pydantic.unit.Unit(
                         symbol=edr_pydantic.unit.Symbol(
-                            value="K", type="https://codes.wmo.int/common/unit/_K"
+                            value=CELSIUS_SYMBOL, type=CELSIUS_ID
                         )
                     ),
                     observedProperty=edr_pydantic.observed_property.ObservedProperty(
-                        id="http://vocab.met.no/CFSTDN/en/page/air_temperature",
+                        id=AIRTEMP_ID,
                         label="Air temperature",
                     ),
                 ),
