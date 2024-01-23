@@ -4,14 +4,11 @@ from functools import lru_cache
 import os
 import sys
 import argparse
-from typing import Tuple
-from datetime import datetime
 import logging
 import xarray as xr
 import requests
-from fastapi import Path
 
-from grib import ISOBARIC_LABEL, TEMPERATURE_LABEL, get_temporal_extent
+from grib import ISOBARIC_LABEL, TEMPERATURE_LABEL
 
 dataset = xr.Dataset()
 logger = logging.getLogger()
@@ -19,7 +16,6 @@ logger = logging.getLogger()
 # Constants used throughout
 
 TIME_FORMAT = "%Y-%m-%dT%H:00:00Z"  #  RFC3339 date-time
-INSTANCE_FORMAT = "%Y%m%dT%H0000Z"
 CELSIUS_SYMBOL = "˚C"
 CELSIUS_ID = "https://codes.wmo.int/common/unit/_Cel"
 AIRTEMP_ID = "http://vocab.met.no/CFSTDN/en/page/air_temperature"
@@ -156,52 +152,8 @@ def download_gribfile(data_path: str, api_url: str) -> str:
     return fname
 
 
-def format_instance_id(timestamp: datetime) -> str:
-    return timestamp.strftime(INSTANCE_FORMAT)
-
-
-def check_instance_exists(ds: xr.Dataset, instance_id: str) -> Tuple[bool, dict]:
-    """Check instance id exists in dataset."""
-    instance_dates = [get_temporal_extent(ds)]
-    for d in instance_dates:
-        if format_instance_id(d) == instance_id:
-            logger.info("instance_id %s is valid", instance_id)
-            return True, {}
-
-    logger.error("instance_id %s does not exist in dataset", instance_id)
-    valid_dates = [format_instance_id(x) for x in instance_dates]
-    return (
-        False,
-        {
-            "detail": [
-                {
-                    "type": "string",
-                    "loc": ["query", "instance"],
-                    "msg": f"instance_id {instance_id} does not exist in dataset. Valid dates are {valid_dates}.",
-                    "input": instance_id,
-                }
-            ]
-        },
-    )
-
-
 args = parse_args()
 DATAFILE = args.file
 BASE_URL = args.base_url
 BIND_HOST = args.bind_host
 API_URL = args.api_url
-
-
-# There is only one instance available. Load and lock.
-instance_id = get_temporal_extent(get_dataset()).strftime(INSTANCE_FORMAT)
-instance_path = Path(
-    pattern="^" + instance_id + "$",
-    description=f"Instance ID, consisting of date in format {INSTANCE_FORMAT}. Only available instance is {instance_id}",
-    openapi_examples={
-        "Date": {
-            "summary": f"The only available instance, {instance_id}",
-            "description": "Fetch data for a position in Oslo",
-            "value": instance_id,
-        },
-    },
-)
