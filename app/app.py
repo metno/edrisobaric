@@ -6,7 +6,7 @@ from typing import AsyncGenerator
 import uvicorn
 from fastapi import FastAPI
 from routes.routes import routes
-from initialize import BIND_HOST
+from initialize import BIND_HOST, CONTACT_EMAIL
 
 app = FastAPI(
     openapi_url="/api",
@@ -22,7 +22,7 @@ app = FastAPI(
     contact={
         "name": "The Norwegian Meteorological Institute",
         "url": "https://api.met.no/doc/support",
-        "email": "weatherapi-adm@met.no",
+        "email": CONTACT_EMAIL,
     },
     version="0.9.0",
     openapi_tags=[

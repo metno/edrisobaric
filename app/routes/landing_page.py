@@ -5,7 +5,7 @@ from fastapi import APIRouter
 from edr_pydantic.capabilities import LandingPageModel, Provider, Contact
 from edr_pydantic.link import Link
 
-from initialize import BASE_URL
+from initialize import BASE_URL, CONTACT_EMAIL
 
 
 @lru_cache
@@ -45,7 +45,7 @@ def create_landing_page(base_url) -> dict:
             url="https://api.met.no/",
         ),
         contact=Contact(
-            email="weatherapi-adm@met.no",
+            email=CONTACT_EMAIL,
             phone="+47.22963000",
             postalCode="0313",
             city="Oslo",

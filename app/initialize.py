@@ -24,6 +24,7 @@ WINDDIR_ID = "http://vocab.met.no/CFSTDN/en/page/wind_from_direction"
 WINDSPEED_ID = "http://vocab.met.no/CFSTDN/en/page/wind_speed"
 DEGREE_SYMBOL = "˚"
 DEGREE_ID = "https://codes.wmo.int/common/unit/_degree_(angle)"
+CONTACT_EMAIL = "weatherapi-adm@met.no"
 
 
 def parse_args() -> argparse.Namespace:
