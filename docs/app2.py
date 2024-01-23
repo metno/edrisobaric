@@ -39,7 +39,7 @@ def create_landing_page() -> dict:
             url="https://api.met.no/",
         ),
         contact=Contact(
-            email="api-users-request@lists.met.no",
+            email="weatherapi-adm@met.no",
             phone="+47.22963000",
             postalCode="0313",
             city="Oslo",
