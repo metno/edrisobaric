@@ -60,12 +60,20 @@ coords_query = Query(
 
 
 def wind_speed_from_u_v(u, v):
-    """Calculate wind speed from u and v wind components. Example copied from <https://spire.com/tutorial/how-to-process-grib2-weather-data-for-wind-turbine-applications-shapefile/>."""
+    """Calculate wind speed from u and v wind components.
+
+    Example copied from
+    <https://spire.com/tutorial/how-to-process-grib2-weather-data-for-wind-turbine-applications-shapefile/>.
+    """
     return sqrt(pow(u, 2) + pow(v, 2))
 
 
 def wind_direction_from_u_v(u, v):
-    """Calculate wind direction from u and v wind components. Example copied from <https://spire.com/tutorial/how-to-process-grib2-weather-data-for-wind-turbine-applications-shapefile/>."""
+    """Calculate wind direction from u and v wind components.
+
+    Example copied from
+    <https://spire.com/tutorial/how-to-process-grib2-weather-data-for-wind-turbine-applications-shapefile/>.
+    """
     if (u, v) == (0.0, 0.0):
         return 0.0
     return (180.0 / pi) * atan2(u, v) + 180.0
@@ -145,7 +153,9 @@ def create_point(coords: str, instance_id: str = "") -> dict:
             method="nearest",
         )
 
-        wind_dir.append(round(wind_direction_from_u_v(uwind.data, vwind.data), PRECISION))
+        wind_dir.append(
+            round(wind_direction_from_u_v(uwind.data, vwind.data), PRECISION)
+        )
         wind_speed.append(round(wind_speed_from_u_v(uwind.data, vwind.data), PRECISION))
 
     cov = Coverage(

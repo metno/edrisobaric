@@ -77,10 +77,10 @@ A grib data file will be downloaded on demand if none is supplied.
 
 Staring the app will give these URLs:
 
-- <http://127.0.0.1:5000/>
-- <http://127.0.0.1:5000/api>
-- <http://127.0.0.1:5000/docs>
-- <http://127.0.0.1:5000/redoc>
+- Landig page: <http://127.0.0.1:5000/>
+- Openapi spec: <http://127.0.0.1:5000/api>
+- SwaggerUI: <http://127.0.0.1:5000/docs>
+- Redoc: <http://127.0.0.1:5000/redoc>
 
 Example position lookup:
 

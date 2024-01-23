@@ -20,6 +20,8 @@ from initialize import (
     WINDSPEED_ID,
     DEGREE_SYMBOL,
     DEGREE_ID,
+    CRS_SHORT,
+    CRS_LONG,
 )
 
 from grib import (
@@ -97,7 +99,8 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
         ],
         extent=edr_pydantic.extent.Extent(
             spatial=edr_pydantic.extent.Spatial(
-                bbox=[get_spatial_extent(dataset)], crs="WGS:84"
+                bbox=[get_spatial_extent(dataset)],
+                crs=CRS_LONG,
             ),
             vertical=edr_pydantic.extent.Vertical(
                 interval=[
@@ -178,6 +181,7 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
                 ),
             }
         ),
+        crs=[CRS_SHORT],
     )
 
     if len(collection_id) == 0:

@@ -14,6 +14,7 @@ from initialize import (
     CELSIUS_SYMBOL,
     CELSIUS_ID,
     AIRTEMP_ID,
+    CRS_LONG,
 )
 
 from grib import (
@@ -52,7 +53,7 @@ def create_instances() -> dict:
                 ],
                 extent=edr_pydantic.extent.Extent(
                     spatial=edr_pydantic.extent.Spatial(
-                        bbox=[get_spatial_extent(dataset)], crs="WGS:84"
+                        bbox=[get_spatial_extent(dataset)], crs=CRS_LONG
                     ),
                     vertical=edr_pydantic.extent.Vertical(
                         interval=[

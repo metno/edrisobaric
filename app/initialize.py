@@ -15,6 +15,9 @@ from grib import ISOBARIC_LABEL, TEMPERATURE_LABEL, get_temporal_extent
 
 dataset = xr.Dataset()
 logger = logging.getLogger()
+
+# Constants used throughout
+
 TIME_FORMAT = "%Y-%m-%dT%H:00:00Z"  #  RFC3339 date-time
 INSTANCE_FORMAT = "%Y%m%dT%H0000Z"
 CELSIUS_SYMBOL = "˚C"
@@ -25,6 +28,12 @@ WINDSPEED_ID = "http://vocab.met.no/CFSTDN/en/page/wind_speed"
 DEGREE_SYMBOL = "˚"
 DEGREE_ID = "https://codes.wmo.int/common/unit/_degree_(angle)"
 CONTACT_EMAIL = "weatherapi-adm@met.no"
+CRS_SHORT = "CRS:84"
+CRS_LONG = (
+    'GEOGCS["Unknown", DATUM["Unknown", SPHEROID["WGS_1984", 6378137.0, '
+    + '298.257223563]], PRIMEM["Greenwich",0], UNIT["degree", 0.017453], '
+    + 'AXIS["Lon", EAST], AXIS["Lat", NORTH]]'
+)
 
 
 def parse_args() -> argparse.Namespace:
