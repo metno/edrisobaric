@@ -93,7 +93,7 @@
               64.25000000000011
             ]
           ],
-          "crs": "WGS84"
+          "crs": "WGS:84"
         },
         "temporal": {
           "interval": [

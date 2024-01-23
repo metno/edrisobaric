@@ -97,7 +97,7 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
         ],
         extent=edr_pydantic.extent.Extent(
             spatial=edr_pydantic.extent.Spatial(
-                bbox=[get_spatial_extent(dataset)], crs="WGS84"
+                bbox=[get_spatial_extent(dataset)], crs="WGS:84"
             ),
             vertical=edr_pydantic.extent.Vertical(
                 interval=[
