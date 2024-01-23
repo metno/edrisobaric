@@ -1,7 +1,7 @@
 """Collections page."""
 from typing import List, Tuple, Annotated
 import logging
-from fastapi import APIRouter, status, Response, Request, Query
+from fastapi import APIRouter, status, Request, Query
 from fastapi.responses import JSONResponse
 import xarray as xr
 from pydantic import AwareDatetime
@@ -13,8 +13,6 @@ from math import atan2, pi, sqrt
 
 from initialize import (
     get_dataset,
-    check_instance_exists,
-    instance_path,
     CELSIUS_SYMBOL,
     CELSIUS_ID,
     DEGREE_SYMBOL,
@@ -79,7 +77,7 @@ def wind_direction_from_u_v(u, v):
     return (180.0 / pi) * atan2(u, v) + 180.0
 
 
-def create_point(coords: str, instance_id: str = "") -> dict:
+def create_point(coords: str) -> dict:
     """Return data for all isometric layers at a point."""
     # Parse coordinates given as WKT
     point = Point()
@@ -114,14 +112,6 @@ def create_point(coords: str, instance_id: str = "") -> dict:
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content=errcoords
         )
-
-    # Sanity check on instance id
-    if len(instance_id) > 0:
-        instance_ok, errinstance = check_instance_exists(dataset, instance_id)
-        if not instance_ok:
-            return Response(
-                status_code=status.HTTP_400_BAD_REQUEST, content=errinstance
-            )
 
     # Fetch temperature data for point
     temperatures = dataset[TEMPERATURE_LABEL].sel(
@@ -338,29 +328,3 @@ async def get_isobaric_page(
         )
 
     return create_point(coords=coords)
-
-
-@router.get(
-    "/collections/isobaric/instances/{instance_id}/position",
-    tags=["Collection Data", "Instance Data"],
-    response_model=Coverage,
-    response_model_exclude_unset=True,
-)
-async def get_instance_of_isobaric_page(
-    request: Request,
-    instance_id: Annotated[
-        str,
-        instance_path,
-    ],
-    coords: Annotated[str, coords_query],
-) -> dict:
-    """Return data closest to a position.
-
-    Same as "/collections/isobaric/position", but with selectable instance ID.
-    """
-    if len(coords) == 0:
-        return {
-            "body": f'Error: No coordinates provided. Example: {str(request.base_url)[0:-1]}{request.scope["path"]}?coords=POINT(11.9384%2060.1699)'
-        }
-
-    return create_point(coords=coords, instance_id=instance_id)

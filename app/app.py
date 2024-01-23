@@ -38,14 +38,6 @@ app = FastAPI(
             "name": "Collection Data",
             "description": "Data queries on collections",
         },
-        {
-            "name": "Instance Metadata",
-            "description": "Description of instances",
-        },
-        {
-            "name": "Instance Data",
-            "description": "Data queries on instances",
-        },
     ],
 )
 logger = logging.getLogger("uvicorn.access")

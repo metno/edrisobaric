@@ -57,50 +57,16 @@ class TestApp(unittest.TestCase):
         # Test for null in data
         self.assertFalse("null" in response.text)
 
-    def test_instances(self) -> None:
-        """Test a variety of URLs related to instances."""
-        # Test list of instances.
-        response = client.get("/collections/isobaric/instances")
-        self.assertEqual(response.status_code, 200)
-
-        # Find current instance.
-        json_response = response.json()
-        instance_id = json_response["instances"][0]["id"]
-
-        # Test link to current instance.
-        self.assertTrue(
-            json_response["instances"][0]["links"][0]["href"]
-            == f"http://localhost:5000/collections/isobaric/instances/{instance_id}/"
-        )
-
-        # Test asking for a specific instance.
-        response = client.get(f"/collections/isobaric/instances/{instance_id}")
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.json()["id"] == "isobaric")
-        self.assertIn(instance_id, response.json()["links"][0]["href"])
-
-        # Test asking for non-existing instance.
-        response = client.get("/collections/isobaric/instances/1234567890/")
+        # Test URL that shouldn't work
+        response = client.get("/collections/isobaric/position?coords=POINT(1160)")
         self.assertEqual(response.status_code, 422)
 
-        # Test asking for data in a non-existing instance.
-        response = client.get(
-            f"/collections/isobaric/instances/1234567890/position?{sample_coords}"
-        )
-        self.assertEqual(response.status_code, 422)
-
-        # Test asking for a sample point in current instance.
-        response = client.get(
-            f"/collections/isobaric/instances/{instance_id}/position?{sample_coords}"
-        )
+        # Test redirect (can't test in normal way, as this isn't run on a webserver)
+        response = client.get("/collections/isobaric/")
         self.assertEqual(response.status_code, 200)
-        self.assertIn(
-            '"id":"isobaric","type":"Coverage","domain":{"type":"Domain","domainType":"VerticalProfile","axes":{"x"',
-            response.text,
-        )
 
     def test_api(self) -> None:
-        response = client.get("/api")
+        response = client.get("/api", follow_redirects=False)
         self.assertEqual(response.status_code, 200)
 
 

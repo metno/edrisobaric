@@ -3,7 +3,7 @@ from functools import lru_cache
 from datetime import timedelta
 import logging
 from typing import Annotated
-from fastapi import APIRouter, status, Response, Path
+from fastapi import APIRouter, Path
 import edr_pydantic
 from edr_pydantic.collections import Collection
 from edr_pydantic.collections import Collections
@@ -11,8 +11,6 @@ from edr_pydantic.collections import Collections
 from initialize import (
     get_dataset,
     BASE_URL,
-    check_instance_exists,
-    instance_path,
     CELSIUS_SYMBOL,
     CELSIUS_ID,
     AIRTEMP_ID,
@@ -35,10 +33,8 @@ logger = logging.getLogger()
 
 
 @lru_cache
-def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
+def create_collection(collection_id: str = "") -> dict:
     """Creates the collections page."""
-    instance_url = f"{BASE_URL}collections/isobaric/instances/{instance_id}/"
-
     link_self = edr_pydantic.link.Link(
         href=f"{BASE_URL}collections",
         hreflang="en",
@@ -49,13 +45,6 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
     dataset = get_dataset()
     vertical_levels = get_vertical_extent(dataset)
     collection_url = f"{BASE_URL}collections/isobaric/"
-    if len(instance_id) > 0:
-        # Sanity check on instance id
-        instance_ok, errmsg = check_instance_exists(dataset, instance_id)
-        if not instance_ok:
-            return Response(status_code=status.HTTP_400_BAD_REQUEST, content=errmsg)
-
-        collection_url = instance_url
 
     links = [
         edr_pydantic.link.Link(
@@ -63,14 +52,6 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
             rel="data",
         )
     ]
-    # If we're listing anything but instances, link to /instances
-    if len(instance_id) == 0:
-        links.append(
-            edr_pydantic.link.Link(
-                href=f"{collection_url}instances",
-                rel="alternate",
-            )
-        )
 
     description = (
         "These files are used by Avinor ATM systems but possibly also of "
@@ -124,17 +105,7 @@ def create_collection(collection_id: str = "", instance_id: str = "") -> dict:
         ),
         links=links,
         data_queries=edr_pydantic.data_queries.DataQueries(
-            # List instances
-            instances=edr_pydantic.data_queries.EDRQuery(
-                link=edr_pydantic.data_queries.EDRQueryLink(
-                    href=f"{collection_url}instances",
-                    rel="alternate",
-                    variables=edr_pydantic.variables.Variables(
-                        query_type="instances", output_formats=["CoverageJSON"]
-                    ),
-                )
-            ),
-            # Get posision in default instance
+            # Get posision
             position=edr_pydantic.data_queries.EDRQuery(
                 link=edr_pydantic.data_queries.EDRQueryLink(
                     href=f"{collection_url}position",
@@ -225,19 +196,3 @@ async def describe_a_collection(
 ) -> dict:
     """Describe a specific collection."""
     return create_collection(collection_id=collection_id)
-
-
-@router.get(
-    "/collections/isobaric/instances/{instance_id}",
-    tags=["Instance Metadata"],
-    response_model=Collection,
-    response_model_exclude_unset=True,
-)
-async def get_instance_of_collection_page(
-    instance_id: Annotated[
-        str,
-        instance_path,
-    ],
-) -> dict:
-    """Return a specific instance of a collection. No data is returned, only info about the instance."""
-    return create_collection("isobaric", instance_id)

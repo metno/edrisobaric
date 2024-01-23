@@ -1,6 +1,5 @@
 import unittest
 import os
-from datetime import datetime
 from initialize import download_gribfile, API_URL
 
 datafile = ""
