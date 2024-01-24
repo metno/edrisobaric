@@ -44,7 +44,7 @@ def get_spatial_extent(dataset: xr.Dataset) -> list[float]:
 def get_temporal_extent(dataset: xr.Dataset) -> datetime:
     """Fetch time from grib data."""
     initial_time = str(
-        dataset[TEMPERATURE_LABEL].time.data
+        dataset[TEMPERATURE_LABEL].valid_time.data
     )  # 2023-12-13T00:00:00.000000000
     timestamp = datetime.strptime(initial_time, "%Y-%m-%dT%H:00:00.000000000")
     return timestamp.replace(tzinfo=pytz.UTC)

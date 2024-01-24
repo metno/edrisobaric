@@ -35,7 +35,16 @@ CRS_LONG = (
 def parse_args() -> argparse.Namespace:
     """Parse arguments for grib filename and URL."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("--file", help="Grib file to read data from", default="")
+    parser.add_argument(
+        "--file",
+        help=(
+            "Grib file or URL to read data from. Default will fetch latest file.\n"
+            + "See <https://api.met.no/weatherapi/isobaricgrib/1.0/available.json?type=grib2> "
+            + "for available files.\nExample: "
+            + '--file="https://api.met.no/weatherapi/isobaricgrib/1.0/grib2?area=southern_norway&time=2024-01-24T18%3A00%3A00Z"'
+        ),
+        default="",
+    )
     parser.add_argument(
         "--base_url",
         help="Base URL for API, with a trailing slash.",
@@ -69,15 +78,21 @@ def get_filename() -> str:
     return DATAFILE
 
 
-def open_grib() -> None:
-    """Open grib file."""
-    global dataset
-
+def open_grib(datafile: str, dataset: xr.Dataset) -> xr.Dataset:
+    """Open grib file, return dataset."""
     filename = ""
-    if len(DATAFILE) > 0:
-        filename = DATAFILE
-    else:
+
+    # If nothing given, download nearest date
+    if len(datafile) == 0:
         filename = download_gribfile(data_path=get_data_path(), api_url=API_URL)
+    else:
+        # If datafile is a URL, download that file
+        if datafile.startswith("http"):
+            filename = download_gribfile(data_path=get_data_path(), api_url=datafile)
+
+        # If datafile is a filename, open that file
+        else:
+            filename = datafile
 
     try:
         dataset = xr.open_dataset(filename, engine="cfgrib")
@@ -89,9 +104,10 @@ def open_grib() -> None:
             err,
         )
         logger.info("xarray versions: %s", xr.show_versions())
-        sys.exit(1)
+        return None
     if not validate_grib(dataset):
-        sys.exit(1)
+        return None
+    return dataset
 
 
 def validate_grib(ds: xr.Dataset) -> bool:
@@ -116,19 +132,25 @@ def validate_grib(ds: xr.Dataset) -> bool:
 
 def get_dataset() -> xr.Dataset:
     """Get grib dataset."""
+    global dataset
+
     if len(dataset) == 0:
-        open_grib()
+        dataset = open_grib(DATAFILE, dataset)
+        if dataset is None:
+            sys.exit(1)
     return dataset
 
 
 def download_gribfile(data_path: str, api_url: str) -> str:
-    """Ensure data dir exists, download latest file. Returns filename."""
+    """Download latest file. Return filename."""
+    fname = ""
+
+    # Ensure data dir exists
     try:
         os.mkdir(data_path)
     except FileExistsError:
         pass
 
-    fname = ""
     response = requests.get(api_url, timeout=30)
     fname = (
         data_path
@@ -138,12 +160,7 @@ def download_gribfile(data_path: str, api_url: str) -> str:
         .replace('"', "")
     )
 
-    if os.path.exists(fname):
-        print(
-            f"download_gribfile: Latest file is {fname}, already have that. Skipping download."
-        )
-        return fname
-
+    # The filenames are not to be trusted, so we download and overwrite every time.
     logger.warning("Downloading %s to path %s.", api_url, fname)
     with open(fname, "wb") as fd:
         for chunk in response.iter_content(chunk_size=524288):
