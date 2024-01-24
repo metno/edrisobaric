@@ -44,7 +44,7 @@ Choose one of the following:
 
 ```bash
 docker pull ghcr.io/metno/edrisobaric:main
-docker run -it --rm --publish 5000:5000 ghcr.io/metno/edrisobaric:main
+docker run -it --rm --publish 5000:5000 ghcr.io/metno/edrisobaric:main --bind_host 0.0.0.0
 ```
 
 #### Build using Conda
@@ -85,6 +85,22 @@ Staring the app will give these URLs:
 Example position lookup:
 
 - <http://127.0.0.1:5000/collections/isobaric/position?coords=POINT(11.9384%2060.1699)>
+
+Arguments supported:
+
+```bash
+    usage: app.py [-h] [--file FILE] [--base_url BASE_URL] [--bind_host BIND_HOST] [--api_url API_URL]
+
+    options:
+    -h, --help            show this help message and exit
+    --file FILE           Grib file or URL to read data from. Default will fetch latest file. See
+                            <https://api.met.no/weatherapi/isobaricgrib/1.0/available.json?type=grib2> for available files. Example:
+                            --file="https://api.met.no/weatherapi/isobaricgrib/1.0/grib2?area=southern_norway&time=2024-01-24T18:00:00Z"
+    --base_url BASE_URL   Base URL for API, with a trailing slash.
+    --bind_host BIND_HOST
+                            Which host to bind to.
+    --api_url API_URL     URL to download grib file from
+```
 
 ### Use it for production
 

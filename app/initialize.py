@@ -41,7 +41,7 @@ def parse_args() -> argparse.Namespace:
             "Grib file or URL to read data from. Default will fetch latest file.\n"
             + "See <https://api.met.no/weatherapi/isobaricgrib/1.0/available.json?type=grib2> "
             + "for available files.\nExample: "
-            + '--file="https://api.met.no/weatherapi/isobaricgrib/1.0/grib2?area=southern_norway&time=2024-01-24T18%3A00%3A00Z"'
+            + '--file="https://api.met.no/weatherapi/isobaricgrib/1.0/grib2?area=southern_norway&time=2024-01-24T18:00:00Z"'
         ),
         default="",
     )

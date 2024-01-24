@@ -18,4 +18,4 @@ COPY ./app /app
 
 WORKDIR /app
 
-CMD ["python", "app.py"]
+ENTRYPOINT ["python", "app.py"]
