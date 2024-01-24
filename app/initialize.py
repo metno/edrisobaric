@@ -5,6 +5,7 @@ import os
 import sys
 import argparse
 import logging
+from datetime import datetime
 import xarray as xr
 import requests
 
@@ -15,6 +16,12 @@ logger = logging.getLogger()
 
 # Constants used throughout
 
+DEFAULT_API_URL = (
+    "https://api.met.no/weatherapi/isobaricgrib/1.0/grib2?area=southern_norway"
+)
+AVAILABLE_API = (
+    "https://api.met.no/weatherapi/isobaricgrib/1.0/available.json?type=grib2"
+)
 TIME_FORMAT = "%Y-%m-%dT%H:00:00Z"  #  RFC3339 date-time
 CELSIUS_SYMBOL = "˚C"
 CELSIUS_ID = "https://codes.wmo.int/common/unit/_Cel"
@@ -39,28 +46,39 @@ def parse_args() -> argparse.Namespace:
         "--file",
         help=(
             "Grib file or URL to read data from. Default will fetch latest file.\n"
-            + "See <https://api.met.no/weatherapi/isobaricgrib/1.0/available.json?type=grib2> "
+            + f"See <{AVAILABLE_API}> "
             + "for available files.\nExample: "
-            + '--file="https://api.met.no/weatherapi/isobaricgrib/1.0/grib2?area=southern_norway&time=2024-01-24T18:00:00Z"'
+            + f'--file="{DEFAULT_API_URL}&time=2024-01-24T18:00:00Z"'
+        ),
+        default="",
+    )
+    parser.add_argument(
+        "--time",
+        help=(
+            "Timestamp to fetch data for. Must be in format 2024-01-24T18:00:00Z, "
+            + "where time matches an available production.\n"
+            + f"See <{AVAILABLE_API}> "
+            + "for available files. They are produced every 3rd hour. \nExample: "
+            + '--datetime="2024-01-24T18:00:00Z"'
         ),
         default="",
     )
     parser.add_argument(
         "--base_url",
-        help="Base URL for API, with a trailing slash.",
+        help="Base URL for API, with a trailing slash. Default is http://localhost:5000/",
         default="http://localhost:5000/",
         required=False,
     )
     parser.add_argument(
         "--bind_host",
-        help="Which host to bind to.",
+        help="Which host to bind to. Default is 127.0.0.1. Use 0.0.0.0 when running in container.",
         default="127.0.0.1",
         required=False,
     )
     parser.add_argument(
         "--api_url",
-        help="URL to download grib file from",
-        default="https://api.met.no/weatherapi/isobaricgrib/1.0/grib2?area=southern_norway",
+        help=f"URL to download grib file from. Default is <{DEFAULT_API_URL}>.",
+        default=DEFAULT_API_URL,
         required=False,
     )
     return parser.parse_args()
@@ -72,23 +90,23 @@ def get_data_path() -> str:
     return "data"
 
 
-@lru_cache
-def get_filename() -> str:
-    """Returns config parameter object."""
-    return DATAFILE
-
-
-def open_grib(datafile: str, dataset: xr.Dataset) -> xr.Dataset:
+def open_grib(datafile: str, dataset: xr.Dataset, timestamp: str = "") -> xr.Dataset:
     """Open grib file, return dataset."""
     filename = ""
 
     # If nothing given, download nearest date
-    if len(datafile) == 0:
+    if len(datafile) == 0 and timestamp is None:
         filename = download_gribfile(data_path=get_data_path(), api_url=API_URL)
     else:
         # If datafile is a URL, download that file
         if datafile.startswith("http"):
             filename = download_gribfile(data_path=get_data_path(), api_url=datafile)
+
+        # If timestamp is given, download file for that time
+        if timestamp:
+            filename = download_gribfile(
+                data_path=get_data_path(), api_url=f"{API_URL}&time={timestamp}"
+            )
 
         # If datafile is a filename, open that file
         else:
@@ -135,7 +153,7 @@ def get_dataset() -> xr.Dataset:
     global dataset
 
     if len(dataset) == 0:
-        dataset = open_grib(DATAFILE, dataset)
+        dataset = open_grib(DATAFILE, dataset, TIME)
         if dataset is None:
             sys.exit(1)
     return dataset
@@ -151,7 +169,17 @@ def download_gribfile(data_path: str, api_url: str) -> str:
     except FileExistsError:
         pass
 
+    # Download file
     response = requests.get(api_url, timeout=30)
+    if response.status_code != 200:
+        error = (
+            f"Error: Unable to download data file. Status code {response.status_code}."
+        )
+        if TIME:
+            error += f" Check if time {TIME} exists in available data set at <{AVAILABLE_API}>."
+        print(error)
+        sys.exit(1)
+
     fname = (
         data_path
         + os.path.sep
@@ -176,8 +204,34 @@ def download_gribfile(data_path: str, api_url: str) -> str:
     return fname
 
 
+def validate_time_input(t: str) -> bool:
+    """Validate time string."""
+    if len(t) > 0:
+        try:
+            test_time = datetime.strptime(
+                t, "%Y-%m-%dT%H:00:00Z"
+            )  # 2024-01-24T18:00:00Z
+            if test_time.hour % 3 != 0:
+                print(
+                    f"Time must be a whole 3 hour interval (00, 03, 06, 09, 12, 15, 18, 21). You gave {t}"
+                )
+                return False
+        except ValueError:
+            print("Time must be on format 2024-01-24T18:00:00Z. You gave {t}.")
+            return False
+    return True
+
+
 args = parse_args()
 DATAFILE = args.file
+TIME = args.time
 BASE_URL = args.base_url
 BIND_HOST = args.bind_host
 API_URL = args.api_url
+
+# Validate time
+if not validate_time_input(args.time):
+    sys.exit(1)
+
+if len(DATAFILE) > 0 and TIME:
+    sys.exit("Cannot specify both --file and --time")
