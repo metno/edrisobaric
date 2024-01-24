@@ -95,8 +95,8 @@ def open_grib(datafile: str, dataset: xr.Dataset) -> xr.Dataset:
             filename = datafile
 
     try:
+        logger.info("Opening data file %s", filename)
         dataset = xr.open_dataset(filename, engine="cfgrib")
-        logger.info("Opened data file %s", filename)
     except ValueError as err:
         logger.error(
             "Unable to open file %s. Check installation of modules cfgrib, eccodes.\n%s",
@@ -166,6 +166,13 @@ def download_gribfile(data_path: str, api_url: str) -> str:
         for chunk in response.iter_content(chunk_size=524288):
             fd.write(chunk)
     logger.info("Download done.")
+
+    # Remove index file if exists
+    for f in os.listdir(data_path):
+        if f.startswith(fname) and f.endswith(".idx"):
+            logger.warning("Removing index file %s", f)
+            os.remove(f)
+
     return fname
 
 

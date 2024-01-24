@@ -11,13 +11,14 @@ data_path = "test_data"
 
 class TestInitialize(unittest.TestCase):
     def test_download_gribfile(self):
+        """Test downloading a grib file."""
         datafile = download_gribfile(data_path=data_path, api_url=API_URL)
         self.assertTrue(os.path.isfile(datafile))
         os.remove(datafile)
 
     def test_open_gribfile(self):
-        """Test opening a grib file."""
-        datafile = "test_data/T_YTNE85_C_ENMI_20240122060000.bin"
+        """Test opening a known grib file."""
+        datafile = "../test_data/T_YTNE85_C_ENMI_20240122060000.bin"
         dataset = None
         dataset = open_grib(datafile, dataset)
         self.assertIsNotNone(dataset)
