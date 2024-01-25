@@ -3,6 +3,7 @@ import os
 from initialize import download_gribfile, API_URL, open_grib, validate_time_input
 from grib import get_temporal_extent
 from datetime import datetime
+import tempfile
 import pytz
 
 datafile = ""
@@ -12,15 +13,19 @@ data_path = "test_data"
 class TestInitialize(unittest.TestCase):
     def test_download_gribfile(self):
         """Test downloading a grib file."""
-        datafile = download_gribfile(data_path="/tmp", api_url=API_URL)
+        tmpdir = tempfile.mkdtemp()
+        datafile = download_gribfile(data_path=tmpdir, api_url=API_URL)
         self.assertTrue(os.path.isfile(datafile))
         os.remove(datafile)
+        os.rmdir(tmpdir)
 
     def test_open_gribfile(self):
         """Test opening a known grib file."""
         dataset = None
         datafile = "test_data/T_YTNE85_C_ENMI_20240122060000.bin"
-        if not os.path.exists(data_path):
+
+        # Test should work if run from project root or "app"
+        if os.getcwd().endswith("/app"):
             datafile = "../" + datafile
         print(f"Current dir {os.getcwd()}. Datafile {datafile}.")
 

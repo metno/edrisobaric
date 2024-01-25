@@ -95,7 +95,7 @@ def open_grib(datafile: str, dataset: xr.Dataset, timestamp: str = "") -> xr.Dat
     filename = ""
 
     # If nothing given, download nearest date
-    if len(datafile) == 0 and timestamp is None:
+    if len(datafile) == 0 and timestamp == "":
         filename = download_gribfile(data_path=get_data_path(), api_url=API_URL)
     else:
         # If datafile is a URL, download that file
@@ -122,6 +122,9 @@ def open_grib(datafile: str, dataset: xr.Dataset, timestamp: str = "") -> xr.Dat
             err,
         )
         logger.info("xarray versions: %s", xr.show_versions())
+        return None
+    except FileNotFoundError as err:
+        print("open_grib Error: ", err)
         return None
     if not validate_grib(dataset):
         return None
@@ -155,6 +158,9 @@ def get_dataset() -> xr.Dataset:
     if len(dataset) == 0:
         dataset = open_grib(DATAFILE, dataset, TIME)
         if dataset is None:
+            print(
+                f"get_dataset Error: Unable to open grib file. DATAFILE {DATAFILE}, TIME {TIME}"
+            )
             sys.exit(1)
     return dataset
 
