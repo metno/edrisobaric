@@ -43,16 +43,6 @@ def parse_args() -> argparse.Namespace:
     """Parse arguments for grib filename and URL."""
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--file",
-        help=(
-            "Grib file or URL to read data from. Default will fetch latest file.\n"
-            + f"See <{AVAILABLE_API}> "
-            + "for available files.\nExample: "
-            + f'--file="{DEFAULT_API_URL}&time=2024-01-24T18:00:00Z"'
-        ),
-        default="",
-    )
-    parser.add_argument(
         "--time",
         help=(
             "Timestamp to fetch data for. Must be in format 2024-01-24T18:00:00Z, "
@@ -61,6 +51,11 @@ def parse_args() -> argparse.Namespace:
             + "for available files. They are produced every 3rd hour. \nExample: "
             + '--datetime="2024-01-24T18:00:00Z"'
         ),
+        default="",
+    )
+    parser.add_argument(
+        "--file",
+        help=("Local grib file to read data from. Default will fetch file from API.\n"),
         default="",
     )
     parser.add_argument(
@@ -94,14 +89,10 @@ def open_grib(datafile: str, dataset: xr.Dataset, timestamp: str = "") -> xr.Dat
     """Open grib file, return dataset."""
     filename = ""
 
-    # If nothing given, download nearest date
+    # If nothing given, download default given by API
     if len(datafile) == 0 and timestamp == "":
         filename = download_gribfile(data_path=get_data_path(), api_url=API_URL)
     else:
-        # If datafile is a URL, download that file
-        if datafile.startswith("http"):
-            filename = download_gribfile(data_path=get_data_path(), api_url=datafile)
-
         # If timestamp is given, download file for that time
         if timestamp:
             filename = download_gribfile(

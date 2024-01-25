@@ -89,17 +89,19 @@ Example position lookup:
 Arguments supported:
 
 ```bash
-    usage: app.py [-h] [--file FILE] [--base_url BASE_URL] [--bind_host BIND_HOST] [--api_url API_URL]
+    usage: app.py [-h] [--time TIME] [--file FILE] [--base_url BASE_URL] [--bind_host BIND_HOST] [--api_url API_URL]
 
     options:
     -h, --help            show this help message and exit
-    --file FILE           Grib file or URL to read data from. Default will fetch latest file. See
-                            <https://api.met.no/weatherapi/isobaricgrib/1.0/available.json?type=grib2> for available files. Example:
-                            --file="https://api.met.no/weatherapi/isobaricgrib/1.0/grib2?area=southern_norway&time=2024-01-24T18:00:00Z"
-    --base_url BASE_URL   Base URL for API, with a trailing slash.
+    --time TIME           Timestamp to fetch data for. Must be in format 2024-01-24T18:00:00Z, where time matches an available production. See
+                            <https://api.met.no/weatherapi/isobaricgrib/1.0/available.json?type=grib2> for available files. They are produced
+                            every 3rd hour. Example: --datetime="2024-01-24T18:00:00Z"
+    --file FILE           Local grib file to read data from. Default will fetch file from API.
+    --base_url BASE_URL   Base URL for API, with a trailing slash. Default is http://localhost:5000/
     --bind_host BIND_HOST
-                            Which host to bind to.
-    --api_url API_URL     URL to download grib file from
+                            Which host to bind to. Default is 127.0.0.1. Use 0.0.0.0 when running in container.
+    --api_url API_URL     URL to download grib file from. Default is
+                            <https://api.met.no/weatherapi/isobaricgrib/1.0/grib2?area=southern_norway>.
 ```
 
 ### Use it for production
