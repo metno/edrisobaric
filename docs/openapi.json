@@ -1,0 +1,2606 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+      "title": "edr-isobaric",
+      "summary": "EDR API for isobaric data",
+      "description": "See <https://api.met.no/weatherapi/isobaricgrib/1.0/documentation>",
+      "termsOfService": "https://api.met.no/doc/TermsOfService",
+      "contact": {
+        "name": "The Norwegian Meteorological Institute",
+        "url": "https://api.met.no/doc/support",
+        "email": "weatherapi-adm@met.no"
+      },
+      "license": {
+        "name": "Norwegian Licence for Open Government Data (NLOD) 2.0",
+        "url": "https://api.met.no/doc/License"
+      },
+      "version": "0.9.0"
+    },
+    "paths": {
+      "/": {
+        "get": {
+          "tags": [
+            "Capabilities"
+          ],
+          "summary": "Landing Page Of This Api",
+          "description": "Provides links to the API definition, the conformance statements and the description of the datasets exposed by this service.",
+          "operationId": "landing_page_of_this_API__get",
+          "responses": {
+            "200": {
+              "description": "Successful Response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/LandingPageModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/conformance": {
+        "get": {
+          "tags": [
+            "Capabilities"
+          ],
+          "summary": "Describe Standards This Api Conforms To",
+          "description": "Provides a list of all requirements classes this service conforms to.",
+          "operationId": "describe_standards_this_API_conforms_to_conformance_get",
+          "responses": {
+            "200": {
+              "description": "Successful Response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ConformanceModel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/collections": {
+        "get": {
+          "tags": [
+            "Collection Metadata"
+          ],
+          "summary": "Describe All Collections",
+          "description": "Describes all collections.",
+          "operationId": "describe_all_collections_collections_get",
+          "responses": {
+            "200": {
+              "description": "Successful Response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Collections"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/collections/{collection_id}": {
+        "get": {
+          "tags": [
+            "Collection Metadata"
+          ],
+          "summary": "Describe A Collection",
+          "description": "Describe a specific collection.",
+          "operationId": "describe_a_collection_collections__collection_id__get",
+          "parameters": [
+            {
+              "name": "collection_id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "pattern": "^isobaric$",
+                "description": "Only available collection is isobaric",
+                "title": "Collection Id"
+              },
+              "description": "Only available collection is isobaric",
+              "examples": {
+                "Isobaric": {
+                  "summary": "The only available collection, isobaric",
+                  "description": "Describe collection **isobaric**",
+                  "value": "isobaric"
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful Response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/components/schemas/Collection"
+                      },
+                      {
+                        "$ref": "#/components/schemas/Collections"
+                      }
+                    ],
+                    "title": "Response Describe A Collection Collections  Collection Id  Get"
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Validation Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/HTTPValidationError"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/collections/isobaric/position": {
+        "get": {
+          "tags": [
+            "Collection Data"
+          ],
+          "summary": "Get Isobaric Page",
+          "description": "Return data closest to a position.",
+          "operationId": "get_isobaric_page_collections_isobaric_position_get",
+          "parameters": [
+            {
+              "name": "coords",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "minLength": 9,
+                "pattern": "^POINT\\(\\d+\\.?\\d* \\d+\\.?\\d*\\)$",
+                "description": "Coordinates, formated as a WKT point: POINT(11.9384 60.1699)",
+                "title": "Coords"
+              },
+              "description": "Coordinates, formated as a WKT point: POINT(11.9384 60.1699)",
+              "examples": {
+                "Oslo": {
+                  "summary": "Henrik Mohns Plass 1",
+                  "description": "Fetch data for a position in Oslo",
+                  "value": "POINT(11.9384 60.1699)"
+                },
+                "Asker": {
+                  "summary": "Asker",
+                  "description": "Fetch data for a position in Asker",
+                  "value": "POINT(10.45 59.83)"
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful Response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Coverage"
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Validation Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/HTTPValidationError"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "Axes": {
+          "properties": {
+            "x": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ValuesAxis_float_"
+                },
+                {
+                  "$ref": "#/components/schemas/CompactAxis"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X"
+            },
+            "y": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ValuesAxis_float_"
+                },
+                {
+                  "$ref": "#/components/schemas/CompactAxis"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Y"
+            },
+            "z": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ValuesAxis_float_"
+                },
+                {
+                  "$ref": "#/components/schemas/CompactAxis"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Z"
+            },
+            "t": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ValuesAxis_AwareDatetime_"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "composite": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ValuesAxis_Tuple_"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "title": "Axes"
+        },
+        "Collection": {
+          "properties": {
+            "id": {
+              "type": "string",
+              "title": "Id"
+            },
+            "title": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Title"
+            },
+            "description": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Description"
+            },
+            "keywords": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Keywords"
+            },
+            "links": {
+              "items": {
+                "$ref": "#/components/schemas/Link"
+              },
+              "type": "array",
+              "title": "Links"
+            },
+            "extent": {
+              "$ref": "#/components/schemas/Extent"
+            },
+            "data_queries": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/DataQueries"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "crs": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Crs"
+            },
+            "output_formats": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Output Formats"
+            },
+            "parameter_names": {
+              "$ref": "#/components/schemas/RootModel_Dict_str__Parameter__"
+            },
+            "distanceunits": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Distanceunits"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "id",
+            "links",
+            "extent",
+            "parameter_names"
+          ],
+          "title": "Collection"
+        },
+        "Collections": {
+          "properties": {
+            "links": {
+              "items": {
+                "$ref": "#/components/schemas/Link"
+              },
+              "type": "array",
+              "title": "Links"
+            },
+            "collections": {
+              "items": {
+                "$ref": "#/components/schemas/Collection"
+              },
+              "type": "array",
+              "title": "Collections"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "links",
+            "collections"
+          ],
+          "title": "Collections"
+        },
+        "CompactAxis": {
+          "properties": {
+            "start": {
+              "type": "number",
+              "title": "Start"
+            },
+            "stop": {
+              "type": "number",
+              "title": "Stop"
+            },
+            "num": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "title": "Num"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "start",
+            "stop",
+            "num"
+          ],
+          "title": "CompactAxis"
+        },
+        "ConformanceModel": {
+          "properties": {
+            "conformsTo": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "title": "Conformsto"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "conformsTo"
+          ],
+          "title": "ConformanceModel"
+        },
+        "Contact": {
+          "properties": {
+            "email": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Email"
+            },
+            "phone": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Phone"
+            },
+            "fax": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Fax"
+            },
+            "hours": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Hours"
+            },
+            "instructions": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Instructions"
+            },
+            "address": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Address"
+            },
+            "postalCode": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Postalcode"
+            },
+            "city": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "City"
+            },
+            "stateorprovince": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Stateorprovince"
+            },
+            "country": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Country"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "title": "Contact"
+        },
+        "CorridorVariables": {
+          "properties": {
+            "query_type": {
+              "type": "string",
+              "title": "Query Type"
+            },
+            "output_formats": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Output Formats"
+            },
+            "default_output_format": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Default Output Format"
+            },
+            "height_units": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "title": "Height Units"
+            },
+            "within_units": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "title": "Within Units"
+            }
+          },
+          "additionalProperties": true,
+          "type": "object",
+          "required": [
+            "query_type",
+            "height_units",
+            "within_units"
+          ],
+          "title": "CorridorVariables"
+        },
+        "Coverage": {
+          "properties": {
+            "id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Id"
+            },
+            "type": {
+              "const": "Coverage",
+              "title": "Type",
+              "default": "Coverage"
+            },
+            "domain": {
+              "$ref": "#/components/schemas/Domain"
+            },
+            "parameters": {
+              "anyOf": [
+                {
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/covjson_pydantic__parameter__Parameter"
+                  },
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Parameters"
+            },
+            "parameterGroups": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/ParameterGroup"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Parametergroups"
+            },
+            "ranges": {
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/NdArray"
+                  },
+                  {
+                    "$ref": "#/components/schemas/TiledNdArray"
+                  },
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "format": "uri"
+                  }
+                ]
+              },
+              "type": "object",
+              "title": "Ranges"
+            }
+          },
+          "additionalProperties": true,
+          "type": "object",
+          "required": [
+            "domain",
+            "ranges"
+          ],
+          "title": "Coverage"
+        },
+        "CubeVariables": {
+          "properties": {
+            "query_type": {
+              "type": "string",
+              "title": "Query Type"
+            },
+            "output_formats": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Output Formats"
+            },
+            "default_output_format": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Default Output Format"
+            },
+            "height_units": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "title": "Height Units"
+            }
+          },
+          "additionalProperties": true,
+          "type": "object",
+          "required": [
+            "query_type",
+            "height_units"
+          ],
+          "title": "CubeVariables"
+        },
+        "Custom": {
+          "properties": {
+            "interval": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "title": "Interval"
+            },
+            "id": {
+              "type": "string",
+              "title": "Id"
+            },
+            "values": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "title": "Values"
+            },
+            "reference": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Reference"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "interval",
+            "id",
+            "values"
+          ],
+          "title": "Custom"
+        },
+        "DataQueries": {
+          "properties": {
+            "position": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/EDRQuery"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "radius": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/EDRQuery"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "area": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/EDRQuery"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "cube": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/EDRQuery"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "trajectory": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/EDRQuery"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "corridor": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/EDRQuery"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "locations": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/EDRQuery"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/EDRQuery"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "instances": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/EDRQuery"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "title": "DataQueries"
+        },
+        "DataType": {
+          "type": "string",
+          "const": "float",
+          "title": "DataType"
+        },
+        "Domain": {
+          "properties": {
+            "type": {
+              "const": "Domain",
+              "title": "Type",
+              "default": "Domain"
+            },
+            "domainType": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/DomainType"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "axes": {
+              "$ref": "#/components/schemas/Axes"
+            },
+            "referencing": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/ReferenceSystemConnectionObject"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Referencing"
+            }
+          },
+          "additionalProperties": true,
+          "type": "object",
+          "required": [
+            "axes"
+          ],
+          "title": "Domain"
+        },
+        "DomainType": {
+          "type": "string",
+          "enum": [
+            "Grid",
+            "VerticalProfile",
+            "PointSeries",
+            "Point",
+            "MultiPointSeries",
+            "MultiPoint"
+          ],
+          "title": "DomainType"
+        },
+        "EDRQuery": {
+          "properties": {
+            "link": {
+              "$ref": "#/components/schemas/EDRQueryLink"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "link"
+          ],
+          "title": "EDRQuery"
+        },
+        "EDRQueryLink": {
+          "properties": {
+            "href": {
+              "type": "string",
+              "title": "Href"
+            },
+            "hreflang": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Hreflang"
+            },
+            "rel": {
+              "type": "string",
+              "title": "Rel"
+            },
+            "type": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Type"
+            },
+            "title": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Title"
+            },
+            "length": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Length"
+            },
+            "templated": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Templated"
+            },
+            "variables": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Variables"
+                },
+                {
+                  "$ref": "#/components/schemas/CubeVariables"
+                },
+                {
+                  "$ref": "#/components/schemas/CorridorVariables"
+                },
+                {
+                  "$ref": "#/components/schemas/ItemVariables"
+                },
+                {
+                  "$ref": "#/components/schemas/RadiusVariables"
+                }
+              ],
+              "title": "Variables"
+            }
+          },
+          "additionalProperties": true,
+          "type": "object",
+          "required": [
+            "href",
+            "rel",
+            "variables"
+          ],
+          "title": "EDRQueryLink"
+        },
+        "Extent": {
+          "properties": {
+            "spatial": {
+              "$ref": "#/components/schemas/Spatial"
+            },
+            "temporal": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Temporal"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vertical": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Vertical"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "custom": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/Custom"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Custom"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "spatial"
+          ],
+          "title": "Extent"
+        },
+        "HTTPValidationError": {
+          "properties": {
+            "detail": {
+              "items": {
+                "$ref": "#/components/schemas/ValidationError"
+              },
+              "type": "array",
+              "title": "Detail"
+            }
+          },
+          "type": "object",
+          "title": "HTTPValidationError"
+        },
+        "ItemVariables": {
+          "properties": {
+            "query_type": {
+              "type": "string",
+              "title": "Query Type"
+            },
+            "output_formats": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Output Formats"
+            },
+            "default_output_format": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Default Output Format"
+            }
+          },
+          "additionalProperties": true,
+          "type": "object",
+          "required": [
+            "query_type"
+          ],
+          "title": "ItemVariables"
+        },
+        "LandingPageModel": {
+          "properties": {
+            "title": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Title"
+            },
+            "description": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Description"
+            },
+            "links": {
+              "items": {
+                "$ref": "#/components/schemas/Link"
+              },
+              "type": "array",
+              "title": "Links"
+            },
+            "keywords": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Keywords"
+            },
+            "provider": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Provider"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "contact": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Contact"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "links"
+          ],
+          "title": "LandingPageModel"
+        },
+        "Link": {
+          "properties": {
+            "href": {
+              "type": "string",
+              "title": "Href"
+            },
+            "hreflang": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Hreflang"
+            },
+            "rel": {
+              "type": "string",
+              "title": "Rel"
+            },
+            "type": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Type"
+            },
+            "title": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Title"
+            },
+            "length": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Length"
+            },
+            "templated": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Templated"
+            },
+            "variables": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Variables"
+                },
+                {
+                  "$ref": "#/components/schemas/CubeVariables"
+                },
+                {
+                  "$ref": "#/components/schemas/CorridorVariables"
+                },
+                {
+                  "$ref": "#/components/schemas/ItemVariables"
+                },
+                {
+                  "$ref": "#/components/schemas/RadiusVariables"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Variables"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "href",
+            "rel"
+          ],
+          "title": "Link"
+        },
+        "NdArray": {
+          "properties": {
+            "type": {
+              "const": "NdArray",
+              "title": "Type",
+              "default": "NdArray"
+            },
+            "dataType": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/DataType"
+                }
+              ],
+              "default": "float"
+            },
+            "axisNames": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Axisnames"
+            },
+            "shape": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Shape"
+            },
+            "values": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "type": "array",
+              "title": "Values"
+            }
+          },
+          "additionalProperties": true,
+          "type": "object",
+          "required": [
+            "values"
+          ],
+          "title": "NdArray"
+        },
+        "ParameterGroup": {
+          "properties": {
+            "type": {
+              "const": "ParameterGroup",
+              "title": "Type",
+              "default": "ParameterGroup"
+            },
+            "id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Id"
+            },
+            "label": {
+              "anyOf": [
+                {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Label"
+            },
+            "description": {
+              "anyOf": [
+                {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Description"
+            },
+            "observedProperty": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/covjson_pydantic__observed_property__ObservedProperty"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "members": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "title": "Members"
+            }
+          },
+          "additionalProperties": true,
+          "type": "object",
+          "required": [
+            "members"
+          ],
+          "title": "ParameterGroup"
+        },
+        "Provider": {
+          "properties": {
+            "name": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Name"
+            },
+            "url": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Url"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "title": "Provider"
+        },
+        "RadiusVariables": {
+          "properties": {
+            "query_type": {
+              "type": "string",
+              "title": "Query Type"
+            },
+            "output_formats": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Output Formats"
+            },
+            "default_output_format": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Default Output Format"
+            },
+            "within_units": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "title": "Within Units"
+            }
+          },
+          "additionalProperties": true,
+          "type": "object",
+          "required": [
+            "query_type",
+            "within_units"
+          ],
+          "title": "RadiusVariables"
+        },
+        "ReferenceSystem": {
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "GeographicCRS",
+                "ProjectedCRS",
+                "VerticalCRS",
+                "TemporalRS",
+                "IdentifierRS"
+              ],
+              "title": "Type"
+            },
+            "id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Id"
+            },
+            "description": {
+              "anyOf": [
+                {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Description"
+            },
+            "calendar": {
+              "anyOf": [
+                {
+                  "const": "Gregorian"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "format": "uri"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Calendar"
+            },
+            "timeScale": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "format": "uri"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Timescale"
+            },
+            "label": {
+              "anyOf": [
+                {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Label"
+            },
+            "targetConcept": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/TargetConcept"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "identifiers": {
+              "anyOf": [
+                {
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/TargetConcept"
+                  },
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Identifiers"
+            }
+          },
+          "additionalProperties": true,
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "title": "ReferenceSystem"
+        },
+        "ReferenceSystemConnectionObject": {
+          "properties": {
+            "coordinates": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "title": "Coordinates"
+            },
+            "system": {
+              "$ref": "#/components/schemas/ReferenceSystem"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "coordinates",
+            "system"
+          ],
+          "title": "ReferenceSystemConnectionObject"
+        },
+        "RootModel_Dict_str__Parameter__": {
+          "additionalProperties": {
+            "$ref": "#/components/schemas/edr_pydantic__parameter__Parameter"
+          },
+          "type": "object",
+          "title": "RootModel[Dict[str, Parameter]]"
+        },
+        "Spatial": {
+          "properties": {
+            "bbox": {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "type": "array",
+              "title": "Bbox"
+            },
+            "crs": {
+              "type": "string",
+              "title": "Crs"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "bbox",
+            "crs"
+          ],
+          "title": "Spatial"
+        },
+        "TargetConcept": {
+          "properties": {
+            "id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Id"
+            },
+            "label": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object",
+              "title": "Label"
+            },
+            "description": {
+              "anyOf": [
+                {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Description"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "label"
+          ],
+          "title": "TargetConcept"
+        },
+        "Temporal": {
+          "properties": {
+            "interval": {
+              "items": {
+                "items": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "type": "array"
+              },
+              "type": "array",
+              "title": "Interval"
+            },
+            "values": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "title": "Values"
+            },
+            "trs": {
+              "type": "string",
+              "title": "Trs"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "interval",
+            "values",
+            "trs"
+          ],
+          "title": "Temporal"
+        },
+        "TileSet": {
+          "properties": {
+            "tileShape": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "type": "array",
+              "title": "Tileshape"
+            },
+            "urlTemplate": {
+              "type": "string",
+              "title": "Urltemplate"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "tileShape",
+            "urlTemplate"
+          ],
+          "title": "TileSet"
+        },
+        "TiledNdArray": {
+          "properties": {
+            "type": {
+              "const": "TiledNdArray",
+              "title": "Type",
+              "default": "TiledNdArray"
+            },
+            "dataType": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/DataType"
+                }
+              ],
+              "default": "float"
+            },
+            "axisNames": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "title": "Axisnames"
+            },
+            "shape": {
+              "items": {
+                "type": "integer"
+              },
+              "type": "array",
+              "title": "Shape"
+            },
+            "tileSets": {
+              "items": {
+                "$ref": "#/components/schemas/TileSet"
+              },
+              "type": "array",
+              "title": "Tilesets"
+            }
+          },
+          "additionalProperties": true,
+          "type": "object",
+          "required": [
+            "axisNames",
+            "shape",
+            "tileSets"
+          ],
+          "title": "TiledNdArray"
+        },
+        "ValidationError": {
+          "properties": {
+            "loc": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ]
+              },
+              "type": "array",
+              "title": "Location"
+            },
+            "msg": {
+              "type": "string",
+              "title": "Message"
+            },
+            "type": {
+              "type": "string",
+              "title": "Error Type"
+            }
+          },
+          "type": "object",
+          "required": [
+            "loc",
+            "msg",
+            "type"
+          ],
+          "title": "ValidationError"
+        },
+        "ValuesAxis_AwareDatetime_": {
+          "properties": {
+            "dataType": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Datatype"
+            },
+            "coordinates": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Coordinates"
+            },
+            "values": {
+              "items": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "type": "array",
+              "title": "Values"
+            },
+            "bounds": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Bounds"
+            }
+          },
+          "additionalProperties": true,
+          "type": "object",
+          "required": [
+            "values"
+          ],
+          "title": "ValuesAxis[AwareDatetime]"
+        },
+        "ValuesAxis_Tuple_": {
+          "properties": {
+            "dataType": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Datatype"
+            },
+            "coordinates": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Coordinates"
+            },
+            "values": {
+              "items": {
+                "items": {},
+                "type": "array"
+              },
+              "type": "array",
+              "title": "Values"
+            },
+            "bounds": {
+              "anyOf": [
+                {
+                  "items": {
+                    "items": {},
+                    "type": "array"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Bounds"
+            }
+          },
+          "additionalProperties": true,
+          "type": "object",
+          "required": [
+            "values"
+          ],
+          "title": "ValuesAxis[Tuple]"
+        },
+        "ValuesAxis_float_": {
+          "properties": {
+            "dataType": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Datatype"
+            },
+            "coordinates": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Coordinates"
+            },
+            "values": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array",
+              "title": "Values"
+            },
+            "bounds": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "number"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Bounds"
+            }
+          },
+          "additionalProperties": true,
+          "type": "object",
+          "required": [
+            "values"
+          ],
+          "title": "ValuesAxis[float]"
+        },
+        "Variables": {
+          "properties": {
+            "query_type": {
+              "type": "string",
+              "title": "Query Type"
+            },
+            "output_formats": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Output Formats"
+            },
+            "default_output_format": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Default Output Format"
+            }
+          },
+          "additionalProperties": true,
+          "type": "object",
+          "required": [
+            "query_type"
+          ],
+          "title": "Variables"
+        },
+        "Vertical": {
+          "properties": {
+            "interval": {
+              "items": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "type": "array",
+              "title": "Interval"
+            },
+            "values": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "title": "Values"
+            },
+            "vrs": {
+              "type": "string",
+              "title": "Vrs"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "interval",
+            "values",
+            "vrs"
+          ],
+          "title": "Vertical"
+        },
+        "covjson_pydantic__observed_property__Category": {
+          "properties": {
+            "id": {
+              "type": "string",
+              "title": "Id"
+            },
+            "label": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object",
+              "title": "Label"
+            },
+            "description": {
+              "anyOf": [
+                {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Description"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "id",
+            "label"
+          ],
+          "title": "Category"
+        },
+        "covjson_pydantic__observed_property__ObservedProperty": {
+          "properties": {
+            "id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Id"
+            },
+            "label": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object",
+              "title": "Label"
+            },
+            "description": {
+              "anyOf": [
+                {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Description"
+            },
+            "categories": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/covjson_pydantic__observed_property__Category"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Categories"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "label"
+          ],
+          "title": "ObservedProperty"
+        },
+        "covjson_pydantic__parameter__Parameter": {
+          "properties": {
+            "type": {
+              "const": "Parameter",
+              "title": "Type",
+              "default": "Parameter"
+            },
+            "id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Id"
+            },
+            "label": {
+              "anyOf": [
+                {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Label"
+            },
+            "description": {
+              "anyOf": [
+                {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Description"
+            },
+            "observedProperty": {
+              "$ref": "#/components/schemas/covjson_pydantic__observed_property__ObservedProperty"
+            },
+            "categoryEncoding": {
+              "anyOf": [
+                {
+                  "additionalProperties": {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "items": {
+                          "type": "integer"
+                        },
+                        "type": "array"
+                      }
+                    ]
+                  },
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Categoryencoding"
+            },
+            "unit": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/covjson_pydantic__unit__Unit"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": true,
+          "type": "object",
+          "required": [
+            "observedProperty"
+          ],
+          "title": "Parameter"
+        },
+        "covjson_pydantic__unit__Symbol": {
+          "properties": {
+            "value": {
+              "type": "string",
+              "title": "Value"
+            },
+            "type": {
+              "type": "string",
+              "title": "Type"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "value",
+            "type"
+          ],
+          "title": "Symbol"
+        },
+        "covjson_pydantic__unit__Unit": {
+          "properties": {
+            "id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Id"
+            },
+            "label": {
+              "anyOf": [
+                {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Label"
+            },
+            "symbol": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/components/schemas/covjson_pydantic__unit__Symbol"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Symbol"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "title": "Unit"
+        },
+        "edr_pydantic__observed_property__Category": {
+          "properties": {
+            "id": {
+              "type": "string",
+              "title": "Id"
+            },
+            "label": {
+              "type": "string",
+              "title": "Label"
+            },
+            "description": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Description"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "id",
+            "label"
+          ],
+          "title": "Category"
+        },
+        "edr_pydantic__observed_property__ObservedProperty": {
+          "properties": {
+            "id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Id"
+            },
+            "label": {
+              "type": "string",
+              "title": "Label"
+            },
+            "description": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Description"
+            },
+            "categories": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/edr_pydantic__observed_property__Category"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Categories"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "label"
+          ],
+          "title": "ObservedProperty"
+        },
+        "edr_pydantic__parameter__Parameter": {
+          "properties": {
+            "type": {
+              "const": "Parameter",
+              "title": "Type",
+              "default": "Parameter"
+            },
+            "id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Id"
+            },
+            "label": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Label"
+            },
+            "description": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Description"
+            },
+            "unit": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/edr_pydantic__unit__Unit"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "observedProperty": {
+              "$ref": "#/components/schemas/edr_pydantic__observed_property__ObservedProperty"
+            }
+          },
+          "additionalProperties": true,
+          "type": "object",
+          "required": [
+            "observedProperty"
+          ],
+          "title": "Parameter"
+        },
+        "edr_pydantic__unit__Symbol": {
+          "properties": {
+            "value": {
+              "type": "string",
+              "title": "Value"
+            },
+            "type": {
+              "type": "string",
+              "title": "Type"
+            }
+          },
+          "additionalProperties": true,
+          "type": "object",
+          "required": [
+            "value",
+            "type"
+          ],
+          "title": "Symbol"
+        },
+        "edr_pydantic__unit__Unit": {
+          "properties": {
+            "id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Id"
+            },
+            "label": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Label"
+            },
+            "symbol": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/components/schemas/edr_pydantic__unit__Symbol"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Symbol"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "title": "Unit"
+        }
+      }
+    },
+    "tags": [
+      {
+        "name": "Capabilities",
+        "description": "Essential characteristics of the API"
+      },
+      {
+        "name": "Collection Metadata",
+        "description": "Description of collections"
+      },
+      {
+        "name": "Collection Data",
+        "description": "Data queries on collections"
+      }
+    ]
+  }

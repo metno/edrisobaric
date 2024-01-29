@@ -1,0 +1,13 @@
+name: edriso
+channels:
+  - conda-forge
+dependencies:
+  - types-pytz
+  - types-requests
+  - black
+  - mypy
+  - prospector
+  - pylint
+  - tox
+  - bandit
+  - httpx
