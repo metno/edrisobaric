@@ -214,7 +214,7 @@ def validate_time_input(t: str) -> bool:
                 )
                 return False
         except ValueError:
-            print("Time must be on format 2024-01-24T18:00:00Z. You gave {t}.")
+            print(f"Time must be on format 2024-01-24T18:00:00Z. You gave {t}.")
             return False
     return True
 
