@@ -1,0 +1,5 @@
+app/data
+app/.mypy_cache
+app/__pycache__
+test_data
+.tox
