@@ -1,6 +1,5 @@
 """Initialize configuration data, open grib file."""
 
-from functools import lru_cache
 import os
 import sys
 import argparse
@@ -37,6 +36,7 @@ CRS_LONG = (
     + '298.257223563]], PRIMEM["Greenwich",0], UNIT["degree", 0.017453], '
     + 'AXIS["Lon", EAST], AXIS["Lat", NORTH]]'
 )
+DATA_PATH = "./data"
 
 
 def parse_args() -> argparse.Namespace:
@@ -76,13 +76,13 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_API_URL,
         required=False,
     )
+    parser.add_argument(
+        "--data_path",
+        help=f"Where to store data files. Default is <{DATA_PATH}>.",
+        default=DATA_PATH,
+        required=False,
+    )
     return parser.parse_args()
-
-
-@lru_cache
-def get_data_path() -> str:
-    """Returns directory to grib file."""
-    return "data"
 
 
 def open_grib(datafile: str, dataset: xr.Dataset, timestamp: str = "") -> xr.Dataset:
@@ -91,12 +91,12 @@ def open_grib(datafile: str, dataset: xr.Dataset, timestamp: str = "") -> xr.Dat
 
     # If nothing given, download default given by API
     if len(datafile) == 0 and timestamp == "":
-        filename = download_gribfile(data_path=get_data_path(), api_url=API_URL)
+        filename = download_gribfile(data_path=DATA_PATH, api_url=API_URL)
     else:
         # If timestamp is given, download file for that time
         if timestamp:
             filename = download_gribfile(
-                data_path=get_data_path(), api_url=f"{API_URL}&time={timestamp}"
+                data_path=DATA_PATH, api_url=f"{API_URL}&time={timestamp}"
             )
 
         # If datafile is a filename, open that file
@@ -225,6 +225,7 @@ TIME = args.time
 BASE_URL = args.base_url
 BIND_HOST = args.bind_host
 API_URL = args.api_url
+DATA_PATH = args.data_path
 
 # Validate time
 if not validate_time_input(args.time):
