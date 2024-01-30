@@ -14,7 +14,7 @@ unittests:
   image: python:3.10-slim
   script:
     - apt update
-    - apt install libeccodes-dev
+    - apt install -y libeccodes-dev
     - cd app
     - pip install tox
     - tox
