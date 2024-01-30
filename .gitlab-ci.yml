@@ -1,4 +1,5 @@
 stages:
+  - unittests
   - test
   - build
   - scanimage
@@ -7,6 +8,16 @@ default:
   image:
     name: docker:24
     pull_policy: if-not-present
+
+unittests:
+  stage: unittests
+  image: python:3.10-slim
+  script:
+    - cd app
+    - pip install tox
+    - tox
+  tags:
+    - teampunkt
 
 .container_scanning:
   stage: scanimage
@@ -60,6 +71,7 @@ test:
       when: never
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_TAG == null
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+  needs: ["unittests"]
 
 build_image:
   stage: build

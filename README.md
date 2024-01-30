@@ -132,6 +132,7 @@ See [output](docs/Output.md) of all operations.
 
 - Issues
 
-## Documentation Template
+## Templates
 
-This document is based on the [Met-norway-readme](https://gitlab.met.no/maler/met-norway-readme)-template.
+- This document is based on the [Met-norway-readme](https://gitlab.met.no/maler/met-norway-readme)-template.
+- Gitlab-ci is based on [team-punkt gitlab-ci](https://gitlab.met.no/team-punkt/gitlab-ci/config)
