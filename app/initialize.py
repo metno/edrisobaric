@@ -78,7 +78,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--data_path",
-        help=f"Where to store data files. Default is <{DATA_PATH}>.",
+        help=f"Where to store data files. Default is {DATA_PATH}",
         default=DATA_PATH,
         required=False,
     )
