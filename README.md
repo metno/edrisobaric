@@ -44,18 +44,6 @@ docker pull ghcr.io/metno/edrisobaric:main
 docker run -it --rm --publish 5000:5000 ghcr.io/metno/edrisobaric:main --bind_host 0.0.0.0
 ```
 
-#### Build using Conda
-
-Clone repo and run:
-
-```bash
-conda create --channel conda-forge --file requirements-conda.txt -n edriso
-conda activate edriso
-pip install edr-pydantic covjson-pydantic
-cd app
-python3 app.py
-```
-
 #### Build using Pip
 
 This method might need you to install `libeccodes-dev` from your package manager. Clone repo and run:

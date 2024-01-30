@@ -13,10 +13,11 @@ unittests:
   stage: unittests
   image: python:3.10-slim
   script:
+    - apt update
+    - apt install libeccodes-dev
     - cd app
     - pip install tox
-    # TODO: also run -e py310
-    - tox -e black,prospector,bandit,mypy
+    - tox
   tags:
     - teampunkt
 
