@@ -4,23 +4,25 @@
 # docker buildx build -t edriso -f Dockerfile .
 
 # run:
-# docker run -it --rm --publish 5000:5000 edriso
+# docker run -it --rm --publish 5000:5000 edriso --bind_host 0.0.0.0
 
-FROM condaforge/mambaforge:23.3.1-1
+FROM ubuntu:22.04
 
 # Create user with home dir
 RUN useradd --create-home nonroot
 
-ENV DEBIAN_FRONTEND noninteractive
+# Install python and libeccodes-dev. Create /data.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3-dev python3-pip \
+    python3-venv libeccodes-dev && \
+        apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install environment into base conda environment
-COPY environment.yml /app/
-RUN mamba env update -n base -f /app/environment.yml
-
-# Install project
-COPY ./app /app
-
+# Set workdir and install app with requirements.
 WORKDIR /app
+COPY app/ ./app/
+COPY requirements.txt ./
+RUN python3 -m venv ./venv && \
+  ./venv/bin/pip install -r ./requirements.txt
 
 # Create data dir
 RUN mkdir /app/data && chown -R nonroot:nonroot /app/data
@@ -28,4 +30,4 @@ RUN mkdir /app/data && chown -R nonroot:nonroot /app/data
 # Run as nonroot user
 USER nonroot
 
-ENTRYPOINT ["python", "app.py"]
+ENTRYPOINT ["/app/venv/bin/python", "/app/app/app.py"]
