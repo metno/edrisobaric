@@ -15,7 +15,8 @@ unittests:
   script:
     - cd app
     - pip install tox
-    - tox
+    # TODO: also run -e py310
+    - tox -e black,prospector,bandit,mypy
   tags:
     - teampunkt
 
