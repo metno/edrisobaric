@@ -103,9 +103,16 @@ def open_grib(datafile: str, dataset: xr.Dataset, timestamp: str = "") -> xr.Dat
         else:
             filename = datafile
 
+    # Check if dir is writable
+    indexpath = ""
+    if os.access(os.path.dirname(datafile), os.W_OK):
+        indexpath = filename + ".idx"
+
     try:
         logger.info("Opening data file %s", filename)
-        dataset = xr.open_dataset(filename, engine="cfgrib")
+        dataset = xr.open_dataset(
+            filename, engine="cfgrib", decode_cf=True, indexpath=indexpath
+        )
     except ValueError as err:
         logger.error(
             "Unable to open file %s. Check installation of modules cfgrib, eccodes.\n%s",

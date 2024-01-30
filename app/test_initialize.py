@@ -1,6 +1,11 @@
 import unittest
 import os
-from initialize import download_gribfile, API_URL, open_grib, validate_time_input
+from initialize import (
+    download_gribfile,
+    API_URL,
+    open_grib,
+    validate_time_input,
+)
 from grib import get_temporal_extent
 from datetime import datetime
 import tempfile
@@ -22,7 +27,7 @@ class TestInitialize(unittest.TestCase):
     def test_open_gribfile(self):
         """Test opening a known grib file."""
         dataset = None
-        datafile = "test_data/T_YTNE85_C_ENMI_20240122060000.bin"
+        datafile = f"{data_path}/T_YTNE85_C_ENMI_20240122060000.bin"
 
         # Test should work if run from project root or "app"
         if os.getcwd().endswith("/app"):
