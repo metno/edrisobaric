@@ -8,9 +8,9 @@ EDR-isobaric is an API for isobaric data (temperature and wind in isobaric layer
 
 The resulting API is for people who need vertical environmental data for a single location.
 
-The code is written as an example aimed at API developers at Met.no. See extensive docs around creating an API at [Overview](docs/Overview.md).
+The code is written as an example aimed at API developers at Met.no.
 
-Resulting data can be pasted into covjson playground for visualizing:
+Resulting data can be pasted into [covjson playground](https://covjson.org/playground) for visualizing:
 
 ![playground](/img/playground.png "playground")
 
@@ -18,18 +18,18 @@ The area covered by the source:
 
 ![playground](/img/extent.jpg "extent")
 
+[![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/pylint-dev/pylint)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/metno/edrisobaric/blob/main/LICENSE)
+
 ## Who is responsible?
 
 - larsfp at met.no
 
 ## Status
 
-[![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/pylint-dev/pylint)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/metno/edrisobaric/blob/main/LICENSE)
-
-In development.
+Feature complete.
 
 ## Getting started
 
@@ -37,7 +37,7 @@ In development.
 
 Choose one of the following:
 
-#### Pull image from Github registry
+#### Pull image from Github registry and run with docker
 
 ```bash
 docker pull ghcr.io/metno/edrisobaric:main
@@ -56,7 +56,11 @@ cd app
 python3 app.py
 ```
 
-#### Usage
+#### Web
+
+A test instance may or may not be available at <https://edrisobaric.k8s.met.no/>.
+
+## Usage
 
 A grib data file will be downloaded on demand if none is supplied.
 
@@ -92,17 +96,18 @@ Arguments supported:
 
 ### Use it for production
 
-This is only ment for local usage. Use as noted in `Testing it out`.
+This is only ment for learning. Use as noted in [Testing it out](#test-it-out).
 
 ## Overview of architecture
 
 - [C4 diagram](docs/C4.md)
-- [Output](docs/Output.md) of all operations.
 
 ## Documentation
 
 - Based on Pydantic EDR- and covjson-libraries by [KNMI](https://github.com/KNMI/)
 - This app will not download _new_ data unless restarted.
+- [Sample output](docs/Output.md)
+- To run tests, activate your venv, install requirements.txt and requirements-dev.txt, then run `tox`.
 
 ### Other APIs for comparison
 
