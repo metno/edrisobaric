@@ -96,7 +96,8 @@ This is only ment for local usage. Use as noted in `Testing it out`.
 
 ## Overview of architecture
 
-See [output](docs/Output.md) of all operations.
+- [C4 diagram](docs/C4.md)
+- [Output](docs/Output.md) of all operations.
 
 ## Documentation
 
