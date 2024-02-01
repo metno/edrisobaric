@@ -6,7 +6,7 @@ stages:
 
 default:
   image:
-    name: docker:24
+    name: registry.met.no/team-punkt/gitlab-ci/images/docker-punkt:latest
     pull_policy: if-not-present
 
 unittests:
@@ -101,9 +101,6 @@ build_container_scanning:
     - build_image
 
 rebuild_image:
-  image:
-    name: docker:24-git
-    pull_policy: if-not-present
   stage: build
   rules:
    - if: $CI_PIPELINE_SOURCE == "schedule"
@@ -120,6 +117,9 @@ rebuild_image:
   - docker push $RELEASE_IMAGE_NAME
   - echo "RELEASE_IMAGE_NAME=${RELEASE_IMAGE_NAME}" >> build.env
   - echo "RELEASE_TAG=${RELEASE_TAG}" >> build.env
+  after_script:
+  - source build.env
+  - /teampunkt/chat-message.sh -u "${CI_CHAT_WEBHOOK}" -m "Scheduled rebuild of image ${RELEASE_IMAGE_NAME} for <gitlab project>. Manual deployment."
   artifacts:
     reports:
       dotenv: build.env
