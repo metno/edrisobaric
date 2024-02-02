@@ -21,9 +21,7 @@ RUN apt-get update && \
 WORKDIR /app
 COPY app/ ./app/
 COPY favicon.ico requirements.txt ./
-# upgrade setuptools to avoid CVE-2022-40897
 RUN python3 -m venv ./venv && \
-  ./venv/bin/pip install --upgrade setuptools && \
   ./venv/bin/pip install -r ./requirements.txt
 
 # Create data dir
