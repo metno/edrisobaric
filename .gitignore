@@ -5,3 +5,4 @@ venv
 testfiles/
 .tox/
 .hypothesis/
+test_data/*.idx

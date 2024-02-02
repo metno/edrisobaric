@@ -1,8 +1,12 @@
 # Changelog
 
-## 0.1.5-draft
+## 0.1.6
 
-Add changelog, C4, favicon.
+Add favicon to docker image.
+
+## 0.1.5
+
+Add changelog, C4, favicon, logging of proxied IPs.
 
 ## 0.1.4
 

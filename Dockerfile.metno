@@ -22,7 +22,7 @@ RUN apt-get update && \
 # Set workdir and install app with requirements.
 WORKDIR /app
 COPY app/ ./app/
-COPY requirements.txt ./
+COPY favicon.ico requirements.txt ./
 RUN python3 -m venv ./venv && \
   ./venv/bin/pip install -r ./requirements.txt
 
