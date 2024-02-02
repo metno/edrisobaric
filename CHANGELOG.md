@@ -2,7 +2,7 @@
 
 ## 0.1.5-draft
 
-Add changelog, C4.
+Add changelog, C4, favicon.
 
 ## 0.1.4
 
