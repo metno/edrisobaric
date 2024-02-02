@@ -2,6 +2,7 @@
 
 from functools import lru_cache
 from fastapi import APIRouter
+from fastapi.responses import FileResponse
 from edr_pydantic.capabilities import LandingPageModel, Provider, Contact
 from edr_pydantic.link import Link
 
@@ -69,3 +70,9 @@ router = APIRouter()
 async def landing_page_of_this_API() -> dict:
     """Provides links to the API definition, the conformance statements and the description of the datasets exposed by this service."""
     return create_landing_page(base_url=BASE_URL)
+
+
+favicon_path = 'favicon.ico'
+@router.get('/' + favicon_path, include_in_schema=False)
+async def favicon():
+    return FileResponse(favicon_path)
