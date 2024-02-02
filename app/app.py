@@ -64,4 +64,4 @@ if __name__ == "__main__":
     # Init dataset
     _ = get_dataset()
 
-    uvicorn.run("app:app", host=BIND_HOST, port=5000)
+    uvicorn.run("app:app", host=BIND_HOST, port=5000, forwarded_allow_ips="*")

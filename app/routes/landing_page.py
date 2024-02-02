@@ -72,7 +72,9 @@ async def landing_page_of_this_API() -> dict:
     return create_landing_page(base_url=BASE_URL)
 
 
-favicon_path = 'favicon.ico'
-@router.get('/' + favicon_path, include_in_schema=False)
+favicon_path = "favicon.ico"
+
+
+@router.get("/" + favicon_path, include_in_schema=False)
 async def favicon():
     return FileResponse(favicon_path)
