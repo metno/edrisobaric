@@ -22,6 +22,7 @@ WORKDIR /app
 COPY app/ ./app/
 COPY favicon.ico requirements.txt ./
 RUN python3 -m venv ./venv && \
+  ./venv/bin/pip install --upgrade setuptools && \
   ./venv/bin/pip install -r ./requirements.txt
 
 # Create data dir
