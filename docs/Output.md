@@ -261,7 +261,7 @@
                 },
                 "direction": "down",
                 "unit": {
-                  "symbol": "Pa"
+                  "symbol": "hPa"
                 }
               }
             ]

@@ -178,7 +178,7 @@ def create_point(coords: str) -> dict:
                                 {
                                     "name": {"en": "Pressure"},
                                     "direction": "down",
-                                    "unit": {"symbol": "Pa"},
+                                    "unit": {"symbol": "hPa"},
                                 }
                             ]
                         },
