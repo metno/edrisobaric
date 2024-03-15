@@ -60,8 +60,8 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--base_url",
-        help="Base URL for API, with a trailing slash. Default is http://localhost:5000/",
-        default="http://localhost:5000/",
+        help="Base URL for API, with a trailing slash. Default is http://localhost:8080/",
+        default="http://localhost:8080/",
         required=False,
     )
     parser.add_argument(
