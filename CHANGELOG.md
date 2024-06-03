@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.8
+
+Update to latest version of deps.
+
+## 0.1.7
+
+Correct Pa to hPa.
+
 ## 0.1.6
 
 Add favicon to docker image.
