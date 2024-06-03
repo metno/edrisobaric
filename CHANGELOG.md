@@ -2,7 +2,7 @@
 
 ## 0.1.8
 
-Update to latest version of deps.
+Update to latest version of deps, latest Ubuntu LTS.
 
 ## 0.1.7
 

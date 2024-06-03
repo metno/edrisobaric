@@ -6,7 +6,7 @@
 # run:
 # docker run -it --rm --publish 5000:5000 edriso --bind_host 0.0.0.0
 
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 # Create user with home dir
 RUN useradd --create-home nonroot
@@ -30,4 +30,5 @@ RUN mkdir /app/data && chown -R nonroot:nonroot /app/data
 # Run as nonroot user
 USER nonroot
 
-ENTRYPOINT ["/app/venv/bin/python", "/app/app/app.py"]
+EXPOSE 5000
+ENTRYPOINT ["/app/venv/bin/python", "/app/app/app.py", "--bind_host", "0.0.0.0"]

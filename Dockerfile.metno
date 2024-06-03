@@ -8,7 +8,7 @@
 # run:
 # docker run -it --rm --publish 5000:5000 edriso --bind_host 0.0.0.0
 
-FROM registry.met.no/baseimg/ubuntu:22.04
+FROM registry.met.no/baseimg/ubuntu:24.04
 
 # Create user with home dir
 RUN useradd --create-home nonroot
