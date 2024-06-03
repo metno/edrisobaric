@@ -1,4 +1,5 @@
 """Collections page."""
+
 from functools import lru_cache
 from datetime import timedelta
 import logging

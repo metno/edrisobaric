@@ -1,4 +1,5 @@
 """Conformance page."""
+
 from functools import lru_cache
 from fastapi import APIRouter
 from edr_pydantic.capabilities import ConformanceModel

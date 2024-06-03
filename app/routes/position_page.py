@@ -1,4 +1,5 @@
 """Collections page."""
+
 from typing import List, Tuple, Annotated
 import logging
 from fastapi import APIRouter, status, Request, Query
