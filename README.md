@@ -52,13 +52,12 @@ This method might need you to install `libeccodes-dev` from your package manager
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-cd app
-python3 app.py
+python3 app/app.py
 ```
 
 #### Web
 
-A test instance may or may not be available at <https://edrisobaric.k8s.met.no/>.
+A test instance is available at <https://edrisobaric.k8s.met.no/>.
 
 ## Usage
 
