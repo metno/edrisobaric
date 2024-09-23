@@ -106,7 +106,12 @@ This is only ment for learning. Use as noted in [Testing it out](#test-it-out).
 - Based on Pydantic EDR- and covjson-libraries by [KNMI](https://github.com/KNMI/)
 - This app will not download _new_ data unless restarted.
 - [Sample output](docs/Output.md)
-- To run tests, activate your venv, install requirements.txt and requirements-dev.txt, then run `tox --parallel`.
+
+### Testing
+
+- This API is tested on commit to internal [gitlab](https://gitlab.met.no/team-punkt/hydra/lekestue/edrisobaric/-/blob/main/.gitlab-ci.yml)
+- This API is tested on commit to public [github](https://gitlab.met.no/team-punkt/hydra/lekestue/edrisobaric/-/blob/main/.github/workflows/tests.yml?ref_type=heads)
+- To run tests manually, activate your venv, install requirements.txt and requirements-dev.txt, then run `tox --parallel`. Multiple tests available, see `tox -a`.
 
 ### Other APIs for comparison
 
