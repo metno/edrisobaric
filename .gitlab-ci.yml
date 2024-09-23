@@ -147,6 +147,6 @@ testapi:
   - docker run --tty=true --detach=true --network=host $RELEASE_IMAGE_NAME --bind_host 0.0.0.0
   - echo "Testing API with ghcr.io/metno/sedr"
   - docker pull ghcr.io/metno/sedr
-  - docker run --interactive=true --tty=true --network=host --rm ghcr.io/metno/sedr --openapi http://localhost:5000/api --url http://localhost:5000
+  - docker run --tty=true --network=host --rm ghcr.io/metno/sedr --openapi http://localhost:5000/api --url http://localhost:5000
   dependencies:
     - build_image
