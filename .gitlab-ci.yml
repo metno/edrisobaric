@@ -19,7 +19,7 @@ unittests:
     - apt install -y libeccodes-dev
     - cd app
     - pip install tox
-    - tox
+    - tox --parallel
   tags:
     - teampunkt
 

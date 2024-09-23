@@ -106,7 +106,7 @@ This is only ment for learning. Use as noted in [Testing it out](#test-it-out).
 - Based on Pydantic EDR- and covjson-libraries by [KNMI](https://github.com/KNMI/)
 - This app will not download _new_ data unless restarted.
 - [Sample output](docs/Output.md)
-- To run tests, activate your venv, install requirements.txt and requirements-dev.txt, then run `tox`.
+- To run tests, activate your venv, install requirements.txt and requirements-dev.txt, then run `tox --parallel`.
 
 ### Other APIs for comparison
 
