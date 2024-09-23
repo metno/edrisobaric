@@ -1,5 +1,6 @@
+---
 stages:
-  # - unittests
+  - unittests
   - test
   - build
   - scanimage
@@ -10,17 +11,17 @@ default:
     name: registry.met.no/team-punkt/gitlab-ci/images/docker-punkt:latest
     pull_policy: if-not-present
 
-# unittests:
-#   stage: unittests
-#   image: python:3.10-slim
-#   script:
-#     - apt update
-#     - apt install -y libeccodes-dev
-#     - cd app
-#     - pip install tox
-#     - tox
-#   tags:
-#     - teampunkt
+unittests:
+  stage: unittests
+  image: python:3.10-slim
+  script:
+    - apt update
+    - apt install -y libeccodes-dev
+    - cd app
+    - pip install tox
+    - tox
+  tags:
+    - teampunkt
 
 .container_scanning:
   stage: scanimage
@@ -57,9 +58,9 @@ default:
       - .trivycache/
   # Enables https://docs.gitlab.com/ee/user/application_security/container_scanning/ (Container Scanning report is available on GitLab EE Ultimate or GitLab.com Gold)
   artifacts:
-    when:                          always
+    when: always
     reports:
-      junit:          $CI_JOB_NAME.xml
+      junit: $CI_JOB_NAME.xml
 
 test:
   stage: test
@@ -74,22 +75,22 @@ test:
       when: never
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_TAG == null
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-  # needs: ["unittests"]
+  needs: ["unittests"]
 
 build_image:
   stage: build
   rules:
-   - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_TAG
   tags:
     - teampunkt
   script:
-  - RELEASE_TAG="${CI_COMMIT_TAG}-${CI_PIPELINE_IID}"
-  - RELEASE_IMAGE_NAME="${CI_REGISTRY_IMAGE}:${RELEASE_TAG}"
-  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  - docker build --pull -t $RELEASE_IMAGE_NAME -f Dockerfile.metno .
-  - docker push $RELEASE_IMAGE_NAME
-  - echo "RELEASE_IMAGE_NAME=${RELEASE_IMAGE_NAME}" >> build.env
-  - echo "RELEASE_TAG=${RELEASE_TAG}" >> build.env
+    - RELEASE_TAG="${CI_COMMIT_TAG}-${CI_PIPELINE_IID}"
+    - RELEASE_IMAGE_NAME="${CI_REGISTRY_IMAGE}:${RELEASE_TAG}"
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build --pull -t $RELEASE_IMAGE_NAME -f Dockerfile.metno .
+    - docker push $RELEASE_IMAGE_NAME
+    - echo "RELEASE_IMAGE_NAME=${RELEASE_IMAGE_NAME}" >> build.env
+    - echo "RELEASE_TAG=${RELEASE_TAG}" >> build.env
   artifacts:
     reports:
       dotenv: build.env
@@ -97,30 +98,30 @@ build_image:
 build_container_scanning:
   extends: .container_scanning
   rules:
-   - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_TAG
   dependencies:
     - build_image
 
 rebuild_image:
   stage: build
   rules:
-   - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "schedule"
   tags:
     - teampunkt
   script:
-  - LAST_GIT_TAG=$(git describe --tags --match="v[0-9]*" --abbrev=0)
-  - if [ -z "$LAST_GIT_TAG" ]; then echo "LAST_GIT_TAG variable not set!"; exit 1;fi
-  - git checkout $LAST_GIT_TAG
-  - RELEASE_TAG="${LAST_GIT_TAG}-${CI_PIPELINE_IID}"
-  - RELEASE_IMAGE_NAME="${CI_REGISTRY_IMAGE}:${RELEASE_TAG}"
-  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  - docker build --pull -t $RELEASE_IMAGE_NAME .
-  - docker push $RELEASE_IMAGE_NAME
-  - echo "RELEASE_IMAGE_NAME=${RELEASE_IMAGE_NAME}" >> build.env
-  - echo "RELEASE_TAG=${RELEASE_TAG}" >> build.env
+    - LAST_GIT_TAG=$(git describe --tags --match="v[0-9]*" --abbrev=0)
+    - if [ -z "$LAST_GIT_TAG" ]; then echo "LAST_GIT_TAG variable not set!"; exit 1;fi
+    - git checkout $LAST_GIT_TAG
+    - RELEASE_TAG="${LAST_GIT_TAG}-${CI_PIPELINE_IID}"
+    - RELEASE_IMAGE_NAME="${CI_REGISTRY_IMAGE}:${RELEASE_TAG}"
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build --pull -t $RELEASE_IMAGE_NAME .
+    - docker push $RELEASE_IMAGE_NAME
+    - echo "RELEASE_IMAGE_NAME=${RELEASE_IMAGE_NAME}" >> build.env
+    - echo "RELEASE_TAG=${RELEASE_TAG}" >> build.env
   after_script:
-  - source build.env
-  - /teampunkt/chat-message.sh -u "${CI_CHAT_WEBHOOK}" -m "Scheduled rebuild of image ${RELEASE_IMAGE_NAME} for <gitlab project>. Manual deployment."
+    - source build.env
+    - /teampunkt/chat-message.sh -u "${CI_CHAT_WEBHOOK}" -m "Scheduled rebuild of image ${RELEASE_IMAGE_NAME} for <gitlab project>. Manual deployment."
   artifacts:
     reports:
       dotenv: build.env
@@ -128,7 +129,7 @@ rebuild_image:
 rebuild_container_scanning:
   extends: .container_scanning
   rules:
-   - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "schedule"
   dependencies:
     - rebuild_image
 
@@ -136,17 +137,19 @@ testapi:
   stage: testapi
   tags:
     - teampunkt
+  rules:
+    - if: $CI_COMMIT_TAG
   script:
-  - LAST_GIT_TAG=$(git describe --tags --match="v[0-9]*" --abbrev=0)
-  - RELEASE_TAG="${LAST_GIT_TAG}-${CI_PIPELINE_IID}"
-  - RELEASE_IMAGE_NAME="${CI_REGISTRY_IMAGE}:${RELEASE_TAG}"
-  - echo "LAST_GIT_TAG=$LAST_GIT_TAG RELEASE_TAG=$RELEASE_TAG RELEASE_IMAGE_NAME=$RELEASE_IMAGE_NAME"
-  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  - echo "Starting $RELEASE_IMAGE_NAME"
-  - docker pull $RELEASE_IMAGE_NAME
-  - docker run --tty=true --detach=true --network=host $RELEASE_IMAGE_NAME --bind_host 0.0.0.0
-  - echo "Testing API with ghcr.io/metno/sedr"
-  - docker pull ghcr.io/metno/sedr
-  - docker run --tty=true --network=host --rm ghcr.io/metno/sedr --openapi http://localhost:5000/api --url http://localhost:5000
+    - LAST_GIT_TAG=$(git describe --tags --match="v[0-9]*" --abbrev=0)
+    - RELEASE_TAG="${LAST_GIT_TAG}-${CI_PIPELINE_IID}"
+    - RELEASE_IMAGE_NAME="${CI_REGISTRY_IMAGE}:${RELEASE_TAG}"
+    - echo "LAST_GIT_TAG=$LAST_GIT_TAG RELEASE_TAG=$RELEASE_TAG RELEASE_IMAGE_NAME=$RELEASE_IMAGE_NAME"
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - echo "Starting $RELEASE_IMAGE_NAME"
+    - docker pull $RELEASE_IMAGE_NAME
+    - docker run --tty=true --detach=true --network=host $RELEASE_IMAGE_NAME --bind_host 0.0.0.0
+    - echo "Testing API with ghcr.io/metno/sedr"
+    - docker pull ghcr.io/metno/sedr
+    - docker run --tty=true --network=host --rm ghcr.io/metno/sedr --openapi http://localhost:5000/api --url http://localhost:5000
   dependencies:
     - build_image
