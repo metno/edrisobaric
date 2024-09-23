@@ -8,3 +8,4 @@ tox~=4.15
 bandit~=1.7
 setuptools~=70.0
 schemathesis~=3.29
+yamllint
