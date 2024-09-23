@@ -74,7 +74,7 @@ test:
       when: never
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_TAG == null
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-  needs: ["unittests"]
+  # needs: ["unittests"]
 
 build_image:
   stage: build
