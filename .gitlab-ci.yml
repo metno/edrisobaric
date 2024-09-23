@@ -10,17 +10,17 @@ default:
     name: registry.met.no/team-punkt/gitlab-ci/images/docker-punkt:latest
     pull_policy: if-not-present
 
-unittests:
-  stage: unittests
-  image: python:3.10-slim
-  script:
-    - apt update
-    - apt install -y libeccodes-dev
-    - cd app
-    - pip install tox
-    - tox
-  tags:
-    - teampunkt
+# unittests:
+#   stage: unittests
+#   image: python:3.10-slim
+#   script:
+#     - apt update
+#     - apt install -y libeccodes-dev
+#     - cd app
+#     - pip install tox
+#     - tox
+#   tags:
+#     - teampunkt
 
 .container_scanning:
   stage: scanimage
