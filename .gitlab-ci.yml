@@ -140,6 +140,7 @@ testapi:
   - LAST_GIT_TAG=$(git describe --tags --match="v[0-9]*" --abbrev=0)
   - RELEASE_TAG="${LAST_GIT_TAG}-${CI_PIPELINE_IID}"
   - RELEASE_IMAGE_NAME="${CI_REGISTRY_IMAGE}:${RELEASE_TAG}"
+  - echo "LAST_GIT_TAG=$LAST_GIT_TAG RELEASE_TAG=$RELEASE_TAG RELEASE_IMAGE_NAME=$RELEASE_IMAGE_NAME"
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   - echo "Starting $RELEASE_IMAGE_NAME"
   - docker run --tty=true --network=host $RELEASE_IMAGE_NAME --bind_host 0.0.0.0
