@@ -3,6 +3,7 @@ stages:
   - test
   - build
   - scanimage
+  - testapi
 
 default:
   image:
@@ -130,3 +131,11 @@ rebuild_container_scanning:
    - if: $CI_PIPELINE_SOURCE == "schedule"
   dependencies:
     - rebuild_image
+
+testapi:
+  script:
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  - docker pull $RELEASE_IMAGE_NAME
+  - docker pull ghcr.io/metno/sedr
+  - docker run --tty=true --network=host ghcr.io/metno/edrisobaric:main --bind_host 0.0.0.0
+  - docker run --interactive=true --tty=true --network=host --rm sedr --openapi http://localhost:5000/api --url http://localhost:5000
