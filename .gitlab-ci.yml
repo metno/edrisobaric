@@ -143,8 +143,10 @@ testapi:
   - echo "LAST_GIT_TAG=$LAST_GIT_TAG RELEASE_TAG=$RELEASE_TAG RELEASE_IMAGE_NAME=$RELEASE_IMAGE_NAME"
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   - echo "Starting $RELEASE_IMAGE_NAME"
+  - docker pull $RELEASE_IMAGE_NAME
   - docker run --tty=true --network=host $RELEASE_IMAGE_NAME --bind_host 0.0.0.0
   - echo "Testing API with ghcr.io/metno/sedr"
+  - docker pull ghcr.io/metno/sedr
   - docker run --interactive=true --tty=true --network=host --rm ghcr.io/metno/sedr --openapi http://localhost:5000/api --url http://localhost:5000
   dependencies:
     - build_image
