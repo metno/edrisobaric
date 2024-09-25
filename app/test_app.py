@@ -19,7 +19,7 @@ class TestApp(unittest.TestCase):
         response = client.get("/conformance")
         self.assertEqual(response.status_code, 200)
         self.assertTrue(
-            "http://www.opengis.net/spec/ogcapi-edr-1/1.0/conf/core" in response.text,
+            "http://www.opengis.net/spec/ogcapi-edr-1/1.1/conf/core" in response.text,
         )
 
     def test_collections(self) -> None:
