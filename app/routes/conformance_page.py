@@ -10,12 +10,13 @@ def create_conformance_page() -> dict:
     """Creates the conformance page."""
     return ConformanceModel(
         conformsTo=[
-            "http://www.opengis.net/spec/ogcapi-edr-1/1.0/conf/core",
             "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/core",
-            "http://www.opengis.net/spec/ogcapi-edr-1/1.0/conf/collections",
+            "http://www.opengis.net/spec/ogcapi-common-2/1.0/conf/collections",
+            "http://www.opengis.net/spec/ogcapi-edr-1/1.1/conf/core",
+            # This URL doesn't exist yet, but it will when the spec is released:
+            "http://www.opengis.net/spec/ogcapi-edr-1/1.2/req/oas31",
             "http://www.opengis.net/spec/ogcapi-edr-1/1.0/conf/covjson",
             "http://www.opengis.net/spec/ogcapi-edr-1/1.0/conf/queries",
-            # "https://github.com/metno/edr-profile/blob/main/profile_weather_forecast_timeseries.md#Conformance",
         ],
     ).model_dump(exclude_none=True)
 
