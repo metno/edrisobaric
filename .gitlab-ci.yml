@@ -5,6 +5,7 @@ stages:
   - build
   - scanimage
   - testapi
+  - release
 
 default:
   image:
@@ -154,3 +155,16 @@ testapi:
     - docker run --tty=true --network=host --rm $VALIDATOR_IMAGE --openapi http://localhost:5000/api --url http://localhost:5000
   dependencies:
     - build_image
+
+tjenester/edrisobaric:
+  stage: release
+  rules:
+    - if: $CI_COMMIT_TAG
+  dependencies:
+    - testapi
+  variables:
+    UPSTREAM_CI_COMMIT_SHA: "${CI_COMMIT_SHA}"
+    UPSTREAM_CI_PROJECT_PATH: "${CI_PROJECT_PATH}"
+    UPSTREAM_CI_PROJECT_URL: "${CI_PROJECT_URL}"
+    UPSTREAM_IMAGES: "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}"
+  trigger: tjenester/edrisobaric
