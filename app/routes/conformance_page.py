@@ -19,7 +19,7 @@ def create_conformance_page() -> dict:
             "http://www.opengis.net/spec/ogcapi-edr-1/1.0/conf/covjson",
             "http://www.opengis.net/spec/ogcapi-edr-1/1.0/conf/queries",
             # Rodeo profile:
-            "https://rodeo-project.eu/rodeo-edr-profile",
+            "http://rodeo-project.eu/spec/rodeo-edr-profile/1/req/core",
         ],
     ).model_dump(exclude_none=True)
 
