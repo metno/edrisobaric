@@ -25,7 +25,13 @@ def create_landing_page(base_url) -> dict:
             Link(
                 href=f"{base_url}api",
                 rel="service-desc",
-                type="application/json",
+                type="application/vnd.oai.openapi+json;version=3.1",
+                title="OpenAPI document",
+            ),
+            Link(
+                href=f"{base_url}docs",
+                rel="service-doc",
+                type="text/html",
                 title="OpenAPI document",
             ),
             Link(
