@@ -141,7 +141,7 @@ testapi:
   rules:
     - if: $CI_COMMIT_TAG
   script:
-    - VALIDATOR_IMAGE="ghcr.io/metno/sedr:0.7.5-2"
+    - VALIDATOR_IMAGE="ghcr.io/metno/sedr:0.7.6"
     - LAST_GIT_TAG=$(git describe --tags --match="v[0-9]*" --abbrev=0)
     - RELEASE_TAG="${LAST_GIT_TAG}-${CI_PIPELINE_IID}"
     - RELEASE_IMAGE_NAME="${CI_REGISTRY_IMAGE}:${RELEASE_TAG}"
