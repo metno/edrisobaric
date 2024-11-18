@@ -52,7 +52,6 @@ unittests:
     - time trivy image \
       --db-repository public.ecr.aws/aquasecurity/trivy-db \
       --java-db-repository public.ecr.aws/aquasecurity/trivy-java-db \
-      --scanners vuln ghcr.io/cloudogu/gitops-playground:0.7.0 \
       --exit-code 0 --no-progress --format template --template "@/contrib/junit.tpl" \
       --output "$CI_PROJECT_DIR/${CI_JOB_NAME}.xml" "$RELEASE_IMAGE_NAME"
     # Prints full report
