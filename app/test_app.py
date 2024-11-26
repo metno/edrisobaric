@@ -7,6 +7,7 @@ from app import app
 
 client = TestClient(app)
 sample_coords = "coords=POINT(11.9384 60.1699)"
+collection_name = "weather_forecast"
 
 
 class TestApp(unittest.TestCase):
@@ -25,18 +26,18 @@ class TestApp(unittest.TestCase):
     def test_collections(self) -> None:
         response = client.get("/collections")
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.json()["collections"][0]["id"] == "isobaric")
+        self.assertTrue(response.json()["collections"][0]["id"] == "weather_forecast")
 
     def test_point(self) -> None:
         # Test various coord formats, which should all work
-        response = client.get("/collections/isobaric/position?coords=POINT(11 60)")
+        response = client.get(f"/collections/{collection_name}/position?coords=POINT(11 60)")
         self.assertEqual(response.status_code, 200)
-        response = client.get("/collections/isobaric/position?coords=POINT(11.0 60.0)")
+        response = client.get(f"/collections/{collection_name}/position?coords=POINT(11.0 60.0)")
         self.assertEqual(response.status_code, 200)
-        response = client.get("/collections/isobaric/position?coords=POINT(11. 60.)")
+        response = client.get(f"/collections/{collection_name}/position?coords=POINT(11. 60.)")
         self.assertEqual(response.status_code, 200)
 
-        response = client.get(f"/collections/isobaric/position?{sample_coords}")
+        response = client.get(f"/collections/{collection_name}/position?{sample_coords}")
         self.assertEqual(response.status_code, 200)
         # Test for values in range -> temperature
         self.assertTrue(
@@ -58,11 +59,11 @@ class TestApp(unittest.TestCase):
         self.assertFalse("null" in response.text)
 
         # Test URL that shouldn't work
-        response = client.get("/collections/isobaric/position?coords=POINT(1160)")
+        response = client.get(f"/collections/{collection_name}/position?coords=POINT(1160)")
         self.assertEqual(response.status_code, 422)
 
         # Test redirect (can't test in normal way, as this isn't run on a webserver)
-        response = client.get("/collections/isobaric/")
+        response = client.get(f"/collections/{collection_name}/")
         self.assertEqual(response.status_code, 200)
 
     def test_api(self) -> None:

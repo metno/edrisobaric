@@ -21,6 +21,7 @@ from initialize import (
     DEGREE_ID,
     CRS_SHORT,
     CRS_LONG,
+    COLLECTION_NAME,
 )
 
 from grib import (
@@ -45,12 +46,12 @@ def create_collection(collection_id: str = "") -> dict:
 
     dataset = get_dataset()
     vertical_levels = get_vertical_extent(dataset)
-    collection_url = f"{BASE_URL}collections/isobaric/"
+    collection_url = f"{BASE_URL}collections/{COLLECTION_NAME}/"
 
     links = [
         edr_pydantic.link.Link(
             href=collection_url,
-            rel="self" if collection_id == "isobaric" else "data",
+            rel="self" if collection_id == COLLECTION_NAME else "data",
         )
     ]
 
@@ -67,7 +68,7 @@ def create_collection(collection_id: str = "") -> dict:
     )
 
     isobaric_col = Collection(
-        id="isobaric",
+        id=COLLECTION_NAME,
         title="IsobaricGRIB - GRIB files",
         description=description,
         keywords=[
@@ -78,6 +79,7 @@ def create_collection(collection_id: str = "") -> dict:
             "wind",
             "forecast",
             "isobaric",
+            COLLECTION_NAME,
         ],
         extent=edr_pydantic.extent.Extent(
             spatial=edr_pydantic.extent.Spatial(
@@ -183,13 +185,13 @@ async def describe_a_collection(
     collection_id: Annotated[
         str,
         Path(
-            pattern="^isobaric$",
-            description="Only available collection is isobaric",
+            pattern=f"^{COLLECTION_NAME}$",
+            description=f"Only available collection is {COLLECTION_NAME}",
             openapi_examples={
-                "Isobaric": {
-                    "summary": "The only available collection, isobaric",
-                    "description": "Describe collection **isobaric**",
-                    "value": "isobaric",
+                COLLECTION_NAME: {
+                    "summary": f"The only available collection, {COLLECTION_NAME}",
+                    "description": f"Describe collection **{COLLECTION_NAME}**",
+                    "value": COLLECTION_NAME,
                 },
             },
         ),
