@@ -52,7 +52,17 @@ def create_collection(collection_id: str = "") -> dict:
         edr_pydantic.link.Link(
             href=collection_url,
             rel="self" if collection_id == COLLECTION_NAME else "data",
-        )
+        ),
+        edr_pydantic.link.Link(
+            href="https://data.norge.no/nlod/en/2.0/",
+            rel="license",
+            type="text/html",
+        ),
+        edr_pydantic.link.Link(
+            href="https://creativecommons.org/licenses/by/4.0/",
+            rel="license",
+            type="text/html",
+        ),
     ]
 
     description = (
