@@ -9,7 +9,7 @@ from pydantic import AwareDatetime
 from shapely import wkt, GEOSException, Point
 import covjson_pydantic
 from covjson_pydantic.coverage import Coverage
-from covjson_pydantic.ndarray import NdArray
+from covjson_pydantic.ndarray import NdArrayFloat
 from math import atan2, pi, sqrt
 
 from initialize import (
@@ -194,17 +194,17 @@ def create_point(coords: str) -> dict:
             ],
         ),
         ranges={
-            "temperature": NdArray(
+            "temperature": NdArrayFloat(
                 axisNames=["z"],
                 shape=[len(isobaric_values)],
                 values=temperature_values,
             ),
-            "wind_from_direction": NdArray(
+            "wind_from_direction": NdArrayFloat(
                 axisNames=["z"],
                 shape=[len(isobaric_values)],
                 values=wind_dir,
             ),
-            "wind_speed": NdArray(
+            "wind_speed": NdArrayFloat(
                 axisNames=["z"],
                 shape=[len(isobaric_values)],
                 values=wind_speed,
