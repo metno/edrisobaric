@@ -30,14 +30,22 @@ class TestApp(unittest.TestCase):
 
     def test_point(self) -> None:
         # Test various coord formats, which should all work
-        response = client.get(f"/collections/{collection_name}/position?coords=POINT(11 60)")
+        response = client.get(
+            f"/collections/{collection_name}/position?coords=POINT(11 60)"
+        )
         self.assertEqual(response.status_code, 200)
-        response = client.get(f"/collections/{collection_name}/position?coords=POINT(11.0 60.0)")
+        response = client.get(
+            f"/collections/{collection_name}/position?coords=POINT(11.0 60.0)"
+        )
         self.assertEqual(response.status_code, 200)
-        response = client.get(f"/collections/{collection_name}/position?coords=POINT(11. 60.)")
+        response = client.get(
+            f"/collections/{collection_name}/position?coords=POINT(11. 60.)"
+        )
         self.assertEqual(response.status_code, 200)
 
-        response = client.get(f"/collections/{collection_name}/position?{sample_coords}")
+        response = client.get(
+            f"/collections/{collection_name}/position?{sample_coords}"
+        )
         self.assertEqual(response.status_code, 200)
         # Test for values in range -> temperature
         self.assertTrue(
@@ -59,7 +67,9 @@ class TestApp(unittest.TestCase):
         self.assertFalse("null" in response.text)
 
         # Test URL that shouldn't work
-        response = client.get(f"/collections/{collection_name}/position?coords=POINT(1160)")
+        response = client.get(
+            f"/collections/{collection_name}/position?coords=POINT(1160)"
+        )
         self.assertEqual(response.status_code, 422)
 
         # Test redirect (can't test in normal way, as this isn't run on a webserver)
