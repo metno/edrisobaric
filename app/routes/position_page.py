@@ -18,6 +18,7 @@ from initialize import (
     CELSIUS_ID,
     DEGREE_SYMBOL,
     DEGREE_ID,
+    COLLECTION_NAME,
 )
 
 from grib import (
@@ -150,7 +151,7 @@ def create_point(coords: str) -> dict:
         wind_speed.append(round(wind_speed_from_u_v(uwind.data, vwind.data), PRECISION))
 
     cov = Coverage(
-        id="isobaric",
+        id=COLLECTION_NAME,
         type="Coverage",
         domain=covjson_pydantic.domain.Domain(
             domainType=covjson_pydantic.domain.DomainType.vertical_profile,
@@ -300,7 +301,7 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, dict
 
 
 @router.get(
-    "/collections/isobaric/position",
+    f"/collections/{COLLECTION_NAME}/position",
     tags=["Collection Data"],
     response_model=Coverage,
     response_model_exclude_unset=True,

@@ -37,6 +37,7 @@ CRS_LONG = (
     + 'AXIS["Lon", EAST], AXIS["Lat", NORTH]]'
 )
 DATA_PATH = "./data"
+COLLECTION_NAME = "weather_forecast"
 
 
 def parse_args() -> argparse.Namespace:
