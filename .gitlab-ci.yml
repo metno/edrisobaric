@@ -29,7 +29,7 @@ unittests:
   tags:
     - teampunkt
   image:
-    name: docker.io/aquasec/trivy:latest
+    name: docker.io/aquasec/trivy
     entrypoint: [""]
   variables:
     # No need to clone the repo, we exclusively work on artifacts.  See
@@ -49,6 +49,7 @@ unittests:
     # TOOMANYREQUESTS problems, https://gitlab.met.no/team-punkt/hydra/lekestue/edrisobaric/-/issues/31
     # - time trivy image --download-db-only --no-progress
     # Builds report and puts it in the default workdir $CI_PROJECT_DIR, so `artifacts:` can take it from there
+    - echo "RELEASE_IMAGE_NAME $RELEASE_IMAGE_NAME CI_PROJECT_DIR/CI_JOB_NAME $CI_PROJECT_DIR/${CI_JOB_NAME}.xml"
     - time trivy image \
       --db-repository public.ecr.aws/aquasecurity/trivy-db \
       --java-db-repository public.ecr.aws/aquasecurity/trivy-java-db \
