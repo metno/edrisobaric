@@ -40,6 +40,8 @@ unittests:
     TRIVY_AUTH_URL: "$CI_REGISTRY"
 
   script:
+    - RELEASE_TAG="${CI_COMMIT_TAG}-${CI_PIPELINE_IID}"
+    - RELEASE_IMAGE_NAME="${CI_REGISTRY_IMAGE}:${RELEASE_TAG}"
     - export TRIVY_CACHE_DIR=$(pwd)/.trivycache/
     - mkdir -p ${TRIVY_CACHE_DIR}
     - trivy --version
