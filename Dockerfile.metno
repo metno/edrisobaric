@@ -3,7 +3,7 @@
 # This file can only be used internally at Met.no.
 
 # build:
-# docker buildx build -t edriso -f Dockerfile .
+# docker build -t edriso -f Dockerfile .
 
 # run:
 # docker run -it --rm --publish 5000:5000 edriso --bind_host 0.0.0.0
