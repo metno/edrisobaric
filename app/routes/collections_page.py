@@ -107,7 +107,7 @@ def create_collection(collection_id: str = "") -> dict:
                     ]
                 ],
                 values=[get_temporal_extent(dataset).isoformat()],
-                trs='Gregorian',
+                trs="Gregorian",
             ),
         ),
         links=links,
@@ -146,15 +146,13 @@ def create_collection(collection_id: str = "") -> dict:
                     label="wind_speed",
                     description="Wind speed",
                     unit=edr_pydantic.unit.Unit(
-                        symbol=edr_pydantic.unit.Symbol(
-                            value="m/s", type=SPEED_ID
-                        )
+                        symbol=edr_pydantic.unit.Symbol(value="m/s", type=SPEED_ID)
                     ),
                     observedProperty=edr_pydantic.observed_property.ObservedProperty(
                         id=WINDSPEED_ID,
                         label="Wind speed",
                         description="Wind speed",
-                    )
+                    ),
                 ),
                 "Air temperature": edr_pydantic.parameter.Parameter(
                     id="Temperature",
