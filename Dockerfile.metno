@@ -13,10 +13,10 @@ FROM registry.met.no/baseimg/ubuntu:24.04
 # Create user with home dir
 RUN useradd --create-home nonroot
 
-# Install python and libeccodes-dev. Create /data.
+# Install python.
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python3-dev python3-pip \
-    python3-venv libeccodes-dev && \
+    python3-venv && \
         apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set workdir and install app with requirements.
