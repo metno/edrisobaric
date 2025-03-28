@@ -17,10 +17,10 @@ from initialize import (
     AIRTEMP_ID,
     WINDDIR_ID,
     WINDSPEED_ID,
+    SPEED_ID,
     DEGREE_SYMBOL,
     DEGREE_ID,
     CRS_SHORT,
-    CRS_LONG,
     COLLECTION_NAME,
 )
 
@@ -89,7 +89,7 @@ def create_collection(collection_id: str = "") -> dict:
         extent=edr_pydantic.extent.Extent(
             spatial=edr_pydantic.extent.Spatial(
                 bbox=[get_spatial_extent(dataset)],
-                crs=CRS_LONG,
+                crs=CRS_SHORT,
             ),
             vertical=edr_pydantic.extent.Vertical(
                 interval=[
@@ -97,7 +97,7 @@ def create_collection(collection_id: str = "") -> dict:
                     [vertical_levels[len(vertical_levels) - 1]],
                 ],
                 values=vertical_levels,
-                vrs="Vertical Reference System: PressureLevel",  # opendata.fmi.fi
+                vrs="Pressure level in hPa",
             ),
             temporal=edr_pydantic.extent.Temporal(
                 interval=[
@@ -107,8 +107,7 @@ def create_collection(collection_id: str = "") -> dict:
                     ]
                 ],
                 values=[get_temporal_extent(dataset).isoformat()],
-                trs='TIMECRS["DateTime",TDATUM["Gregorian Calendar"],'
-                + 'CS[TemporalDateTime,1],AXIS["Time (T)",future]',  # opendata.fmi.fi
+                trs='Gregorian',
             ),
         ),
         links=links,
@@ -130,6 +129,8 @@ def create_collection(collection_id: str = "") -> dict:
             {
                 "wind_from_direction": edr_pydantic.parameter.Parameter(
                     id="wind_from_direction",
+                    label="wind_from_direction",
+                    description="Wind from direction",
                     unit=edr_pydantic.unit.Unit(
                         symbol=edr_pydantic.unit.Symbol(
                             value=DEGREE_SYMBOL, type=DEGREE_ID
@@ -141,13 +142,24 @@ def create_collection(collection_id: str = "") -> dict:
                     ),
                 ),
                 "wind_speed": edr_pydantic.parameter.Parameter(
+                    id="wind_speed",
+                    label="wind_speed",
+                    description="Wind speed",
+                    unit=edr_pydantic.unit.Unit(
+                        symbol=edr_pydantic.unit.Symbol(
+                            value="m/s", type=SPEED_ID
+                        )
+                    ),
                     observedProperty=edr_pydantic.observed_property.ObservedProperty(
                         id=WINDSPEED_ID,
                         label="Wind speed",
+                        description="Wind speed",
                     )
                 ),
                 "Air temperature": edr_pydantic.parameter.Parameter(
                     id="Temperature",
+                    label="Air temperature",
+                    description="Air temperature",
                     unit=edr_pydantic.unit.Unit(
                         symbol=edr_pydantic.unit.Symbol(
                             value=CELSIUS_SYMBOL, type=CELSIUS_ID
