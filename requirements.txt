@@ -1,6 +1,6 @@
 fastapi[all]~=0.115.0
 uvicorn[standard]~=0.32.0
-eccodes~=1.7
+eccodes~=2.40.0
 cfgrib==0.9.14.0
 shapely~=2.0.0
 xarray~=2024.11.0
