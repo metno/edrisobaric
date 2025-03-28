@@ -46,7 +46,7 @@ docker run -it --rm --publish 5000:5000 ghcr.io/metno/edrisobaric:main --bind_ho
 
 #### Build using Pip
 
-This method might need you to install `libeccodes-dev` from your package manager. Clone repo and run:
+Clone repo and run:
 
 ```bash
 python3 -m venv venv
