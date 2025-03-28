@@ -23,19 +23,16 @@ AVAILABLE_API = (
 )
 TIME_FORMAT = "%Y-%m-%dT%H:00:00Z"  #  RFC3339 date-time
 CELSIUS_SYMBOL = "˚C"
-CELSIUS_ID = "https://codes.wmo.int/common/unit/_Cel"
-AIRTEMP_ID = "http://vocab.met.no/CFSTDN/en/page/air_temperature"
-WINDDIR_ID = "http://vocab.met.no/CFSTDN/en/page/wind_from_direction"
-WINDSPEED_ID = "http://vocab.met.no/CFSTDN/en/page/wind_speed"
+CELSIUS_ID = "https://qudt.org/vocab/unit/DEG_C"
+AIRTEMP_ID = "https://vocab.nerc.ac.uk/standard_name/air_temperature/"
+WINDDIR_ID = "https://vocab.nerc.ac.uk/standard_name/wind_from_direction/"
+WINDSPEED_ID = "https://vocab.nerc.ac.uk/standard_name/wind_speed/"
+SPEED_ID = "https://qudt.org/vocab/unit/M-PER-SEC"
 DEGREE_SYMBOL = "˚"
-DEGREE_ID = "https://codes.wmo.int/common/unit/_degree_(angle)"
+DEGREE_ID = "https://qudt.org/vocab/unit/DEG"
 CONTACT_EMAIL = "weatherapi-adm@met.no"
-CRS_SHORT = "CRS:84"
-CRS_LONG = (
-    'GEOGCS["Unknown", DATUM["Unknown", SPHEROID["WGS_1984", 6378137.0, '
-    + '298.257223563]], PRIMEM["Greenwich",0], UNIT["degree", 0.017453], '
-    + 'AXIS["Lon", EAST], AXIS["Lat", NORTH]]'
-)
+CRS_SHORT = "OGC:CRS84"
+
 DATA_PATH = "./data"
 COLLECTION_NAME = "weather_forecast"
 
