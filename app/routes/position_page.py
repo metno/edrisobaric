@@ -32,7 +32,7 @@ from grib import (
     ISOBARIC_LABEL,
 )
 
-POINT_REGEX = "^POINT\\(\\d+\\.?\\d* \\d+\\.?\\d*\\)$"
+POINT_REGEX = "^POINT\\(-?\\d+\\.?\\d* -?\\d+\\.?\\d*\\)$"
 PRECISION = 2
 
 router = APIRouter()
