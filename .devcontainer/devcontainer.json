@@ -1,0 +1,20 @@
+{
+    "name": "edrisobaric Development Container",
+    "image": "mcr.microsoft.com/vscode/devcontainers/python:3.12",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode"
+            ]
+        }
+    },
+    // Installs in system, not venv
+    "postCreateCommand": "pip install -r requirements.txt && pip install -r requirements-dev.txt",
+    "portsAttributes": {
+        "5000": {
+            "label": "api"
+        }
+    }
+}
