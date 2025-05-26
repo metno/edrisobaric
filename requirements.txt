@@ -1,9 +1,9 @@
-fastapi[all]~=0.115.0
+fastapi[standard]~=0.115.0
 uvicorn[standard]~=0.34.0
-eccodes~=2.40.0
+eccodes~=2.41.0
 cfgrib==0.9.15.0
 shapely~=2.1.0
-xarray~=2025.3.0
+xarray~=2025.4.0
 requests~=2.32.0
 edr-pydantic~=0.7.0
-covjson-pydantic~=0.5.0
+covjson-pydantic~=0.7.0
