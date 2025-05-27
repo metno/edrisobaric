@@ -10,8 +10,7 @@ FROM ubuntu:24.04
 
 # Install python.
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends python3-dev python3-pip \
-    python3-venv && \
+    apt-get install -y --no-install-recommends python3-dev python3-venv && \
         apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set workdir and install app with requirements.
