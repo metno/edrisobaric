@@ -7,3 +7,4 @@ xarray~=2025.4.0
 requests~=2.32.0
 edr-pydantic~=0.7.0
 covjson-pydantic~=0.7.0
+setuptools>=78.1.1 # https://huntr.com/bounties/d6362117-ad57-4e83-951f-b8141c6e7ca5
