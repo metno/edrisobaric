@@ -13,8 +13,7 @@ def create_conformance_page() -> dict:
             "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/core",
             # This URL doesn't exist, but is part of the spec:
             "http://www.opengis.net/spec/ogcapi-common-2/1.0/conf/collections",
-            "http://www.opengis.net/spec/ogcapi-edr-1/1.1/conf/core",
-            # This URL doesn't exist yet, but it will when the spec is released:
+            "http://www.opengis.net/spec/ogcapi-edr-1/1.2/conf/core",
             "http://www.opengis.net/spec/ogcapi-edr-1/1.2/req/oas31",
             "http://www.opengis.net/spec/ogcapi-edr-1/1.0/conf/covjson",
             "http://www.opengis.net/spec/ogcapi-edr-1/1.0/conf/queries",
