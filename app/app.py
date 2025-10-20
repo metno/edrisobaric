@@ -24,7 +24,6 @@ app = FastAPI(
         "url": "https://api.met.no/doc/support",
         "email": CONTACT_EMAIL,
     },
-    version="0.9.0",
     openapi_tags=[
         {
             "name": "Capabilities",

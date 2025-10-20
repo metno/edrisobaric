@@ -44,15 +44,14 @@ docker pull ghcr.io/metno/edrisobaric:main
 docker run -it --rm --publish 5000:5000 ghcr.io/metno/edrisobaric:main --bind_host 0.0.0.0
 ```
 
-#### Build using Pip
+#### Build using Uv
 
 Clone repo and run:
 
 ```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-python3 app/app.py
+uv venv
+uv pip sync requirements.txt
+uv run app/app.py
 ```
 
 #### Web

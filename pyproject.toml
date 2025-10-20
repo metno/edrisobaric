@@ -1,0 +1,96 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "edriso"
+authors = [
+    {name = "Lars Falk-Petersen", email = "larsfp@met.no"},
+]
+description = "EDR-isobaric is an API for isobaric data (temperature and wind in isobaric layers)."
+keywords = ["meteorology", "forecast", ]
+readme = "README.md"
+license = "MIT AND (Apache-2.0 OR BSD-2-Clause)"
+
+requires-python = ">=3.11"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Framework :: FastAPI",
+    "Framework :: Pydantic",
+    "Framework :: tox",
+]
+dependencies = [
+    "fastapi[standard]~=0.115.0",
+    "uvicorn[standard]~=0.34.0",
+    "eccodes~=2.41.0",
+    "cfgrib==0.9.15.0",
+    "shapely~=2.1.0",
+    "xarray~=2025.4.0",
+    "requests~=2.32.0",
+    "edr-pydantic~=0.7.0",
+    "covjson-pydantic~=0.7.0",
+    "setuptools>=78.1.1", # https://huntr.com/bounties/d6362117-ad57-4e83-951f-b8141c6e7ca5
+]
+
+optional-dependencies.dev = [
+    "types-pytz~=2024.2.0",
+    "types-requests~=2.32.0",
+    "black~=24.10.0",
+    "mypy~=1.13.0",
+    "prospector~=1.13.0",
+    "bandit~=1.7.0",
+    "schemathesis~=3.38.0",
+    "yamllint~=1.35.0",
+]
+
+optional-dependencies.tests = [
+    "tox", # For running tests
+]
+
+dynamic = ["version"]
+
+urls.Documentation = "https://github.com/metno/edrisobaric"
+urls.Homepage = "https://github.com/metno/edrisobaric"
+urls.Issues = "https://github.com/metno/edrisobaric/issues"
+urls.Repository = "https://github.com/metno/edrisobaric"
+
+[project.scripts]
+edriso = "app:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["edriso"]
+
+[tool.setuptools.dynamic]
+version = {attr = "app.__version__"}
+
+[tool.setuptools.package-data]
+bris = ["schema/*.json"]
+
+[tool.ruff.lint]
+fixable = ["I"]
+select = [
+    "E",  # pycodestyle
+    "F",  # Pyflakes
+    "UP", # pyupgrade
+    "B",  # flake8-bugbear
+    "SIM",# flake8-simplify
+    "I",  # isort
+]
+ignore = [
+    "E402", # module-import-not-at-top-of-file (E402)
+    "E501", # Line too long
+    "F401", # imported but unused
+]
+
+[tool.mypy]
+ignore_missing_imports = true
+install_types = true
+
+[tool.bandit]
+exclude_dirs = ["tests_data"]
