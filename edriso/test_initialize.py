@@ -1,12 +1,12 @@
 import unittest
 import os
-from initialize import (
+from edriso.initialize import (
     download_gribfile,
     API_URL,
     open_grib,
     validate_time_input,
 )
-from grib import get_temporal_extent
+from edriso.grib import get_temporal_extent
 from datetime import datetime
 import tempfile
 import pytz

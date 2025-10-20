@@ -6,7 +6,7 @@ from fastapi import APIRouter
 # App routes #
 ##############
 
-from routes import (
+from edriso.routes import (
     landing_page,
     conformance_page,
     collections_page,

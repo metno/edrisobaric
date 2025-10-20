@@ -9,7 +9,7 @@ COPY --from=ghcr.io/astral-sh/uv:0.9.4 /uv /uvx /bin/
 
 # Set workdir and install app with requirements.
 WORKDIR /app
-COPY app/ ./app/
+COPY edriso/ ./edriso/
 COPY favicon.ico pyproject.toml ./
 # Create user with home dir
 RUN useradd --create-home edriso
@@ -28,4 +28,4 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 ENV PATH=/home/edriso/.local/bin:$PATH
 
 EXPOSE 5000
-ENTRYPOINT ["/usr/bin/uv", "run", "/app/app/app.py", "--bind_host", "0.0.0.0"]
+ENTRYPOINT ["/usr/bin/uv", "run", "/app/edriso/app.py", "--bind_host", "0.0.0.0"]

@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse
 from edr_pydantic.capabilities import LandingPageModel, Provider, Contact
 from edr_pydantic.link import Link
 
-from initialize import BASE_URL, CONTACT_EMAIL
+from edriso.initialize import BASE_URL, CONTACT_EMAIL
 
 
 @lru_cache
