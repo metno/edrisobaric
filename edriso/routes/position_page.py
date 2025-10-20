@@ -92,7 +92,6 @@ def create_point(coords: str) -> dict:
         )
         logger.error(errmsg)
         return JSONResponse(
-            media_type="application/problem+json",
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={
                 "detail": [
@@ -113,17 +112,8 @@ def create_point(coords: str) -> dict:
     coords_ok, errcoords = check_coords_within_bounds(dataset, point)
     if not coords_ok:
         return JSONResponse(
-            media_type="application/problem+json",
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            content="""
-            {
-                'application/problem+json': {
-                    'schema': {
-                        '$ref': '#/components/schemas/HTTPValidationError'
-                    }
-                }
-            }
-            """,
+            content=errcoords,
         )
 
     # Fetch temperature data for point
@@ -324,7 +314,6 @@ async def get_isobaric_page(
     """Return data closest to a position."""
     if len(coords) == 0:
         return JSONResponse(
-            media_type="application/problem+json",
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={
                 "body": {
