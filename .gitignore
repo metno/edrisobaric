@@ -7,3 +7,5 @@ testfiles/
 .hypothesis/
 test_data/*.idx
 *.log
+.zed/
+*.egg-info/
