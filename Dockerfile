@@ -2,13 +2,15 @@
 # docker build -t edriso -f Dockerfile .
 
 # run:
-# docker run -it --rm --publish 5000:5000 edriso --bind_host 0.0.0.0
+# docker run -it --rm --user edriso --publish 5000:5000 edriso --bind_host 0.0.0.0
 
 FROM ubuntu:24.04
 COPY --from=ghcr.io/astral-sh/uv:0.9.4 /uv /uvx /bin/
 
+ARG UID=10000
+
 # Create user with home dir
-RUN useradd --create-home edriso
+RUN useradd --create-home --uid $UID  edriso
 
 # Set workdir and install app with requirements.
 WORKDIR /app
@@ -16,18 +18,19 @@ WORKDIR /app
 # Create data dir
 RUN mkdir /app/data && chown -R edriso:edriso /app
 
-COPY favicon.ico pyproject.toml ./
+COPY favicon.ico ./
 COPY edriso/ ./edriso/
 
 # Run as edriso user
 USER edriso
+ENV PATH=/home/edriso/.local/bin:$PATH
 
-RUN --mount=type=cache,target=/root/.cache/uv \
+RUN --mount=type=cache,target=/home/edriso/.cache/uv,uid=$UID \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv python install 3.13 && \
     uv venv && \
-    uv sync
-
-ENV PATH=/home/edriso/.local/bin:$PATH
+    uv sync --compile-bytecode
 
 EXPOSE 5000
 ENTRYPOINT ["/usr/bin/uv", "run", "/app/edriso/app.py", "--bind_host", "0.0.0.0"]
