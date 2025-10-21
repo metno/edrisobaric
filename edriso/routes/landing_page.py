@@ -1,10 +1,11 @@
 """Landing page."""
 
 from functools import lru_cache
+
+from edr_pydantic.capabilities import Contact, LandingPageModel, Provider
+from edr_pydantic.link import Link
 from fastapi import APIRouter
 from fastapi.responses import FileResponse
-from edr_pydantic.capabilities import LandingPageModel, Provider, Contact
-from edr_pydantic.link import Link
 
 from edriso.initialize import BASE_URL, CONTACT_EMAIL
 

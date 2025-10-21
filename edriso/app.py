@@ -3,10 +3,12 @@
 import logging
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
+
 import uvicorn
 from fastapi import FastAPI
-from edriso.routes import routes
+
 from edriso.initialize import BIND_HOST, CONTACT_EMAIL, get_dataset
+from edriso.routes import routes
 
 app = FastAPI(
     openapi_url="/api",

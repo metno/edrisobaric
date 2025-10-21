@@ -1,6 +1,7 @@
 """Mostly to check all URLs reply without crash after code changes."""
 
 import unittest
+
 from fastapi.testclient import TestClient
 
 from edriso.app import app

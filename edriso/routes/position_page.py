@@ -1,35 +1,35 @@
 """Collections page."""
 
-from typing import List, Tuple, Annotated
 import logging
-from fastapi import APIRouter, status, Request, Query
-from fastapi.responses import JSONResponse
-import xarray as xr
-from pydantic import AwareDatetime
-from shapely import wkt, GEOSException, Point
+from math import atan2, pi, sqrt
+from typing import Annotated, List, Tuple
+
 import covjson_pydantic
+import xarray as xr
 from covjson_pydantic.coverage import Coverage
 from covjson_pydantic.ndarray import NdArrayFloat
-from math import atan2, pi, sqrt
-
-from edriso.initialize import (
-    get_dataset,
-    CELSIUS_SYMBOL,
-    CELSIUS_ID,
-    DEGREE_SYMBOL,
-    DEGREE_ID,
-    COLLECTION_NAME,
-)
+from fastapi import APIRouter, Query, Request, status
+from fastapi.responses import JSONResponse
+from pydantic import AwareDatetime
+from shapely import GEOSException, Point, wkt
 
 from edriso.grib import (
-    get_vertical_extent,
-    get_temporal_extent,
-    TEMPERATURE_LABEL,
+    ISOBARIC_LABEL,
     LAT_LABEL,
     LON_LABEL,
+    TEMPERATURE_LABEL,
     UWIND_LABEL,
     VWIND_LABEL,
-    ISOBARIC_LABEL,
+    get_temporal_extent,
+    get_vertical_extent,
+)
+from edriso.initialize import (
+    CELSIUS_ID,
+    CELSIUS_SYMBOL,
+    COLLECTION_NAME,
+    DEGREE_ID,
+    DEGREE_SYMBOL,
+    get_dataset,
 )
 
 POINT_REGEX = "^POINT\\(-?\\d+\\.?\\d* -?\\d+\\.?\\d*\\)$"

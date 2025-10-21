@@ -1,33 +1,33 @@
 """Collections page."""
 
-from functools import lru_cache
-from datetime import timedelta
 import logging
+from datetime import timedelta
+from functools import lru_cache
 from typing import Annotated
-from fastapi import APIRouter, Path
+
 import edr_pydantic
-from edr_pydantic.collections import Collection
-from edr_pydantic.collections import Collections
+from edr_pydantic.collections import Collection, Collections
+from fastapi import APIRouter, Path
 
 from edriso.initialize import (
-    get_dataset,
-    BASE_URL,
-    CELSIUS_SYMBOL,
-    CELSIUS_ID,
     AIRTEMP_ID,
+    BASE_URL,
+    CELSIUS_ID,
+    CELSIUS_SYMBOL,
+    COLLECTION_NAME,
+    CRS_SHORT,
+    DEGREE_ID,
+    DEGREE_SYMBOL,
+    SPEED_ID,
     WINDDIR_ID,
     WINDSPEED_ID,
-    SPEED_ID,
-    DEGREE_SYMBOL,
-    DEGREE_ID,
-    CRS_SHORT,
-    COLLECTION_NAME,
+    get_dataset,
 )
 
 from ..grib import (
-    get_vertical_extent,
     get_spatial_extent,
     get_temporal_extent,
+    get_vertical_extent,
 )
 
 router = APIRouter()

@@ -1,15 +1,17 @@
-import unittest
 import os
+import tempfile
+import unittest
+from datetime import datetime
+
+import pytz
+
+from edriso.grib import get_temporal_extent
 from edriso.initialize import (
-    download_gribfile,
     API_URL,
+    download_gribfile,
     open_grib,
     validate_time_input,
 )
-from edriso.grib import get_temporal_extent
-from datetime import datetime
-import tempfile
-import pytz
 
 datafile = ""
 data_path = "test_data"

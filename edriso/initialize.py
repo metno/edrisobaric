@@ -1,12 +1,13 @@
 """Initialize configuration data, open grib file."""
 
-import os
-import sys
 import argparse
 import logging
+import os
+import sys
 from datetime import datetime
-import xarray as xr
+
 import requests
+import xarray as xr
 
 from edriso.grib import ISOBARIC_LABEL, TEMPERATURE_LABEL
 

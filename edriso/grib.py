@@ -1,9 +1,9 @@
 """Grib contents operations."""
 
 from datetime import datetime
+
 import pytz
 import xarray as xr
-
 
 # Define labels in grib file
 TEMPERATURE_LABEL = "t"
