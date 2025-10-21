@@ -32,7 +32,7 @@ from edriso.initialize import (
     get_dataset,
 )
 
-POINT_REGEX = "^POINT\\(-?\\d+\\.?\\d* -?\\d+\\.?\\d*\\)$"
+POINT_REGEX = "(?i)^POINT ?\\(-?\\d+\\.?\\d* -?\\d+\\.?\\d*\\)$"
 PRECISION = 2
 
 router = APIRouter()

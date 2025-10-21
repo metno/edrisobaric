@@ -160,7 +160,7 @@
               "schema": {
                 "type": "string",
                 "minLength": 9,
-                "pattern": "^POINT\\(\\d+\\.?\\d* \\d+\\.?\\d*\\)$",
+                "pattern": "(?i)^POINT ?\\(-?\\d+\\.?\\d* -?\\d+\\.?\\d*\\)$",
                 "description": "Coordinates, formated as a WKT point: POINT(11.9384 60.1699)",
                 "title": "Coords"
               },
