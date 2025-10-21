@@ -321,7 +321,7 @@ async def get_isobaric_page(
                         {
                             "loc": ["string", 0],
                             "msg": "Error: No coordinates provided. Example: "
-                            + f'{str(request.base_url)[0:-1]}{request.scope["path"]}'
+                            + f"{str(request.base_url)[0:-1]}{request.scope['path']}"
                             + "?coords=POINT(11.9384%2060.1699)",
                             "type": "string",
                         }
