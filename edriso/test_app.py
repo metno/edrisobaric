@@ -3,7 +3,7 @@
 import unittest
 from fastapi.testclient import TestClient
 
-from app import app
+from edriso.app import app
 
 client = TestClient(app)
 sample_coords = "coords=POINT(11.9384 60.1699)"

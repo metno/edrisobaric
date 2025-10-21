@@ -12,7 +12,7 @@ from covjson_pydantic.coverage import Coverage
 from covjson_pydantic.ndarray import NdArrayFloat
 from math import atan2, pi, sqrt
 
-from initialize import (
+from edriso.initialize import (
     get_dataset,
     CELSIUS_SYMBOL,
     CELSIUS_ID,
@@ -21,7 +21,7 @@ from initialize import (
     COLLECTION_NAME,
 )
 
-from grib import (
+from edriso.grib import (
     get_vertical_extent,
     get_temporal_extent,
     TEMPERATURE_LABEL,
@@ -112,7 +112,8 @@ def create_point(coords: str) -> dict:
     coords_ok, errcoords = check_coords_within_bounds(dataset, point)
     if not coords_ok:
         return JSONResponse(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content=errcoords
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content=errcoords,
         )
 
     # Fetch temperature data for point

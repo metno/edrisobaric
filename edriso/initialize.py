@@ -8,7 +8,7 @@ from datetime import datetime
 import xarray as xr
 import requests
 
-from grib import ISOBARIC_LABEL, TEMPERATURE_LABEL
+from edriso.grib import ISOBARIC_LABEL, TEMPERATURE_LABEL
 
 dataset = xr.Dataset()
 logger = logging.getLogger()

@@ -18,7 +18,7 @@ unittests:
   script:
     - apt update
     - apt install -y libeccodes-dev
-    - cd app
+    - cd edriso
     - pip install tox
     - tox --parallel
   tags:

@@ -5,8 +5,8 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 import uvicorn
 from fastapi import FastAPI
-from routes.routes import routes
-from initialize import BIND_HOST, CONTACT_EMAIL, get_dataset
+from edriso.routes import routes
+from edriso.initialize import BIND_HOST, CONTACT_EMAIL, get_dataset
 
 app = FastAPI(
     openapi_url="/api",
@@ -24,7 +24,6 @@ app = FastAPI(
         "url": "https://api.met.no/doc/support",
         "email": CONTACT_EMAIL,
     },
-    version="0.9.0",
     openapi_tags=[
         {
             "name": "Capabilities",
@@ -57,7 +56,7 @@ async def lifespan() -> AsyncGenerator[None, None]:
     yield
 
 
-app.include_router(routes)
+app.include_router(routes.routes)
 
 
 if __name__ == "__main__":

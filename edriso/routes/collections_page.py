@@ -9,7 +9,7 @@ import edr_pydantic
 from edr_pydantic.collections import Collection
 from edr_pydantic.collections import Collections
 
-from initialize import (
+from edriso.initialize import (
     get_dataset,
     BASE_URL,
     CELSIUS_SYMBOL,
@@ -24,7 +24,7 @@ from initialize import (
     COLLECTION_NAME,
 )
 
-from grib import (
+from ..grib import (
     get_vertical_extent,
     get_spatial_extent,
     get_temporal_extent,
