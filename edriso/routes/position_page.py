@@ -2,7 +2,7 @@
 
 import logging
 from math import atan2, pi, sqrt
-from typing import Annotated, List, Tuple
+from typing import Annotated
 
 import covjson_pydantic
 import xarray as xr
@@ -122,9 +122,9 @@ def create_point(coords: str) -> dict:
     )
 
     isobaric_values = get_vertical_extent(dataset)
-    temperature_values: List[float] = []
-    wind_dir: List[float] = []
-    wind_speed: List[float] = []
+    temperature_values: list[float] = []
+    wind_dir: list[float] = []
+    wind_speed: list[float] = []
 
     # For each temperature value found:
     for temperature in temperatures:
@@ -258,7 +258,7 @@ def create_point(coords: str) -> dict:
     return cov.model_dump(exclude_none=True)
 
 
-def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, dict]:
+def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> tuple[bool, dict]:
     """Check coordinates are within bounds of dataset."""
     errmsg = {}
     if (

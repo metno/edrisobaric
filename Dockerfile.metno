@@ -26,7 +26,7 @@ RUN mkdir /app/data && chown -R edriso:edriso /app
 USER edriso
 
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv python install 3.12 && \
+    uv python install 3.13 && \
     uv venv && \
     uv sync
 

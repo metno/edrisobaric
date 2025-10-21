@@ -7,21 +7,23 @@
 FROM ubuntu:24.04
 COPY --from=ghcr.io/astral-sh/uv:0.9.4 /uv /uvx /bin/
 
-# Set workdir and install app with requirements.
-WORKDIR /app
-COPY edriso/ ./edriso/
-COPY favicon.ico pyproject.toml ./
 # Create user with home dir
 RUN useradd --create-home edriso
 
+# Set workdir and install app with requirements.
+WORKDIR /app
+
 # Create data dir
 RUN mkdir /app/data && chown -R edriso:edriso /app
+
+COPY favicon.ico pyproject.toml ./
+COPY edriso/ ./edriso/
 
 # Run as edriso user
 USER edriso
 
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv python install 3.12 && \
+    uv python install 3.13 && \
     uv venv && \
     uv sync
 

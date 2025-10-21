@@ -1,6 +1,7 @@
 """Initialize configuration data, open grib file."""
 
 import argparse
+import contextlib
 import logging
 import os
 import sys
@@ -41,7 +42,7 @@ COLLECTION_NAME = "weather_forecast"
 def parse_args() -> argparse.Namespace:
     """Parse arguments for grib filename and URL."""
     parser = argparse.ArgumentParser()
-    parser.add_argument(
+    _ = parser.add_argument(
         "--time",
         help=(
             "Timestamp to fetch data for. Must be in format 2024-01-24T18:00:00Z, "
@@ -52,30 +53,31 @@ def parse_args() -> argparse.Namespace:
         ),
         default="",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--file",
         help=("Local grib file to read data from. Default will fetch file from API.\n"),
         default="",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--base_url",
         help="Base URL for API, with a trailing slash. Default is http://localhost:5000/",
         default="http://localhost:5000/",
         required=False,
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--bind_host",
         help="Which host to bind to. Default is 127.0.0.1. Use 0.0.0.0 when running in container.",
         default="127.0.0.1",
+        type=str,
         required=False,
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--api_url",
         help=f"URL to download grib file from. Default is <{DEFAULT_API_URL}>.",
         default=DEFAULT_API_URL,
         required=False,
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--data_path",
         help=f"Where to store data files. Default is {DATA_PATH}",
         default=DATA_PATH,
@@ -167,10 +169,8 @@ def download_gribfile(data_path: str, api_url: str) -> str:
     fname = ""
 
     # Ensure data dir exists
-    try:
+    with contextlib.suppress(FileExistsError):
         os.mkdir(data_path)
-    except FileExistsError:
-        pass
 
     # Download file
     response = requests.get(api_url, timeout=30)
