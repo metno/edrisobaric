@@ -11,7 +11,24 @@ from fastapi.middleware.cors import CORSMiddleware
 from edriso.initialize import BIND_HOST, CONTACT_EMAIL, get_dataset
 from edriso.routes import routes
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    """Runs before startup. Set logging format."""
+    logger = logging.getLogger("uvicorn.access")
+    console_formatter = uvicorn.logging.ColourizedFormatter(
+        "{levelprefix} ({asctime}) : {message}",
+        "%Y-%m-%d %H:%M:%S",
+        style="{",
+        use_colors=True,
+    )
+    logger.handlers[0].setFormatter(console_formatter)
+
+    yield
+
+
 app = FastAPI(
+    lifespan=lifespan,
     openapi_url="/api",
     docs_url="/docs",
     title="edr-isobaric",
@@ -51,23 +68,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-logger = logging.getLogger("uvicorn.access")
-
-
-@asynccontextmanager
-async def lifespan() -> AsyncGenerator[None, None]:
-    """Runs before startup. Set logging format."""
-    console_formatter = uvicorn.logging.ColourizedFormatter(
-        "{levelprefix} ({asctime}) : {message}",
-        "%Y-%m-%d %H:%M:%S",
-        style="{",
-        use_colors=True,
-    )
-    logger.handlers[0].setFormatter(console_formatter)
-
-    yield
-
 
 app.include_router(routes.routes)
 
