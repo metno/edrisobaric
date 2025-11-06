@@ -114,7 +114,11 @@ def open_grib(
     try:
         logger.info("Opening data file %s", filename)
         dataset = xr.open_dataset(
-            filename, engine="cfgrib", decode_cf=True, indexpath=indexpath
+            filename,
+            engine="cfgrib",
+            decode_cf=True,
+            decode_timedelta=True,
+            indexpath=indexpath,
         )
     except ValueError as err:
         logger.error(
