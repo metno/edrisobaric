@@ -2,7 +2,7 @@
 # docker build -t edriso -f Dockerfile .
 
 # run:
-# docker run -it --rm --user edriso --publish 5000:5000 edriso --bind_host 0.0.0.0
+# docker run -it --rm --user edriso --read-only --tmpfs=/tmp --tmpfs=/app/data:mode=1777 --publish 5000:5000 edriso --bind_host 0.0.0.0
 
 FROM ubuntu:24.04
 COPY --from=ghcr.io/astral-sh/uv:0.9.4 /uv /uvx /bin/
@@ -31,5 +31,6 @@ RUN --mount=type=cache,target=/home/edriso/.cache/uv,uid=$UID \
     uv venv && \
     uv sync --compile-bytecode
 
+ENV UV_NO_CACHE=1
 EXPOSE 5000
 ENTRYPOINT ["/usr/bin/uv", "run", "/app/edriso/app.py", "--bind_host", "0.0.0.0"]
