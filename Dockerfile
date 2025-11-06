@@ -2,10 +2,10 @@
 # docker build -t edriso -f Dockerfile .
 
 # run:
-# docker run -it --rm --user edriso --read-only --tmpfs=/tmp --tmpfs=/app/data:mode=1777 --publish 5000:5000 edriso --bind_host 0.0.0.0
+# docker run -it --rm --user edriso --read-only --tmpfs=/tmp --tmpfs=/app/data:mode=0777 --publish 5000:5000 edriso --bind_host 0.0.0.0
 
 FROM ubuntu:24.04
-COPY --from=ghcr.io/astral-sh/uv:0.9.4 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.9.7 /uv /uvx /bin/
 
 ARG UID=10000
 
