@@ -15,9 +15,9 @@ ISOBARIC_LABEL = "isobaricInhPa"
 
 
 def get_vertical_extent(dataset: xr.Dataset) -> list[str]:
-    """Find and return a list of vertical levels, decending."""
+    """Find and return a list of vertical levels, descending."""
     float_list = dataset[TEMPERATURE_LABEL][ISOBARIC_LABEL].data.tolist()
-    str_list = [str(float_list[i]) for i in range(len(float_list))]
+    str_list = [str(val) for val in float_list]
     return str_list
 
 

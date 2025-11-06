@@ -59,16 +59,16 @@ coords_query = Query(
 )
 
 
-def wind_speed_from_u_v(u, v):
+def wind_speed_from_u_v(u: float, v: float) -> float:
     """Calculate wind speed from u and v wind components.
 
     Example copied from
     <https://spire.com/tutorial/how-to-process-grib2-weather-data-for-wind-turbine-applications-shapefile/>.
     """
-    return sqrt(pow(u, 2) + pow(v, 2))
+    return sqrt(u**2 + v**2)
 
 
-def wind_direction_from_u_v(u, v):
+def wind_direction_from_u_v(u: float, v: float) -> float:
     """Calculate wind direction from u and v wind components.
 
     Example copied from
@@ -288,7 +288,7 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> tuple[bool, dict
             "detail": [
                 {
                     "loc": ["string", 0],
-                    "msg": "Error, coord {point.x} out of bounds. Min/max is "
+                    "msg": f"Error, coord {point.x} out of bounds. Min/max is "
                     + f"{ds[TEMPERATURE_LABEL][LON_LABEL].values.min()}/"
                     + f"{ds[TEMPERATURE_LABEL][LON_LABEL].values.max()}",
                     "type": "string",
