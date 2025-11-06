@@ -24,6 +24,7 @@ COPY edriso/ ./edriso/
 # Run as edriso user
 USER edriso
 ENV PATH=/home/edriso/.local/bin:$PATH
+ENV UV_NO_CACHE=1
 
 RUN --mount=type=cache,target=/home/edriso/.cache/uv,uid=$UID \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
