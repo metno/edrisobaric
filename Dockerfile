@@ -31,6 +31,6 @@ RUN --mount=type=cache,target=/home/edriso/.cache/uv,uid=$UID \
     uv venv && \
     uv sync --compile-bytecode
 
-ENV UV_NO_CACHE=1
 EXPOSE 5000
-ENTRYPOINT ["/usr/bin/uv", "run", "/app/edriso/app.py", "--bind_host", "0.0.0.0"]
+ENTRYPOINT ["/usr/bin/uv", "run", "--no-cache", "/app/edriso/app.py", "--bind_host", "0.0.0.0"]
+CMD [ "--data_path", "/tmp" ]
