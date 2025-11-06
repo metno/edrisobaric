@@ -7,6 +7,10 @@ stages:
   - testapi
   - release
 
+variables:
+  # UID to match k8s
+  UID: 17313
+
 default:
   image:
     name: registry.met.no/team-punkt/gitlab-ci/images/docker-punkt:latest
@@ -14,7 +18,7 @@ default:
 
 unittests:
   stage: unittests
-  image: python:3.12-slim
+  image: python:3.13-slim
   script:
     - apt update
     - apt install -y libeccodes-dev
@@ -68,7 +72,7 @@ test:
   script:
     - TMP_IMAGE_NAME="${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}"
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build --build-arg UID=17313 -t $TMP_IMAGE_NAME -f Dockerfile.metno .
+    - docker build --build-arg UID=$UID -t $TMP_IMAGE_NAME -f Dockerfile.metno .
   tags:
     - teampunkt
   rules:
@@ -88,7 +92,7 @@ build_image:
     - RELEASE_TAG="${CI_COMMIT_TAG}-${CI_PIPELINE_IID}"
     - RELEASE_IMAGE_NAME="${CI_REGISTRY_IMAGE}:${RELEASE_TAG}"
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build --pull -t $RELEASE_IMAGE_NAME -f Dockerfile.metno .
+    - docker build --build-arg UID=$UID --pull -t $RELEASE_IMAGE_NAME -f Dockerfile.metno .
     - docker push $RELEASE_IMAGE_NAME
     - echo "RELEASE_IMAGE_NAME=${RELEASE_IMAGE_NAME}" >> build.env
     - echo "RELEASE_TAG=${RELEASE_TAG}" >> build.env
@@ -116,7 +120,7 @@ rebuild_image:
     - RELEASE_TAG="${LAST_GIT_TAG}-${CI_PIPELINE_IID}"
     - RELEASE_IMAGE_NAME="${CI_REGISTRY_IMAGE}:${RELEASE_TAG}"
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build --pull -t $RELEASE_IMAGE_NAME .
+    - docker build --build-arg UID=$UID --pull -t $RELEASE_IMAGE_NAME .
     - docker push $RELEASE_IMAGE_NAME
     - echo "RELEASE_IMAGE_NAME=${RELEASE_IMAGE_NAME}" >> build.env
     - echo "RELEASE_TAG=${RELEASE_TAG}" >> build.env
