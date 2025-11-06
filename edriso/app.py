@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from edriso.initialize import BIND_HOST, CONTACT_EMAIL, get_dataset
 from edriso.routes import routes
@@ -41,6 +42,16 @@ app = FastAPI(
         },
     ],
 )
+
+# Add CORS middleware to allow all origins
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 logger = logging.getLogger("uvicorn.access")
 
 
