@@ -50,8 +50,8 @@ Clone repo and run:
 
 ```bash
 uv venv
-uv pip sync requirements.txt
-uv run app/app.py
+uv pip sync pyproject.toml
+uv run edriso/app.py
 ```
 
 #### Web
