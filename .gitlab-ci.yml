@@ -45,6 +45,7 @@ unittests:
     TRIVY_AUTH_URL: "$CI_REGISTRY"
 
   script:
+    - ls -lha
     - export TRIVY_CACHE_DIR=$(pwd)/.trivycache/
     - mkdir -p ${TRIVY_CACHE_DIR}
     - trivy --version
