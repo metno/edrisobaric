@@ -51,6 +51,8 @@ unittests:
     # Cache cleanup is needed when scanning images with same tags.
     # Does not remove the database
     - time trivy clean --scan-cache
+    # Scan Dockerfile
+    - trivy fs --exit-code 1 --severity MEDIUM,HIGH,CRITICAL --scanners vuln,secret,license,misconfig Dockerfile
     # Builds report and puts it in the default workdir $CI_PROJECT_DIR,
     # so `artifacts:` can take it from there
     - time trivy image --db-repository public.ecr.aws/aquasecurity/trivy-db --java-db-repository public.ecr.aws/aquasecurity/trivy-java-db --exit-code 0 --no-progress --format template --template "@/contrib/junit.tpl" --output "$CI_PROJECT_DIR/${CI_JOB_NAME}.xml" "$RELEASE_IMAGE_NAME"
