@@ -37,9 +37,6 @@ trivy_docker:
     name: docker.io/aquasec/trivy
     entrypoint: [""]
   script:
-    - pwd
-    - ls -lh
-    - ls -lh /
     - export TRIVY_CACHE_DIR=$(pwd)/.trivycache/
     - mkdir -p ${TRIVY_CACHE_DIR}
     # Scan Dockerfile
