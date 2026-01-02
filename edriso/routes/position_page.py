@@ -42,8 +42,8 @@ logger = logging.getLogger()
 # Query for both position routes
 coords_query = Query(
     # This gives a generic error on bad values. We need more contol to follow the profile.
-    #min_length=9,
-    #pattern=POINT_REGEX,
+    # min_length=9,
+    # pattern=POINT_REGEX,
     description="Coordinates, formated as a WKT point: POINT(11.9384 60.1699)",
     openapi_examples={
         "Oslo": {
@@ -101,7 +101,7 @@ def create_point(coords: str) -> dict:
                 "type": "string",
             },
         )
-        response.headers['content-type'] = 'application/problem+json'
+        response.headers["content-type"] = "application/problem+json"
         return response
 
     logger.info("create_data for coord %s, %s", point.y, point.x)
@@ -114,7 +114,7 @@ def create_point(coords: str) -> dict:
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content=errcoords,
         )
-        response.headers['content-type'] = 'application/problem+json'
+        response.headers["content-type"] = "application/problem+json"
         return response
 
     # Fetch temperature data for point
@@ -331,7 +331,7 @@ async def get_isobaric_page(
                 }
             },
         )
-        response.headers['content-type'] = 'application/problem+json'
+        response.headers["content-type"] = "application/problem+json"
         return response
 
     return create_point(coords=coords)

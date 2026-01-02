@@ -46,9 +46,10 @@ def validate_collection_name(collection_name, input_name) -> JSONResponse | None
                 "type": "string",
             },
         )
-        response.headers['content-type'] = 'application/problem+json'
+        response.headers["content-type"] = "application/problem+json"
         return response
     return None
+
 
 @lru_cache
 def create_collection(collection_id: str = "") -> dict:
