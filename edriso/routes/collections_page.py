@@ -7,8 +7,7 @@ from typing import Annotated
 
 import edr_pydantic
 from edr_pydantic.collections import Collection, Collections
-from fastapi import APIRouter, Path, status
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, HTTPException, Path, status
 
 from edriso.initialize import (
     AIRTEMP_ID,
@@ -35,20 +34,18 @@ router = APIRouter()
 logger = logging.getLogger()
 
 
-def validate_collection_name(collection_name, input_name) -> JSONResponse | None:
+def validate_collection_name(collection_name, input_name) -> None:
     if input_name != collection_name:
-        response = JSONResponse(
+        raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            content={
+            detail={
                 "title": "Validation error",
                 "msg": "Error: Bad collection name given. Only valid: 'weather_forecast'",
                 "input": input_name,
                 "type": "string",
             },
+            headers={"content-type": "application/problem+json"},
         )
-        response.headers["content-type"] = "application/problem+json"
-        return response
-    return None
 
 
 @lru_cache
@@ -243,9 +240,7 @@ async def describe_a_collection(
 ) -> dict:
     """Describe a specific collection."""
 
-    # Validate collection name
-    valid = validate_collection_name(COLLECTION_NAME, collection_id)
-    if valid is not None:
-        return valid
+    # Validate collection name, rasies HTTPException on error
+    validate_collection_name(COLLECTION_NAME, collection_id)
 
     return create_collection(collection_id=collection_id)
