@@ -1,14 +1,16 @@
 """Initialize configuration data, open grib file."""
 
+import argparse
+import contextlib
+import logging
 import os
 import sys
-import argparse
-import logging
 from datetime import datetime
-import xarray as xr
-import requests
 
-from grib import ISOBARIC_LABEL, TEMPERATURE_LABEL
+import requests
+import xarray as xr
+
+from edriso.grib import ISOBARIC_LABEL, TEMPERATURE_LABEL
 
 dataset = xr.Dataset()
 logger = logging.getLogger()
@@ -40,7 +42,7 @@ COLLECTION_NAME = "weather_forecast"
 def parse_args() -> argparse.Namespace:
     """Parse arguments for grib filename and URL."""
     parser = argparse.ArgumentParser()
-    parser.add_argument(
+    _ = parser.add_argument(
         "--time",
         help=(
             "Timestamp to fetch data for. Must be in format 2024-01-24T18:00:00Z, "
@@ -51,30 +53,31 @@ def parse_args() -> argparse.Namespace:
         ),
         default="",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--file",
         help=("Local grib file to read data from. Default will fetch file from API.\n"),
         default="",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--base_url",
         help="Base URL for API, with a trailing slash. Default is http://localhost:5000/",
         default="http://localhost:5000/",
         required=False,
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--bind_host",
         help="Which host to bind to. Default is 127.0.0.1. Use 0.0.0.0 when running in container.",
         default="127.0.0.1",
+        type=str,
         required=False,
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--api_url",
         help=f"URL to download grib file from. Default is <{DEFAULT_API_URL}>.",
         default=DEFAULT_API_URL,
         required=False,
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--data_path",
         help=f"Where to store data files. Default is {DATA_PATH}",
         default=DATA_PATH,
@@ -83,7 +86,9 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def open_grib(datafile: str, dataset: xr.Dataset, timestamp: str = "") -> xr.Dataset:
+def open_grib(
+    datafile: str, dataset: xr.Dataset, timestamp: str = ""
+) -> xr.Dataset | None:
     """Open grib file, return dataset."""
     filename = ""
 
@@ -103,7 +108,7 @@ def open_grib(datafile: str, dataset: xr.Dataset, timestamp: str = "") -> xr.Dat
 
     # Check if dir is writable
     indexpath = ""
-    if os.access(os.path.dirname(datafile), os.W_OK):
+    if os.access(os.path.dirname(filename), os.W_OK):
         indexpath = filename + ".idx"
 
     try:
@@ -120,7 +125,7 @@ def open_grib(datafile: str, dataset: xr.Dataset, timestamp: str = "") -> xr.Dat
         logger.info("xarray versions: %s", xr.show_versions())
         return None
     except FileNotFoundError as err:
-        print("open_grib Error: ", err)
+        logger.error("open_grib Error: %s", err)
         return None
     if not validate_grib(dataset):
         return None
@@ -129,19 +134,11 @@ def open_grib(datafile: str, dataset: xr.Dataset, timestamp: str = "") -> xr.Dat
 
 def validate_grib(ds: xr.Dataset) -> bool:
     """Check that variables are as expected."""
-    # print(dataset.coords)
-    # print("Variables in file:")
-    # for v in ds:
-    #     print(
-    #         "Name <%s>   Long name <%s>   Unit <%s>"
-    #         % (v, ds[v].attrs["long_name"], dataset[v].attrs["units"])
-    #     )
-
     if len(ds[ISOBARIC_LABEL]) < 10:
         logger.error("Error: Count of ISOBARIC_LABEL in file is unexpected")
         return False
-    if ds[TEMPERATURE_LABEL] is None:
-        logger.error("Error: Count of TEMPERATURE_LABEL in file is unexpected")
+    if TEMPERATURE_LABEL not in ds:
+        logger.error("Error: TEMPERATURE_LABEL not found in file")
         return False
 
     return True
@@ -152,24 +149,23 @@ def get_dataset() -> xr.Dataset:
     global dataset
 
     if len(dataset) == 0:
-        dataset = open_grib(DATAFILE, dataset, TIME)
-        if dataset is None:
-            print(
-                f"get_dataset Error: Unable to open grib file. DATAFILE {DATAFILE}, TIME {TIME}"
+        result = open_grib(DATAFILE, dataset, TIME)
+        if result is None:
+            logger.error(
+                "get_dataset Error: Unable to open grib file. DATAFILE %s, TIME %s",
+                DATAFILE,
+                TIME,
             )
             sys.exit(1)
+        dataset = result
     return dataset
 
 
 def download_gribfile(data_path: str, api_url: str) -> str:
     """Download latest file. Return filename."""
-    fname = ""
-
     # Ensure data dir exists
-    try:
+    with contextlib.suppress(FileExistsError):
         os.mkdir(data_path)
-    except FileExistsError:
-        pass
 
     # Download file
     response = requests.get(api_url, timeout=30)
@@ -179,7 +175,7 @@ def download_gribfile(data_path: str, api_url: str) -> str:
         )
         if TIME:
             error += f" Check if time {TIME} exists in available data set at <{AVAILABLE_API}>."
-        print(error)
+        logger.error(error)
         sys.exit(1)
 
     fname = (
@@ -198,10 +194,10 @@ def download_gribfile(data_path: str, api_url: str) -> str:
     logger.info("Download done.")
 
     # Remove index file if exists
-    for f in os.listdir(data_path):
-        if f.startswith(fname) and f.endswith(".idx"):
-            logger.warning("Removing index file %s", f)
-            os.remove(f)
+    index_path = os.path.join(data_path, fname + ".idx")
+    if os.path.exists(index_path):
+        logger.warning("Removing index file %s", index_path)
+        os.remove(index_path)
 
     return fname
 
@@ -214,12 +210,13 @@ def validate_time_input(t: str) -> bool:
                 t, "%Y-%m-%dT%H:00:00Z"
             )  # 2024-01-24T18:00:00Z
             if test_time.hour % 3 != 0:
-                print(
-                    f"Time must be a whole 3 hour interval (00, 03, 06, 09, 12, 15, 18, 21). You gave {t}"
+                logger.error(
+                    "Time must be a whole 3 hour interval (00, 03, 06, 09, 12, 15, 18, 21). You gave %s",
+                    t,
                 )
                 return False
         except ValueError:
-            print(f"Time must be on format 2024-01-24T18:00:00Z. You gave {t}.")
+            logger.error("Time must be on format 2024-01-24T18:00:00Z. You gave %s.", t)
             return False
     return True
 

@@ -1,38 +1,38 @@
 """Collections page."""
 
-from typing import List, Tuple, Annotated
 import logging
-from fastapi import APIRouter, status, Request, Query
-from fastapi.responses import JSONResponse
-import xarray as xr
-from pydantic import AwareDatetime
-from shapely import wkt, GEOSException, Point
+from math import atan2, pi, sqrt
+from typing import Annotated
+
 import covjson_pydantic
+import xarray as xr
 from covjson_pydantic.coverage import Coverage
 from covjson_pydantic.ndarray import NdArrayFloat
-from math import atan2, pi, sqrt
+from fastapi import APIRouter, Query, Request, status
+from fastapi.responses import JSONResponse
+from pydantic import AwareDatetime
+from shapely import GEOSException, Point, wkt
 
-from initialize import (
-    get_dataset,
-    CELSIUS_SYMBOL,
-    CELSIUS_ID,
-    DEGREE_SYMBOL,
-    DEGREE_ID,
-    COLLECTION_NAME,
-)
-
-from grib import (
-    get_vertical_extent,
-    get_temporal_extent,
-    TEMPERATURE_LABEL,
+from edriso.grib import (
+    ISOBARIC_LABEL,
     LAT_LABEL,
     LON_LABEL,
+    TEMPERATURE_LABEL,
     UWIND_LABEL,
     VWIND_LABEL,
-    ISOBARIC_LABEL,
+    get_temporal_extent,
+    get_vertical_extent,
+)
+from edriso.initialize import (
+    CELSIUS_ID,
+    CELSIUS_SYMBOL,
+    COLLECTION_NAME,
+    DEGREE_ID,
+    DEGREE_SYMBOL,
+    get_dataset,
 )
 
-POINT_REGEX = "^POINT\\(-?\\d+\\.?\\d* -?\\d+\\.?\\d*\\)$"
+POINT_REGEX = "(?i)^POINT ?\\(-?\\d+\\.?\\d* -?\\d+\\.?\\d*\\)$"
 PRECISION = 2
 
 router = APIRouter()
@@ -59,16 +59,16 @@ coords_query = Query(
 )
 
 
-def wind_speed_from_u_v(u, v):
+def wind_speed_from_u_v(u: float, v: float) -> float:
     """Calculate wind speed from u and v wind components.
 
     Example copied from
     <https://spire.com/tutorial/how-to-process-grib2-weather-data-for-wind-turbine-applications-shapefile/>.
     """
-    return sqrt(pow(u, 2) + pow(v, 2))
+    return sqrt(u**2 + v**2)
 
 
-def wind_direction_from_u_v(u, v):
+def wind_direction_from_u_v(u: float, v: float) -> float:
     """Calculate wind direction from u and v wind components.
 
     Example copied from
@@ -132,9 +132,9 @@ def create_point(coords: str) -> dict:
     )
 
     isobaric_values = get_vertical_extent(dataset)
-    temperature_values: List[float] = []
-    wind_dir: List[float] = []
-    wind_speed: List[float] = []
+    temperature_values: list[float] = []
+    wind_dir: list[float] = []
+    wind_speed: list[float] = []
 
     # For each temperature value found:
     for temperature in temperatures:
@@ -268,7 +268,7 @@ def create_point(coords: str) -> dict:
     return cov.model_dump(exclude_none=True)
 
 
-def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, dict]:
+def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> tuple[bool, dict]:
     """Check coordinates are within bounds of dataset."""
     errmsg = {}
     if (
@@ -298,7 +298,7 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> Tuple[bool, dict
             "detail": [
                 {
                     "loc": ["string", 0],
-                    "msg": "Error, coord {point.x} out of bounds. Min/max is "
+                    "msg": f"Error, coord {point.x} out of bounds. Min/max is "
                     + f"{ds[TEMPERATURE_LABEL][LON_LABEL].values.min()}/"
                     + f"{ds[TEMPERATURE_LABEL][LON_LABEL].values.max()}",
                     "type": "string",
@@ -332,7 +332,7 @@ async def get_isobaric_page(
                         {
                             "loc": ["string", 0],
                             "msg": "Error: No coordinates provided. Example: "
-                            + f'{str(request.base_url)[0:-1]}{request.scope["path"]}'
+                            + f"{str(request.base_url)[0:-1]}{request.scope['path']}"
                             + "?coords=POINT(11.9384%2060.1699)",
                             "type": "string",
                         }

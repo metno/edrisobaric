@@ -1,9 +1,10 @@
 """Mostly to check all URLs reply without crash after code changes."""
 
 import unittest
+
 from fastapi.testclient import TestClient
 
-from app import app
+from edriso.app import app
 
 client = TestClient(app)
 sample_coords = "coords=POINT(11.9384 60.1699)"
@@ -82,4 +83,4 @@ class TestApp(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    _ = unittest.main()

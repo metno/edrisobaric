@@ -1,14 +1,34 @@
 """Uvicorn entry point."""
 
 import logging
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+
 import uvicorn
 from fastapi import FastAPI
-from routes.routes import routes
-from initialize import BIND_HOST, CONTACT_EMAIL, get_dataset
+from fastapi.middleware.cors import CORSMiddleware
+
+from edriso.initialize import BIND_HOST, CONTACT_EMAIL, get_dataset
+from edriso.routes import routes
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    """Runs before startup. Set logging format."""
+    logger = logging.getLogger("uvicorn.access")
+    console_formatter = uvicorn.logging.ColourizedFormatter(
+        "{levelprefix} ({asctime}) : {message}",
+        "%Y-%m-%d %H:%M:%S",
+        style="{",
+        use_colors=True,
+    )
+    logger.handlers[0].setFormatter(console_formatter)
+
+    yield
+
 
 app = FastAPI(
+    lifespan=lifespan,
     openapi_url="/api",
     docs_url="/docs",
     title="edr-isobaric",
@@ -24,7 +44,6 @@ app = FastAPI(
         "url": "https://api.met.no/doc/support",
         "email": CONTACT_EMAIL,
     },
-    version="0.9.0",
     openapi_tags=[
         {
             "name": "Capabilities",
@@ -40,24 +59,17 @@ app = FastAPI(
         },
     ],
 )
-logger = logging.getLogger("uvicorn.access")
 
+# Add CORS middleware to allow all origins
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@asynccontextmanager
-async def lifespan() -> AsyncGenerator[None, None]:
-    """Runs before startup. Set logging format."""
-    console_formatter = uvicorn.logging.ColourizedFormatter(
-        "{levelprefix} ({asctime}) : {message}",
-        "%Y-%m-%d %H:%M:%S",
-        style="{",
-        use_colors=True,
-    )
-    logger.handlers[0].setFormatter(console_formatter)
-
-    yield
-
-
-app.include_router(routes)
+app.include_router(routes.routes)
 
 
 if __name__ == "__main__":

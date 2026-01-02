@@ -1,0 +1,88 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "edriso"
+authors = [
+    {name = "Lars Falk-Petersen", email = "larsfp@met.no"},
+]
+description = "EDR-isobaric is an API for isobaric data (temperature and wind in isobaric layers)."
+keywords = ["meteorology", "forecast", ]
+readme = "README.md"
+license = "MIT AND (Apache-2.0 OR BSD-2-Clause)"
+
+requires-python = ">=3.11"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Framework :: FastAPI",
+    "Framework :: Pydantic",
+    "Framework :: tox",
+]
+dependencies = [
+    "fastapi[standard]~=0.119.0",
+    "uvicorn[standard]~=0.38.0",
+    "eccodes~=2.41.0",
+    "cfgrib==0.9.15.0",
+    "shapely~=2.1.0",
+    "xarray~=2025.10.0",
+    "requests~=2.32.0",
+    "edr-pydantic~=0.7.0",
+    "covjson-pydantic~=0.7.0",
+]
+
+optional-dependencies.dev = [
+    "schemathesis~=4.3.0",
+]
+
+optional-dependencies.tests = [
+    "tox", # For running tests
+]
+
+dynamic = ["version"]
+
+urls.Documentation = "https://github.com/metno/edrisobaric"
+urls.Homepage = "https://github.com/metno/edrisobaric"
+urls.Issues = "https://github.com/metno/edrisobaric/issues"
+urls.Repository = "https://github.com/metno/edrisobaric"
+
+[project.scripts]
+edriso = "edriso:app"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["edriso"]
+
+[tool.setuptools.dynamic]
+version = {attr = "edriso.__version__"}
+
+[tool.setuptools.package-data]
+bris = ["schema/*.json"]
+
+[tool.ruff.lint]
+fixable = ["I"]
+select = [
+    "E",  # pycodestyle
+    "F",  # Pyflakes
+    "UP", # pyupgrade
+    "B",  # flake8-bugbear
+    "SIM",# flake8-simplify
+    "I",  # isort
+]
+ignore = [
+    "E402", # module-import-not-at-top-of-file (E402)
+    "E501", # Line too long
+    "F401", # imported but unused
+]
+
+[tool.mypy]
+ignore_missing_imports = true
+install_types = true
+
+[tool.bandit]
+exclude_dirs = ["tests_data"]

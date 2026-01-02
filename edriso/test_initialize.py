@@ -1,15 +1,17 @@
-import unittest
 import os
-from initialize import (
-    download_gribfile,
+import tempfile
+import unittest
+from datetime import datetime
+
+import pytz
+
+from edriso.grib import get_temporal_extent
+from edriso.initialize import (
     API_URL,
+    download_gribfile,
     open_grib,
     validate_time_input,
 )
-from grib import get_temporal_extent
-from datetime import datetime
-import tempfile
-import pytz
 
 datafile = ""
 data_path = "test_data"
@@ -51,4 +53,4 @@ class TestInitialize(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    _ = unittest.main()
