@@ -123,7 +123,7 @@ def create_point(coords: str) -> dict:
                         }
                     }
                 }
-            """
+            """,
         )
 
     # Fetch temperature data for point
