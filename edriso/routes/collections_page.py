@@ -35,6 +35,21 @@ router = APIRouter()
 logger = logging.getLogger()
 
 
+def validate_collection_name(collection_name, input_name) -> JSONResponse | None:
+    if input_name != collection_name:
+        response = JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content={
+                "title": "Validation error",
+                "msg": "Error: Bad collection name given. Only valid: 'weather_forecast'",
+                "input": input_name,
+                "type": "string",
+            },
+        )
+        response.headers['content-type'] = 'application/problem+json'
+        return response
+    return None
+
 @lru_cache
 def create_collection(collection_id: str = "") -> dict:
     """Creates the collections page."""
@@ -196,6 +211,17 @@ async def describe_all_collections() -> dict:
     tags=["Collection Metadata"],
     response_model=Collection | Collections,
     response_model_exclude_unset=True,
+    responses={
+        422: {
+            "content": {
+                "application/problem+json": {
+                    "title": "Validation error",
+                    "msg": "Error: Bad collection name given. Only valid: 'weather_forecast'",
+                    "type": "string",
+                },
+            },
+        },
+    },
 )
 async def describe_a_collection(
     collection_id: Annotated[
@@ -217,20 +243,8 @@ async def describe_a_collection(
     """Describe a specific collection."""
 
     # Validate collection name
-    if collection_id != COLLECTION_NAME:
-        response = JSONResponse(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            content={
-                "detail": [
-                    {
-                        "type": "string",
-                        "msg": "Error: Bad collection name given. Only valid: 'weather_forecast'",
-                        "input": collection_id,
-                    }
-                ]
-            },
-        )
-        response.headers['content-type'] = 'application/problem+json'
-        return response
+    valid = validate_collection_name(COLLECTION_NAME, collection_id)
+    if valid is not None:
+        return valid
 
     return create_collection(collection_id=collection_id)

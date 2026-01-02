@@ -41,8 +41,9 @@ logger = logging.getLogger()
 
 # Query for both position routes
 coords_query = Query(
-    min_length=9,
-    pattern=POINT_REGEX,
+    # This gives a generic error on bad values. We need more contol to follow the profile.
+    #min_length=9,
+    #pattern=POINT_REGEX,
     description="Coordinates, formated as a WKT point: POINT(11.9384 60.1699)",
     openapi_examples={
         "Oslo": {
@@ -94,14 +95,10 @@ def create_point(coords: str) -> dict:
         response = JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={
-                "detail": [
-                    {
-                        "type": "string",
-                        "loc": ["query", "coords"],
-                        "msg": errmsg,
-                        "input": coords,
-                    }
-                ]
+                "title": "Validation error",
+                "msg": errmsg,
+                "input": coords,
+                "type": "string",
             },
         )
         response.headers['content-type'] = 'application/problem+json'
@@ -115,13 +112,7 @@ def create_point(coords: str) -> dict:
     if not coords_ok:
         response = JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            content="""
-                {
-                    'schema': {
-                            '$ref': '#/components/schemas/HTTPValidationError'
-                    }
-                }
-            """,
+            content=errcoords,
         )
         response.headers['content-type'] = 'application/problem+json'
         return response
@@ -287,7 +278,8 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> tuple[bool, dict
                 }
             ]
         }
-        logger.error(errmsg)
+
+        # logger.debug(errmsg)
         return False, errmsg
 
     if (
@@ -306,7 +298,7 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> tuple[bool, dict
                 }
             ]
         }
-        logger.error(errmsg)
+        # logger.error(errmsg)
         return False, errmsg
     return True, errmsg
 
@@ -316,20 +308,30 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> tuple[bool, dict
     tags=["Collection Data"],
     response_model=Coverage,
     response_model_exclude_unset=True,
+    responses={
+        422: {
+            "content": {
+                "application/problem+json": {
+                    "type": "string",
+                    "title": "Validation error",
+                    "msg": "Error: Bad coords given.",
+                },
+            },
+        },
+    },
 )
 async def get_isobaric_page(
     request: Request,
-    coords: Annotated[str, coords_query],
+    coords: Annotated[str | None, coords_query] = None,
 ) -> dict:
     """Return data closest to a position."""
-    if len(coords) == 0:
-        return JSONResponse(
+    if coords is None:
+        response = JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={
                 "body": {
                     "detail": [
                         {
-                            "loc": ["string", 0],
                             "msg": "Error: No coordinates provided. Example: "
                             + f"{str(request.base_url)[0:-1]}{request.scope['path']}"
                             + "?coords=POINT(11.9384%2060.1699)",
@@ -339,5 +341,7 @@ async def get_isobaric_page(
                 }
             },
         )
+        response.headers['content-type'] = 'application/problem+json'
+        return response
 
     return create_point(coords=coords)
