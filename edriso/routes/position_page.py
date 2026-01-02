@@ -92,7 +92,6 @@ def create_point(coords: str) -> dict:
         )
         logger.error(errmsg)
         response = JSONResponse(
-            media_type="application/problem+json",
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={
                 "detail": [
@@ -115,7 +114,6 @@ def create_point(coords: str) -> dict:
     coords_ok, errcoords = check_coords_within_bounds(dataset, point)
     if not coords_ok:
         response = JSONResponse(
-            media_type="application/problem+json",
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content="""
                 {
@@ -326,7 +324,6 @@ async def get_isobaric_page(
     """Return data closest to a position."""
     if len(coords) == 0:
         return JSONResponse(
-            media_type="application/problem+json",
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={
                 "body": {

@@ -7,7 +7,8 @@ from typing import Annotated
 
 import edr_pydantic
 from edr_pydantic.collections import Collection, Collections
-from fastapi import APIRouter, Path
+from fastapi import APIRouter, Path, status
+from fastapi.responses import JSONResponse
 
 from edriso.initialize import (
     AIRTEMP_ID,
@@ -200,7 +201,8 @@ async def describe_a_collection(
     collection_id: Annotated[
         str,
         Path(
-            pattern=f"^{COLLECTION_NAME}$",
+            # This gives a generic error on bad names. We need more contol to follow the profile.
+            # pattern=f"^{COLLECTION_NAME}$",
             description=f"Only available collection is {COLLECTION_NAME}",
             openapi_examples={
                 COLLECTION_NAME: {
@@ -213,4 +215,22 @@ async def describe_a_collection(
     ],
 ) -> dict:
     """Describe a specific collection."""
+
+    # Validate collection name
+    if collection_id != COLLECTION_NAME:
+        response = JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content={
+                "detail": [
+                    {
+                        "type": "string",
+                        "msg": "Error: Bad collection name given. Only valid: 'weather_forecast'",
+                        "input": collection_id,
+                    }
+                ]
+            },
+        )
+        response.headers['content-type'] = 'application/problem+json'
+        return response
+
     return create_collection(collection_id=collection_id)
