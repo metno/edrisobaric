@@ -91,7 +91,7 @@ def create_point(coords: str) -> dict:
             + f"POINT(11.0 59.0). You gave <{coords}>"
         )
         logger.error(errmsg)
-        return JSONResponse(
+        response = JSONResponse(
             media_type="application/problem+json",
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={
@@ -105,6 +105,8 @@ def create_point(coords: str) -> dict:
                 ]
             },
         )
+        response.headers['content-type'] = 'application/problem+json'
+        return response
 
     logger.info("create_data for coord %s, %s", point.y, point.x)
     dataset = get_dataset()
@@ -112,19 +114,19 @@ def create_point(coords: str) -> dict:
     # Sanity check on coordinates
     coords_ok, errcoords = check_coords_within_bounds(dataset, point)
     if not coords_ok:
-        return JSONResponse(
+        response = JSONResponse(
             media_type="application/problem+json",
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content="""
                 {
-                    'application/problem+json': {
-                        'schema': {
+                    'schema': {
                             '$ref': '#/components/schemas/HTTPValidationError'
-                        }
                     }
                 }
             """,
         )
+        response.headers['content-type'] = 'application/problem+json'
+        return response
 
     # Fetch temperature data for point
     temperatures = dataset[TEMPERATURE_LABEL].sel(
