@@ -41,8 +41,9 @@ logger = logging.getLogger()
 
 # Query for both position routes
 coords_query = Query(
-    min_length=9,
-    pattern=POINT_REGEX,
+    # This gives a generic error on bad values. We need more contol to follow the profile.
+    # min_length=9,
+    # pattern=POINT_REGEX,
     description="Coordinates, formated as a WKT point: POINT(11.9384 60.1699)",
     openapi_examples={
         "Oslo": {
@@ -91,19 +92,17 @@ def create_point(coords: str) -> dict:
             + f"POINT(11.0 59.0). You gave <{coords}>"
         )
         logger.error(errmsg)
-        return JSONResponse(
+        response = JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={
-                "detail": [
-                    {
-                        "type": "string",
-                        "loc": ["query", "coords"],
-                        "msg": errmsg,
-                        "input": coords,
-                    }
-                ]
+                "title": "Validation error",
+                "msg": errmsg,
+                "input": coords,
+                "type": "string",
             },
         )
+        response.headers["content-type"] = "application/problem+json"
+        return response
 
     logger.info("create_data for coord %s, %s", point.y, point.x)
     dataset = get_dataset()
@@ -111,10 +110,12 @@ def create_point(coords: str) -> dict:
     # Sanity check on coordinates
     coords_ok, errcoords = check_coords_within_bounds(dataset, point)
     if not coords_ok:
-        return JSONResponse(
+        response = JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content=errcoords,
         )
+        response.headers["content-type"] = "application/problem+json"
+        return response
 
     # Fetch temperature data for point
     temperatures = dataset[TEMPERATURE_LABEL].sel(
@@ -266,18 +267,14 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> tuple[bool, dict
         or point.y < ds[TEMPERATURE_LABEL][LAT_LABEL].values.min()
     ):
         errmsg = {
-            "detail": [
-                {
-                    "loc": ["string", 0],
-                    "msg": f"Error, coord {point.y} out of bounds. Min/max is "
-                    + f"{ds[TEMPERATURE_LABEL][LAT_LABEL].values.min()}/"
-                    + f"{ds[TEMPERATURE_LABEL][LAT_LABEL].values.max()}",
-                    "type": "string",
-                    "input": point.y,
-                }
-            ]
+            "msg": f"Error, coord {point.y} out of bounds. Min/max is "
+            + f"{ds[TEMPERATURE_LABEL][LAT_LABEL].values.min()}/"
+            + f"{ds[TEMPERATURE_LABEL][LAT_LABEL].values.max()}",
+            "input": point.y,
+            "type": "string",
         }
-        logger.error(errmsg)
+
+        # logger.debug(errmsg)
         return False, errmsg
 
     if (
@@ -285,18 +282,13 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> tuple[bool, dict
         or point.x < ds[TEMPERATURE_LABEL][LON_LABEL].values.min()
     ):
         errmsg = {
-            "detail": [
-                {
-                    "loc": ["string", 0],
-                    "msg": f"Error, coord {point.x} out of bounds. Min/max is "
-                    + f"{ds[TEMPERATURE_LABEL][LON_LABEL].values.min()}/"
-                    + f"{ds[TEMPERATURE_LABEL][LON_LABEL].values.max()}",
-                    "type": "string",
-                    "input": point.x,
-                }
-            ]
+            "msg": f"Error, coord {point.x} out of bounds. Min/max is "
+            + f"{ds[TEMPERATURE_LABEL][LON_LABEL].values.min()}/"
+            + f"{ds[TEMPERATURE_LABEL][LON_LABEL].values.max()}",
+            "input": point.x,
+            "type": "string",
         }
-        logger.error(errmsg)
+        # logger.error(errmsg)
         return False, errmsg
     return True, errmsg
 
@@ -306,20 +298,30 @@ def check_coords_within_bounds(ds: xr.Dataset, point: Point) -> tuple[bool, dict
     tags=["Collection Data"],
     response_model=Coverage,
     response_model_exclude_unset=True,
+    responses={
+        422: {
+            "content": {
+                "application/problem+json": {
+                    "type": "string",
+                    "title": "Validation error",
+                    "msg": "Error: Bad coords given.",
+                },
+            },
+        },
+    },
 )
 async def get_isobaric_page(
     request: Request,
-    coords: Annotated[str, coords_query],
+    coords: Annotated[str | None, coords_query] = None,
 ) -> dict:
     """Return data closest to a position."""
-    if len(coords) == 0:
-        return JSONResponse(
+    if coords is None:
+        response = JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={
                 "body": {
                     "detail": [
                         {
-                            "loc": ["string", 0],
                             "msg": "Error: No coordinates provided. Example: "
                             + f"{str(request.base_url)[0:-1]}{request.scope['path']}"
                             + "?coords=POINT(11.9384%2060.1699)",
@@ -329,5 +331,7 @@ async def get_isobaric_page(
                 }
             },
         )
+        response.headers["content-type"] = "application/problem+json"
+        return response
 
     return create_point(coords=coords)
