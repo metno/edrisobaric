@@ -7,7 +7,7 @@ from typing import Annotated
 
 import edr_pydantic
 from edr_pydantic.collections import Collection, Collections
-from fastapi import APIRouter, Path
+from fastapi import APIRouter, HTTPException, Path, status
 
 from edriso.initialize import (
     AIRTEMP_ID,
@@ -32,6 +32,20 @@ from ..grib import (
 
 router = APIRouter()
 logger = logging.getLogger()
+
+
+def validate_collection_name(collection_name, input_name) -> None:
+    if input_name != collection_name:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={
+                "title": "Validation error",
+                "msg": "Error: Bad collection name given. Only valid: 'weather_forecast'",
+                "input": input_name,
+                "type": "string",
+            },
+            headers={"content-type": "application/problem+json"},
+        )
 
 
 @lru_cache
@@ -195,12 +209,24 @@ async def describe_all_collections() -> dict:
     tags=["Collection Metadata"],
     response_model=Collection | Collections,
     response_model_exclude_unset=True,
+    responses={
+        422: {
+            "content": {
+                "application/problem+json": {
+                    "title": "Validation error",
+                    "msg": "Error: Bad collection name given. Only valid: 'weather_forecast'",
+                    "type": "string",
+                },
+            },
+        },
+    },
 )
 async def describe_a_collection(
     collection_id: Annotated[
         str,
         Path(
-            pattern=f"^{COLLECTION_NAME}$",
+            # This gives a generic error on bad names. We need more contol to follow the profile.
+            # pattern=f"^{COLLECTION_NAME}$",
             description=f"Only available collection is {COLLECTION_NAME}",
             openapi_examples={
                 COLLECTION_NAME: {
@@ -213,4 +239,8 @@ async def describe_a_collection(
     ],
 ) -> dict:
     """Describe a specific collection."""
+
+    # Validate collection name, rasies HTTPException on error
+    validate_collection_name(COLLECTION_NAME, collection_id)
+
     return create_collection(collection_id=collection_id)
