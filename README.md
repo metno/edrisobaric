@@ -46,11 +46,11 @@ docker run -it --rm --publish 5000:5000 ghcr.io/metno/edrisobaric:main --bind_ho
 
 #### Build using Uv
 
-Clone repo and run:
+Clone repo and run (requires eccodes lib):
 
 ```bash
 uv venv
-uv pip sync pyproject.toml
+uv sync
 uv run edriso/app.py
 ```
 
