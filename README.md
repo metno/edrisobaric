@@ -112,7 +112,7 @@ This project is heavily tested to serve as an example for API developers and of 
 
 - This API is tested on commit to internal [gitlab](https://gitlab.met.no/team-punkt/hydra/lekestue/edrisobaric/-/blob/main/.gitlab-ci.yml)
 - This API is tested on commit to public [github](https://gitlab.met.no/team-punkt/hydra/lekestue/edrisobaric/-/blob/main/.github/workflows/tests.yml?ref_type=heads)
-- To run tests use `uv tool run tox`.
+- To run tests use `uvx tox`. Doesn't run in a container, so requires eccodes lib installed.
 
 ### Other APIs for comparison
 
