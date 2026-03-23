@@ -32,6 +32,7 @@ dependencies = [
     "requests~=2.32.0",
     "edr-pydantic~=0.7.0",
     "covjson-pydantic~=0.7.0",
+    "urllib3~=2.6.0",
 ]
 
 optional-dependencies.dev = [
