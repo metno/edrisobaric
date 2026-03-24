@@ -39,7 +39,7 @@ trivy_docker:
   tags:
     - teampunkt
   image:
-    name: docker.io/aquasec/trivy
+    name: docker.io/aquasec/trivy:0.69.3@sha256:7228e304ae0f610a1fad937baa463598cadac0c2ac4027cc68f3a8b997115689
     entrypoint: [""]
   script:
     - export TRIVY_CACHE_DIR=$(pwd)/.trivycache/
