@@ -104,6 +104,23 @@ def create_point(coords: str) -> dict:
         response.headers["content-type"] = "application/problem+json"
         return response
 
+    if point.geom_type == "MultiPoint":
+        errmsg = (
+            "Error, coords of type MULTIPOINT is not supported. You gave <{coords}>"
+        )
+        logger.error(errmsg)
+        response = JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content={
+                "title": "Validation error",
+                "msg": errmsg,
+                "input": coords,
+                "type": "string",
+            },
+        )
+        response.headers["content-type"] = "application/problem+json"
+        return response
+
     logger.info("create_data for coord %s, %s", point.y, point.x)
     dataset = get_dataset()
 
