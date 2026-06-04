@@ -84,7 +84,6 @@ class TestApp(unittest.TestCase):
         self.assertEqual(response.status_code, 422)
         self.assertIn("coords of type MULTIPOINT is not supported", response.text)
 
-
     def test_api(self) -> None:
         response = client.get("/api", follow_redirects=False)
         self.assertEqual(response.status_code, 200)
