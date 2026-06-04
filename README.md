@@ -55,8 +55,10 @@ uv run edriso/app.py
 ```
 
 #### Web
-
-A test instance is available at <https://edrisobaric.k8s.met.no/>.
+- A test instance is available at <https://edrisobaric.k8s.met.no/>.
+- Compliance can be tested with
+  - https://github.com/metno/sedr
+  - https://ogcbrowser.rauhala.app/
 
 ## Usage
 
