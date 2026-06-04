@@ -10,7 +10,7 @@ stages:
 variables:
   # UID to match k8s
   K8SUID: 17313
-  BASE_IMAGE: registry.met.no/baseimg/ubuntu:24.04
+  BASE_IMAGE: registry.met.no/baseimg/ubuntu:26.04
 
 default:
   image:
