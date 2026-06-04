@@ -77,6 +77,14 @@ class TestApp(unittest.TestCase):
         response = client.get(f"/collections/{collection_name}/")
         self.assertEqual(response.status_code, 200)
 
+        # Test multipoint, which should be rejected
+        response = client.get(
+            f"/collections/{collection_name}/position?coords=MULTIPOINT%28%286.317+58.394%29%2C%288.644+59.140%29%29"
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertIn("coords of type MULTIPOINT is not supported", response.text)
+
+
     def test_api(self) -> None:
         response = client.get("/api", follow_redirects=False)
         self.assertEqual(response.status_code, 200)
