@@ -1,11 +1,14 @@
 # syntax=docker.io/docker/dockerfile:1.3.0
-ARG BASE_IMAGE="ubuntu:24.04"
+
+# build: docker build -f Dockerfile -t edrisobaric .
+
+ARG BASE_IMAGE="ubuntu:26.04"
 FROM ${BASE_IMAGE}
 
 ARG UID=10000
 ARG PYTHON=3.13
 
-COPY --from=ghcr.io/astral-sh/uv:0.9.7 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.11@sha256:b46b03ddfcfbf8f547af7e9eaefdf8a39c8cebcba7c98858d3162bd28cf536f6 /uv /uvx /bin/
 
 # Create user with home dir
 RUN useradd --create-home --uid $UID  edriso
