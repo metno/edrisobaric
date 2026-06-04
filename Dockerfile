@@ -27,7 +27,7 @@ RUN --mount=type=cache,target=/home/edriso/.cache/uv,uid=$UID \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv python install $PYTHON && \
     uv venv && \
-    uv sync --compile-bytecode
+    uv sync --frozen --compile-bytecode
 
 EXPOSE 5000
 ENTRYPOINT ["/usr/bin/uv", "run", "--no-cache", "/app/edriso/app.py", "--bind_host", "0.0.0.0"]
