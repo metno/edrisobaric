@@ -135,7 +135,7 @@ def create_collection(collection_id: str = "") -> dict:
                         query_type="position",
                         output_formats=["CoverageJSON"],
                         default_output_format="CoverageJSON",
-                        multipoint="false" # Advertize we do not support multipoint
+                        multipoint="false",  # Advertize we do not support multipoint
                     ),
                 )
             ),
