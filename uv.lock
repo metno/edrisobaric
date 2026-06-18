@@ -255,14 +255,14 @@ wheels = [
 
 [[package]]
 name = "covjson-pydantic"
-version = "0.7.0"
+version = "0.8.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/77/c5/5e7c474ce0a804ff759d4549aab227f6778264684a7040be60f089713a79/covjson_pydantic-0.7.0.tar.gz", hash = "sha256:9642672ce6c566a1a6dc6c1923c8dce13226cca43cc82b3c871421b521aaa5e2", size = 21366, upload-time = "2025-05-09T11:28:53.337Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4b/2b/130ad9c7b5318974c1aa5da0d73c3c948f695002793253b99ffc896f2dc6/covjson_pydantic-0.8.0.tar.gz", hash = "sha256:66fb12da6634b22ff3c401b3b1e3e42a1abe8dc7830283a0655ca3ec9fc9ade0", size = 22114, upload-time = "2026-06-16T14:36:30.655Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c3/a0/8e0d62342e1905b85ac9cd89da7ca0b8010258cc265d7163aae0e0177baa/covjson_pydantic-0.7.0-py3-none-any.whl", hash = "sha256:af47bff748174d08c426e208e6ae829bfa2f8c4b6a5343ac82c1209f83bfccd1", size = 14149, upload-time = "2025-05-09T11:28:52.373Z" },
+    { url = "https://files.pythonhosted.org/packages/db/91/318355d3a76ee3d52cddf1e4e3c63eb942e80fe917d853722cdeecb09832/covjson_pydantic-0.8.0-py3-none-any.whl", hash = "sha256:c38ce951d2991403a252a28919eb2912cb0c34bf76ddca2fb8d4d1aac31a27bc", size = 14152, upload-time = "2026-06-16T14:36:29.692Z" },
 ]
 
 [[package]]
@@ -285,7 +285,7 @@ wheels = [
 
 [[package]]
 name = "eccodes"
-version = "2.45.0"
+version = "2.47.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
@@ -293,12 +293,12 @@ dependencies = [
     { name = "findlibs" },
     { name = "numpy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e5/c3/41378ba5547fbbb08db9efc7c520bfd0ccf2684bf7fbba0e09eab53b9eff/eccodes-2.45.0.tar.gz", hash = "sha256:08fe1544e6fa597a416bde9a630af4b6e34a021bc3c209f0ece4f7ed5990f992", size = 2466789, upload-time = "2026-01-15T16:27:08.418Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/dc/8d/63d8287e912a99a73fa37b9c821883fb8f09a900187a8c917ba72e3743be/eccodes-2.47.0.tar.gz", hash = "sha256:ae9207ef27c67656d068aab97f172abeb85fc3620f56faa22fdac5b1be75de69", size = 2467378, upload-time = "2026-04-22T11:30:08.465Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ad/1b/903f014d0645811253384f2056f00e9a1c8936a4c158c83f69acf564a4ec/eccodes-2.45.0-cp311-cp311-win_amd64.whl", hash = "sha256:99162409c6ff7e1c2a4836ad246c54ffab8157b6a738e4ed856cf236ea0a8c6e", size = 7406737, upload-time = "2026-01-15T16:26:39.928Z" },
-    { url = "https://files.pythonhosted.org/packages/76/2a/721b05d551f90ed198aa05c2455fd056f4f1742967cee154347eaada2745/eccodes-2.45.0-cp312-cp312-win_amd64.whl", hash = "sha256:b661ce2d0e73ce0724f137606bf6b579fb2eba4db0f5b466b4345170cb4bf5f2", size = 7406814, upload-time = "2026-01-15T16:26:42.454Z" },
-    { url = "https://files.pythonhosted.org/packages/6b/33/3dceb280fbbacb10f8f1e2e1a249a7fd80ce7cc532b69d56c981df21a348/eccodes-2.45.0-cp313-cp313-win_amd64.whl", hash = "sha256:2f07d8892cca722cf67528d3f82d25c851f298cb9b9c6de4c79cb8698857a8ef", size = 7406811, upload-time = "2026-01-15T16:26:39.689Z" },
-    { url = "https://files.pythonhosted.org/packages/7f/40/0a42c7441d76c373a7bef7ec1f535f26910a8c82a37e745ffcd3ea0cdf79/eccodes-2.45.0-py3-none-any.whl", hash = "sha256:0ba61dbd2844843f1fd466c8ca24107932cc40088338f6176428cf38c533c08c", size = 91433, upload-time = "2026-01-15T16:27:06.601Z" },
+    { url = "https://files.pythonhosted.org/packages/09/40/42bb2d98bc6103194d25fa8da141cd43cabf32277cbf2ab513fe35532196/eccodes-2.47.0-cp311-cp311-win_amd64.whl", hash = "sha256:3b71ae31bca13e4b62712405d7eb3c988b71b0b0bbd85fe4d3eacac7fc67ae27", size = 7435928, upload-time = "2026-04-22T11:29:40.702Z" },
+    { url = "https://files.pythonhosted.org/packages/31/01/d8bfb2ac2ec4831789a82cc06afc609a599f5f545dc885da1c8671a308e5/eccodes-2.47.0-cp312-cp312-win_amd64.whl", hash = "sha256:7ab3b689fd3caa07451f7bcf07329b2268acdc7434bcedac8b13d1f20d3389c0", size = 7436009, upload-time = "2026-04-22T11:29:36.343Z" },
+    { url = "https://files.pythonhosted.org/packages/d7/ba/4cbca5157e90d90c318b2acae178d38b0c6c6df73b434e6a2b6a8cb23a2b/eccodes-2.47.0-cp313-cp313-win_amd64.whl", hash = "sha256:f5f9b71b6e2cb8c9b8349b88a09791e8fb6d51a4396d7160b3da2a83149a4973", size = 7436001, upload-time = "2026-04-22T11:29:36.596Z" },
+    { url = "https://files.pythonhosted.org/packages/b3/a3/f58ff573ba0f678ff8116686e868afe436627b19b457a2aba62cd463c9ad/eccodes-2.47.0-py3-none-any.whl", hash = "sha256:13d0b28bd58e94e2c303f42415ca0dcc56ab3febf0f52b1fb0f1d4aa5e7db8e1", size = 91567, upload-time = "2026-04-22T11:30:06.789Z" },
 ]
 
 [[package]]
@@ -341,11 +341,11 @@ tests = [
 
 [package.metadata]
 requires-dist = [
-    { name = "cfgrib", specifier = "==0.9.15.0" },
-    { name = "covjson-pydantic", specifier = "~=0.7.0" },
-    { name = "eccodes", specifier = "~=2.45.0" },
+    { name = "cfgrib", specifier = "~=0.9.15.0" },
+    { name = "covjson-pydantic", specifier = "~=0.8.0" },
+    { name = "eccodes", specifier = "~=2.47.0" },
     { name = "edr-pydantic", specifier = "~=0.7.0" },
-    { name = "fastapi", extras = ["standard"], specifier = "~=0.136.0" },
+    { name = "fastapi", extras = ["standard"], specifier = "~=0.137.0" },
     { name = "pytz", specifier = ">=2026.2" },
     { name = "requests", specifier = "~=2.34.0" },
     { name = "schemathesis", marker = "extra == 'dev'", specifier = "~=4.21.0" },
@@ -372,7 +372,7 @@ wheels = [
 
 [[package]]
 name = "fastapi"
-version = "0.136.3"
+version = "0.137.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "annotated-doc" },
@@ -381,9 +381,9 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "typing-inspection" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/81/2d/ff8d91d7b564d464629a0fd50a4489c97fcb836ac230bf3a7269232a9b1f/fastapi-0.136.3.tar.gz", hash = "sha256:e487fae93ad408e6f47641ee4dfe389864fd7bec92e547ea8498fc13f43e83ab", size = 396410, upload-time = "2026-05-23T18:53:15.192Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e2/29/cc5819dc24d3daa80cdaa1aec023bf8652a70dd7fd1c96b0b225c99a7690/fastapi-0.137.2.tar.gz", hash = "sha256:b9d893bebc97dcfbdcb1917e88a292d062844ea19445a5fa4f7eb28c4baea9e3", size = 410332, upload-time = "2026-06-18T06:58:24.434Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e0/82/45359b62a067409bd929ae8a56b8ed13e5a8c8a61194b3c236920999ab83/fastapi-0.136.3-py3-none-any.whl", hash = "sha256:3d2a69bdf04b7e9f3afa292c3bc7a98816bbfafa10bc9b45f3f3700d2f761620", size = 117481, upload-time = "2026-05-23T18:53:16.924Z" },
+    { url = "https://files.pythonhosted.org/packages/2f/ed/0c6b644e99fb5697d8bdcd36cdb47c52e77a63fc7a1514b1f03a6ecab955/fastapi-0.137.2-py3-none-any.whl", hash = "sha256:791d36261e916a98b25ac85ee591bc3db159394070f6d3d096d94fb378f60ce2", size = 122252, upload-time = "2026-06-18T06:58:26.074Z" },
 ]
 
 [package.optional-dependencies]
