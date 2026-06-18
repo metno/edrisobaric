@@ -18,7 +18,7 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Framework :: FastAPI",
     "Framework :: Pydantic",
     "Framework :: tox",
@@ -64,9 +64,6 @@ include = ["edriso"]
 [tool.setuptools.dynamic]
 version = {attr = "edriso.__version__"}
 
-[tool.setuptools.package-data]
-bris = ["schema/*.json"]
-
 [tool.ruff.lint]
 fixable = ["I"]
 select = [
@@ -88,4 +85,4 @@ ignore_missing_imports = true
 install_types = true
 
 [tool.bandit]
-exclude_dirs = ["tests_data"]
+exclude_dirs = ["test_data"]

@@ -1,6 +1,7 @@
 # syntax=docker.io/docker/dockerfile:1.3.0
 
-# build: docker build -f Dockerfile -t edrisobaric .
+# build: docker build -t edriso -f Dockerfile .
+# run: docker run -it --rm --user edriso --read-only --tmpfs=/tmp --publish 5000:5000 edriso
 
 ARG BASE_IMAGE="ubuntu:26.04"
 FROM ${BASE_IMAGE}
@@ -9,6 +10,11 @@ ARG UID=10000
 ARG PYTHON=3.13
 
 COPY --from=ghcr.io/astral-sh/uv:0.11@sha256:b46b03ddfcfbf8f547af7e9eaefdf8a39c8cebcba7c98858d3162bd28cf536f6 /uv /uvx /bin/
+
+# Install libeccodes-dev
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libeccodes-dev && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Create user with home dir
 RUN useradd --create-home --uid $UID  edriso
@@ -32,9 +38,3 @@ RUN --mount=type=cache,target=/home/edriso/.cache/uv,uid=$UID \
 EXPOSE 5000
 ENTRYPOINT ["/usr/bin/uv", "run", "--no-cache", "/app/edriso/app.py", "--bind_host", "0.0.0.0"]
 CMD [ "--data_path", "/tmp" ]
-
-# build:
-# docker build -t edriso -f Dockerfile .
-
-# run:
-# docker run -it --rm --user edriso --read-only --tmpfs=/tmp --publish 5000:5000 edriso

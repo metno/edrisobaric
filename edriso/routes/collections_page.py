@@ -55,7 +55,7 @@ def create_collection(collection_id: str = "") -> dict:
         href=f"{BASE_URL}collections",
         hreflang="en",
         rel="self",
-        type="aplication/json",
+        type="application/json",
     )
 
     dataset = get_dataset()

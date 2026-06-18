@@ -106,7 +106,7 @@ def create_point(coords: str) -> dict:
 
     if point.geom_type == "MultiPoint":
         errmsg = (
-            "Error, coords of type MULTIPOINT is not supported. You gave <{coords}>"
+            f"Error, coords of type MULTIPOINT is not supported. You gave <{coords}>"
         )
         logger.error(errmsg)
         response = JSONResponse(
