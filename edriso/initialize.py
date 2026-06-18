@@ -87,19 +87,23 @@ def parse_args() -> argparse.Namespace:
 
 
 def open_grib(
-    datafile: str, dataset: xr.Dataset, timestamp: str = ""
+    datafile: str,
+    dataset: xr.Dataset,
+    timestamp: str = "",
+    data_path: str = DATA_PATH,
+    api_url: str = DEFAULT_API_URL,
 ) -> xr.Dataset | None:
     """Open grib file, return dataset."""
     filename = ""
 
     # If nothing given, download default given by API
     if len(datafile) == 0 and timestamp == "":
-        filename = download_gribfile(data_path=DATA_PATH, api_url=API_URL)
+        filename = download_gribfile(data_path=data_path, api_url=api_url)
     else:
         # If timestamp is given, download file for that time
         if timestamp:
             filename = download_gribfile(
-                data_path=DATA_PATH, api_url=f"{API_URL}&time={timestamp}"
+                data_path=data_path, api_url=f"{api_url}&time={timestamp}"
             )
 
         # If datafile is a filename, open that file
@@ -153,7 +157,9 @@ def get_dataset() -> xr.Dataset:
     global dataset
 
     if len(dataset) == 0:
-        result = open_grib(DATAFILE, dataset, TIME)
+        result = open_grib(
+            DATAFILE, dataset, TIME, data_path=DATA_PATH, api_url=API_URL
+        )
         if result is None:
             logger.error(
                 "get_dataset Error: Unable to open grib file. DATAFILE %s, TIME %s",
