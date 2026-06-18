@@ -7,7 +7,7 @@ ARG BASE_IMAGE="ubuntu:26.04"
 FROM ${BASE_IMAGE}
 
 ARG UID=10000
-ARG PYTHON=3.13
+ARG PYTHON=3.14
 
 COPY --from=ghcr.io/astral-sh/uv:0.11@sha256:b46b03ddfcfbf8f547af7e9eaefdf8a39c8cebcba7c98858d3162bd28cf536f6 /uv /uvx /bin/
 
