@@ -196,7 +196,7 @@ scheduled_vuln_check:
       echo "Tagging $LAST_GIT_TAG -> $NEW_TAG"
       git config user.email "ci@gitlab.met.no"
       git config user.name "GitLab CI"
-      git remote set-url origin "https://gitlab-ci-token:${PROJECT_ACCESS_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+      git remote set-url origin "https://oauth2:${PROJECT_ACCESS_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
       git tag "$NEW_TAG" "$LAST_GIT_TAG"
       git push origin "$NEW_TAG"
       echo "NEW_TAG=${NEW_TAG}" >> vuln_check.env
