@@ -9,3 +9,9 @@ test_data/*.idx
 *.log
 .zed/
 *.egg-info/
+
+
+# APM dependencies
+apm_modules/
+.github/instructions/
+.github/copilot-instructions.md

@@ -11,6 +11,7 @@ variables:
   # UID to match k8s
   K8SUID: 17313
   BASE_IMAGE: registry.met.no/baseimg/ubuntu:26.04
+  TRIVY_IMAGE: docker.io/aquasec/trivy:0.69.3@sha256:7228e304ae0f610a1fad937baa463598cadac0c2ac4027cc68f3a8b997115689
 
 default:
   image:
@@ -39,7 +40,7 @@ trivy_docker:
   tags:
     - teampunkt
   image:
-    name: docker.io/aquasec/trivy:0.69.3@sha256:7228e304ae0f610a1fad937baa463598cadac0c2ac4027cc68f3a8b997115689
+    name: $TRIVY_IMAGE
     entrypoint: [""]
   script:
     - export TRIVY_CACHE_DIR=$(pwd)/.trivycache/
@@ -55,7 +56,7 @@ trivy_docker:
   tags:
     - teampunkt
   image:
-    name: docker.io/aquasec/trivy
+    name: $TRIVY_IMAGE
     entrypoint: [""]
   variables:
     # No need to clone the repo, we exclusively work on artifacts.  See
@@ -129,36 +130,85 @@ build_container_scanning:
   dependencies:
     - build_image
 
-rebuild_image:
-  stage: build
+# Requires CI/CD variable PROJECT_ACCESS_TOKEN (scope: write_repository)
+scheduled_vuln_check:
+  stage: scanimage
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
   tags:
     - teampunkt
+  image:
+    name: $TRIVY_IMAGE
+    entrypoint: [""]
+  variables:
+    TRIVY_USERNAME: "$CI_REGISTRY_USER"
+    TRIVY_PASSWORD: "$CI_REGISTRY_PASSWORD"
+    TRIVY_AUTH_URL: "$CI_REGISTRY"
   script:
-    - LAST_GIT_TAG=$(git describe --tags --match="v[0-9]*" --abbrev=0)
-    - if [ -z "$LAST_GIT_TAG" ]; then echo "LAST_GIT_TAG variable not set!"; exit 1;fi
-    - git checkout $LAST_GIT_TAG
-    - RELEASE_TAG="${LAST_GIT_TAG}-${CI_PIPELINE_IID}"
-    - RELEASE_IMAGE_NAME="${CI_REGISTRY_IMAGE}:${RELEASE_TAG}"
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build --build-arg UID=$K8SUID --build-arg BASE_IMAGE=$BASE_IMAGE --pull -t $RELEASE_IMAGE_NAME .
-    - docker push $RELEASE_IMAGE_NAME
-    - echo "RELEASE_IMAGE_NAME=${RELEASE_IMAGE_NAME}" >> build.env
-    - echo "RELEASE_TAG=${RELEASE_TAG}" >> build.env
-  after_script:
-    - source build.env
-    - /teampunkt/chat-message.sh -u "${CI_CHAT_WEBHOOK}" -m "Scheduled rebuild of image ${RELEASE_IMAGE_NAME} for <gitlab project>. Manual deployment."
-  artifacts:
-    reports:
-      dotenv: build.env
+    - |
+      set -e
+      apk add --no-cache git curl jq
+      export TRIVY_CACHE_DIR=$(pwd)/.trivycache/
+      mkdir -p ${TRIVY_CACHE_DIR}
 
-rebuild_container_scanning:
-  extends: .container_scanning
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-  dependencies:
-    - rebuild_image
+      # Find latest release tag
+      LAST_GIT_TAG=$(git describe --tags --match="v[0-9]*" --abbrev=0)
+      if [ -z "$LAST_GIT_TAG" ]; then echo "No tag found"; exit 1; fi
+      echo "Latest tag: $LAST_GIT_TAG"
+
+      # Look up the container image built from this tag via registry API
+      REPO_ID=$(curl -s --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/registry/repositories" \
+        | jq '.[0].id')
+      IMAGE_TAG=$(curl -s --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/registry/repositories/${REPO_ID}/tags?per_page=100" \
+        | jq -r --arg prefix "${LAST_GIT_TAG}-" \
+        '[.[] | select(.name | startswith($prefix))] | sort_by(.created_at) | last | .name')
+      if [ -z "$IMAGE_TAG" ] || [ "$IMAGE_TAG" = "null" ]; then
+        echo "No image found for $LAST_GIT_TAG"
+        exit 1
+      fi
+      SCAN_IMAGE="${CI_REGISTRY_IMAGE}:${IMAGE_TAG}"
+      echo "Scanning $SCAN_IMAGE"
+
+      # Scan for fixable HIGH/CRITICAL vulnerabilities (exit code 10 = vulns found)
+      set +e
+      trivy image --ignore-unfixed --severity HIGH,CRITICAL \
+        --exit-code 10 --no-progress "$SCAN_IMAGE"
+      TRIVY_EXIT=$?
+      set -e
+
+      if [ "$TRIVY_EXIT" -eq 0 ]; then
+        echo "No fixable HIGH/CRITICAL vulnerabilities. No rebuild needed."
+        exit 0
+      elif [ "$TRIVY_EXIT" -ne 10 ]; then
+        echo "Trivy scan error (exit code $TRIVY_EXIT)"
+        exit 1
+      fi
+
+      # Fixable vulnerabilities found - bump patch version and push tag
+      echo "Fixable HIGH/CRITICAL vulnerabilities detected. Creating patch release..."
+      MAJOR=$(echo "$LAST_GIT_TAG" | sed 's/^v//' | cut -d. -f1)
+      MINOR=$(echo "$LAST_GIT_TAG" | sed 's/^v//' | cut -d. -f2)
+      PATCH=$(echo "$LAST_GIT_TAG" | sed 's/^v//' | cut -d. -f3)
+      NEW_TAG="v${MAJOR}.${MINOR}.$((PATCH + 1))"
+      echo "Tagging $LAST_GIT_TAG -> $NEW_TAG"
+      git config user.email "ci@gitlab.met.no"
+      git config user.name "GitLab CI"
+      git remote set-url origin "https://gitlab-ci-token:${PROJECT_ACCESS_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+      git tag "$NEW_TAG" "$LAST_GIT_TAG"
+      git push origin "$NEW_TAG"
+      echo "NEW_TAG=${NEW_TAG}" >> vuln_check.env
+  cache:
+    paths:
+      - .trivycache/
+  after_script:
+    - |
+      if [ -f vuln_check.env ]; then
+        source vuln_check.env
+        /teampunkt/chat-message.sh -u "${CI_CHAT_WEBHOOK}" \
+          -m "Scheduled vulnerability scan for <gitlab project>: fixable HIGH/CRITICAL issues found. Pushed ${NEW_TAG} to trigger rebuild and deploy to dev."
+      fi
 
 testapi:
   stage: testapi
