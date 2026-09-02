@@ -36,6 +36,10 @@ unittests:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
 
 trivy_docker:
+  rules: # Don't run in schedule
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - when: on_success
   stage: scanimage
   tags:
     - teampunkt
