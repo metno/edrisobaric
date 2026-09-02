@@ -157,7 +157,8 @@ scheduled_vuln_check:
 
       # Find latest release tag (strict semver only, ignore -N pipeline suffixes)
       git fetch --tags --force
-      LAST_GIT_TAG=$(git tag -l 'v[0-9]*' --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
+      git tag -l 'v[0-9]*' --sort=-v:refname > release-tags.txt
+      LAST_GIT_TAG=$(awk '/^v[0-9]+\.[0-9]+\.[0-9]+$/ { print; exit }' release-tags.txt)
       if [ -z "$LAST_GIT_TAG" ]; then echo "No tag found"; exit 1; fi
       echo "Latest tag: $LAST_GIT_TAG"
 
