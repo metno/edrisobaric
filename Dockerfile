@@ -19,6 +19,9 @@ RUN apt-get update && \
 # Create user with home dir
 RUN useradd --create-home --uid $UID  edriso
 
+# Unused preinstalled binary
+RUN rm /usr/bin/pebble
+
 # Run as edriso user
 USER edriso
 ENV PATH=/home/edriso/.local/bin:$PATH
@@ -34,9 +37,6 @@ RUN --mount=type=cache,target=/home/edriso/.cache/uv,uid=$UID \
     uv python install $PYTHON && \
     uv venv && \
     uv sync --frozen --compile-bytecode
-
-# Unused preinstalled binary
-RUN rm /usr/bin/pebble
 
 EXPOSE 5000
 ENTRYPOINT ["/usr/bin/uv", "run", "--no-cache", "/app/edriso/app.py", "--bind_host", "0.0.0.0"]
