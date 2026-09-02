@@ -35,6 +35,9 @@ RUN --mount=type=cache,target=/home/edriso/.cache/uv,uid=$UID \
     uv venv && \
     uv sync --frozen --compile-bytecode
 
+# Unused preinstalled binary
+RUN rm /usr/bin/pebble
+
 EXPOSE 5000
 ENTRYPOINT ["/usr/bin/uv", "run", "--no-cache", "/app/edriso/app.py", "--bind_host", "0.0.0.0"]
 CMD [ "--data_path", "/tmp" ]
