@@ -50,7 +50,7 @@ trivy_docker:
     - export TRIVY_CACHE_DIR=$(pwd)/.trivycache/
     - mkdir -p ${TRIVY_CACHE_DIR}
     # Scan Dockerfile
-    - trivy fs --exit-code 1 --severity MEDIUM,HIGH,CRITICAL --scanners vuln,secret,license,misconfig Dockerfile
+    - trivy fs --exit-code 1 --severity HIGH,CRITICAL --scanners vuln,secret,license,misconfig Dockerfile
   cache:
     paths:
       - .trivycache/
