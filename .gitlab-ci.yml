@@ -197,7 +197,7 @@ scheduled_vuln_check:
       git config user.email "ci@gitlab.met.no"
       git config user.name "GitLab CI"
       git remote set-url origin "https://oauth2:${PROJECT_ACCESS_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
-      git tag -f "$NEW_TAG" "$LAST_GIT_TAG"
+      git tag -f -a "$NEW_TAG" "$LAST_GIT_TAG" -m "Automatic redeploy: fixable HIGH/CRITICAL vulnerabilities detected"
       git push origin "$NEW_TAG"
       echo "NEW_TAG=${NEW_TAG}" >> vuln_check.env
   cache:
@@ -207,8 +207,10 @@ scheduled_vuln_check:
     - |
       if [ -f vuln_check.env ]; then
         source vuln_check.env
-        /teampunkt/chat-message.sh -u "${CI_CHAT_WEBHOOK}" \
-          -m "Scheduled vulnerability scan for <gitlab project>: fixable HIGH/CRITICAL issues found. Pushed ${NEW_TAG} to trigger rebuild and deploy to dev."
+        MSG="Scheduled vulnerability scan for <gitlab project>: fixable HIGH/CRITICAL issues found. Pushed ${NEW_TAG} to trigger rebuild and deploy to dev."
+        curl -s -X POST -H 'Content-Type: application/json' \
+          -d "{\"text\": \"${MSG}\"}" \
+          "${CI_CHAT_WEBHOOK}"
       fi
 
 testapi:
