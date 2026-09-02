@@ -9,7 +9,7 @@ FROM ${BASE_IMAGE}
 ARG UID=10000
 ARG PYTHON=3.14
 
-COPY --from=ghcr.io/astral-sh/uv:0.11@sha256:b46b03ddfcfbf8f547af7e9eaefdf8a39c8cebcba7c98858d3162bd28cf536f6 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.12.9@sha256:8b940d3a9d65bed080436972241af2e21c84b5e8c9193f7014ed71479ee795ff /uv /uvx /bin/
 
 # Install libeccodes-dev
 RUN apt-get update && \

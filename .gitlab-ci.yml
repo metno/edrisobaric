@@ -151,8 +151,9 @@ scheduled_vuln_check:
       export TRIVY_CACHE_DIR=$(pwd)/.trivycache/
       mkdir -p ${TRIVY_CACHE_DIR}
 
-      # Find latest release tag
-      LAST_GIT_TAG=$(git describe --tags --match="v[0-9]*" --abbrev=0)
+      # Find latest release tag (strict semver only, ignore -N pipeline suffixes)
+      git fetch --tags --force
+      LAST_GIT_TAG=$(git tag -l 'v[0-9]*' --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
       if [ -z "$LAST_GIT_TAG" ]; then echo "No tag found"; exit 1; fi
       echo "Latest tag: $LAST_GIT_TAG"
 
@@ -197,7 +198,7 @@ scheduled_vuln_check:
       git config user.email "ci@gitlab.met.no"
       git config user.name "GitLab CI"
       git remote set-url origin "https://oauth2:${PROJECT_ACCESS_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
-      git tag -f -a "$NEW_TAG" "$LAST_GIT_TAG" -m "Automatic redeploy: fixable HIGH/CRITICAL vulnerabilities detected"
+      git tag -f -a "$NEW_TAG" "${LAST_GIT_TAG}^{}" -m "Automatic redeploy: fixable HIGH/CRITICAL vulnerabilities detected"
       git push origin "$NEW_TAG"
       echo "NEW_TAG=${NEW_TAG}" >> vuln_check.env
   cache:
