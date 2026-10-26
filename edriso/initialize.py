@@ -5,7 +5,10 @@ import contextlib
 import logging
 import os
 import sys
+import tempfile
 from datetime import datetime
+from pathlib import Path
+from urllib.parse import unquote
 
 import requests
 import xarray as xr
@@ -171,14 +174,45 @@ def get_dataset() -> xr.Dataset:
     return dataset
 
 
+def _safe_download_filename(content_disposition: str | None) -> str:
+    """Return a safe filename from a Content-Disposition header."""
+    filename = ""
+    if content_disposition:
+        for parameter in content_disposition.split(";"):
+            key, separator, value = parameter.partition("=")
+            if separator and key.strip().lower() in {"filename", "filename*"}:
+                filename = value.strip().strip('"')
+                if key.strip().lower() == "filename*" and "''" in filename:
+                    _, filename = filename.split("''", 1)
+                filename = unquote(filename)
+                break
+
+    # A missing filename is valid. Use a fixed name rather than constructing a
+    # path from untrusted response data.
+    if not filename:
+        return "download.bin"
+
+    # Reject absolute paths, path separators, and traversal components. This
+    # also rejects backslashes, which could become separators on another host.
+    path = Path(filename)
+    if (
+        path.is_absolute()
+        or "/" in filename
+        or "\\" in filename
+        or ".." in path.parts
+        or path.name != filename
+    ):
+        raise ValueError("Unsafe filename in Content-Disposition header")
+    return filename
+
+
 def download_gribfile(data_path: str, api_url: str) -> str:
     """Download latest file. Return filename."""
-    # Ensure data dir exists
-    with contextlib.suppress(FileExistsError):
-        os.mkdir(data_path)
+    data_dir = Path(data_path).resolve()
+    data_dir.mkdir(parents=True, exist_ok=True)
 
     # Download file
-    response = requests.get(api_url, timeout=30)
+    response = requests.get(api_url, timeout=30, stream=True)
     if response.status_code != 200:
         error = (
             f"Error: Unable to download data file. Status code {response.status_code}."
@@ -188,28 +222,47 @@ def download_gribfile(data_path: str, api_url: str) -> str:
         logger.error(error)
         sys.exit(1)
 
-    fname = (
-        data_path
-        + os.path.sep
-        + str(response.headers.get("Content-Disposition"))
-        .split("filename=")[1]
-        .replace('"', "")
-    )
+    try:
+        filename = _safe_download_filename(
+            response.headers.get("Content-Disposition")
+        )
+    except ValueError as err:
+        logger.error("Unable to download data file: %s", err)
+        sys.exit(1)
 
-    # The filenames are not to be trusted, so we download and overwrite every time.
-    logger.warning("Downloading %s to path %s.", api_url, fname)
-    with open(fname, "wb") as fd:
-        for chunk in response.iter_content(chunk_size=524288):
-            fd.write(chunk)
+    target = data_dir / filename
+    # Resolve existing symlinks before writing so a response cannot overwrite a
+    # file outside the configured data directory.
+    if target.resolve().parent != data_dir:
+        logger.error("Unable to download data file: target is outside data path")
+        sys.exit(1)
+
+    # Write through a uniquely named temporary file and replace the target
+    # atomically. This avoids following a pre-existing temporary-file symlink.
+    temporary_path: Path | None = None
+    logger.warning("Downloading %s to path %s.", api_url, target)
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="wb", dir=data_dir, prefix=f".{filename}.", suffix=".tmp", delete=False
+        ) as fd:
+            temporary_path = Path(fd.name)
+            for chunk in response.iter_content(chunk_size=524288):
+                if chunk:
+                    fd.write(chunk)
+        os.replace(temporary_path, target)
+    finally:
+        if temporary_path is not None:
+            with contextlib.suppress(FileNotFoundError):
+                temporary_path.unlink()
     logger.info("Download done.")
 
     # Remove index file if exists
-    index_path = os.path.join(data_path, fname + ".idx")
-    if os.path.exists(index_path):
+    index_path = target.with_name(target.name + ".idx")
+    if index_path.exists():
         logger.warning("Removing index file %s", index_path)
-        os.remove(index_path)
+        index_path.unlink()
 
-    return fname
+    return str(target)
 
 
 def validate_time_input(t: str) -> bool:

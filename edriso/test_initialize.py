@@ -8,6 +8,7 @@ import pytz
 from edriso.grib import get_temporal_extent
 from edriso.initialize import (
     API_URL,
+    _safe_download_filename,
     download_gribfile,
     open_grib,
     validate_time_input,
@@ -45,8 +46,28 @@ class TestInitialize(unittest.TestCase):
             datetime(2024, 1, 22, 18, 0, 0, tzinfo=pytz.UTC),
         )
 
+    def test_safe_download_filename(self):
+        """Test that response filenames cannot escape the data directory."""
+        self.assertEqual(
+            _safe_download_filename('attachment; filename="forecast.bin"'),
+            "forecast.bin",
+        )
+        self.assertEqual(
+            _safe_download_filename("attachment; filename*=UTF-8''forecast.bin"),
+            "forecast.bin",
+        )
+        self.assertEqual(_safe_download_filename(None), "download.bin")
+
+        for header in (
+            'attachment; filename="../../outside.bin"',
+            'attachment; filename="/outside.bin"',
+            'attachment; filename="..\\outside.bin"',
+        ):
+            with self.assertRaises(ValueError):
+                _safe_download_filename(header)
+
     def test_validate_time_input(self):
-        """Test that a valid time input is parsed correctly."""
+        """Test that a valid time string is parsed correctly."""
         self.assertTrue(validate_time_input("2024-01-22T18:00:00Z"))
         self.assertFalse(validate_time_input("2024-01-2218:00:00Z"))
         self.assertFalse(validate_time_input("2024-01-22T19:00:00Z"))
