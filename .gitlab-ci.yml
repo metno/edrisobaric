@@ -49,8 +49,8 @@ trivy_docker:
   script:
     - export TRIVY_CACHE_DIR=$(pwd)/.trivycache/
     - mkdir -p ${TRIVY_CACHE_DIR}
-    # Scan Dockerfile
-    - trivy fs --exit-code 1 --severity HIGH,CRITICAL --scanners vuln,secret,license,misconfig Dockerfile
+    # Scan Containerfile
+    - trivy fs --exit-code 1 --severity HIGH,CRITICAL --scanners vuln,secret,license,misconfig Containerfile
   cache:
     paths:
       - .trivycache/
@@ -99,7 +99,7 @@ test:
   script:
     - TMP_IMAGE_NAME="${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}"
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build --build-arg UID=$K8SUID --build-arg BASE_IMAGE=$BASE_IMAGE -t $TMP_IMAGE_NAME .
+    - docker build --build-arg UID=$K8SUID --build-arg BASE_IMAGE=$BASE_IMAGE -t $TMP_IMAGE_NAME -f Containerfile .
   tags:
     - teampunkt
   rules:
@@ -119,7 +119,7 @@ build_image:
     - RELEASE_TAG="${CI_COMMIT_TAG}-${CI_PIPELINE_IID}"
     - RELEASE_IMAGE_NAME="${CI_REGISTRY_IMAGE}:${RELEASE_TAG}"
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build --build-arg UID=$K8SUID --build-arg BASE_IMAGE=$BASE_IMAGE --pull -t $RELEASE_IMAGE_NAME .
+    - docker build --build-arg UID=$K8SUID --build-arg BASE_IMAGE=$BASE_IMAGE --pull -t $RELEASE_IMAGE_NAME -f Containerfile .
     - docker push $RELEASE_IMAGE_NAME
     - echo "RELEASE_IMAGE_NAME=${RELEASE_IMAGE_NAME}" >> build.env
     - echo "RELEASE_TAG=${RELEASE_TAG}" >> build.env

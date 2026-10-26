@@ -1,7 +1,5 @@
-# syntax=docker.io/docker/dockerfile:1.3.0
-
-# build: docker build -t edriso -f Dockerfile .
-# run: docker run -it --rm --user edriso --read-only --tmpfs=/tmp --publish 5000:5000 edriso
+# build: podman build -t edriso -f Containerfile .
+# run: podman run -it --rm --user edriso --read-only --tmpfs=/tmp --publish 5000:5000 edriso
 
 ARG BASE_IMAGE="ubuntu:26.04"
 FROM ${BASE_IMAGE}
