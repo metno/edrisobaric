@@ -45,7 +45,7 @@ dependencies = [
     "pydantic-settings~=2.14.0",
     "python-dotenv~=1.2.0",
     "certifi>=2025.10.19",
-    "anyio>=4.11.0",
+    "anyio>=4.14.2",
     "virtualenv>=20.36.1",
 ]
 
