@@ -223,9 +223,7 @@ def download_gribfile(data_path: str, api_url: str) -> str:
         sys.exit(1)
 
     try:
-        filename = _safe_download_filename(
-            response.headers.get("Content-Disposition")
-        )
+        filename = _safe_download_filename(response.headers.get("Content-Disposition"))
     except ValueError as err:
         logger.error("Unable to download data file: %s", err)
         sys.exit(1)
