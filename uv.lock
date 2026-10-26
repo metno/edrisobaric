@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.12'",
@@ -318,6 +318,7 @@ wheels = [
 name = "edriso"
 source = { editable = "." }
 dependencies = [
+    { name = "certifi" },
     { name = "cfgrib" },
     { name = "click" },
     { name = "covjson-pydantic" },
@@ -349,6 +350,7 @@ tests = [
 
 [package.metadata]
 requires-dist = [
+    { name = "certifi", specifier = ">=2025.10.5" },
     { name = "cfgrib", specifier = "~=0.9.15.0" },
     { name = "click", specifier = "~=8.3.3" },
     { name = "covjson-pydantic", specifier = "~=0.8.0" },

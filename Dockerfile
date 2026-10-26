@@ -9,7 +9,7 @@ FROM ${BASE_IMAGE}
 ARG UID=10000
 ARG PYTHON=3.14
 
-COPY --from=ghcr.io/astral-sh/uv:0.12.9@sha256:8b940d3a9d65bed080436972241af2e21c84b5e8c9193f7014ed71479ee795ff /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.13.5-debian@sha256:477cd3e9492fa6199f4d524198fa75ec03f1c7a64c566cdc7e05fe290042fa3a /usr/local/bin/uv /usr/local/bin/uvx /bin/
 
 # Install libeccodes-dev
 RUN apt-get update && \
@@ -21,6 +21,8 @@ RUN useradd --create-home --uid $UID  edriso
 
 # Unused preinstalled binary
 RUN rm /usr/bin/pebble
+
+RUN mkdir /app && chown edriso /app
 
 # Run as edriso user
 USER edriso
